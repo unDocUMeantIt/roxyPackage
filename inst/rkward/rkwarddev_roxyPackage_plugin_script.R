@@ -309,7 +309,7 @@ JS.preprocess <- rk.paste.JS(
         echo("given=\\\"", rxp.optioncol.aut.given, "\\\""),
         ite(rxp.optioncol.aut.family, echo(", family=\\\"", rxp.optioncol.aut.family, "\\\"")),
         ite(rxp.optioncol.aut.email, echo(", email=\\\"", rxp.optioncol.aut.email, "\\\"")),
-        ite(js.rxp.oset.authors.role, echo(", ", js.rxp.oset.authors.role)),
+        ite(js.rxp.oset.authors.role, echo(js.rxp.oset.authors.role)),
         echo(")"),
         collapse=",\\n\\t\\t\\t"
       ),
@@ -319,7 +319,15 @@ JS.preprocess <- rk.paste.JS(
   echo("\tstringsAsFactors=FALSE\n)\n\n"),
   ## multiple R homes
   ite(id(rxp.valsl.Rhomes, " != \"\""),
-    echo("R.homes <- c(\n\t\"", rxp.valsl.Rhomes, "\"\n)\n\n")
+    echo(
+      "R.homes <- c(\n\t\"", rxp.valsl.Rhomes, "\"\n)\n",
+      "all.homes <- c(R.homes, R.home())\n",
+      "all.libs <- c(file.path(R.homes,\"lib64\",\"R\",\"library\"))\n\n"
+    ),
+    echo(
+      "all.homes <- R.home()\n",
+      "all.libs <- c(file.path(R.home(),\"lib64\",\"R\",\"library\"))\n\n"
+    )
   ),
   ## sandbox
   ite(rxp.frame.sndbx,
@@ -357,15 +365,16 @@ rxp.opt.actions <- rk.JS.options("actions",
   ite(rxp.cbox.action.license, qp("\n\t\t\"license\"")),
   collapse="",
   option="actions",
-  funct="c"
+  funct="c",
+  opt.sep=",\\n\\t"
 )
 
 JS.calculate <- rk.paste.JS(
   rk.JS.vars(rxp.frame.action.deb),
   rxp.opt.actions,
-  echo("roxy.package(\n\t", rxp.opt.actions, ",\n"),
+  echo("roxy.package(", rxp.opt.actions, ",\n"),
     echo("\tpck.description=packageDescription,\n"),
-    echo("\tpck.source.dir=RDir,\n"),
+    echo("\tpck.source.dir=packageRoot,\n"),
     echo("\tpck.version=packageVersion,\n"),
     echo("\tR.homes=all.homes,\n"),
     echo("\tR.libs=all.libs,\n"),
