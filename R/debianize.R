@@ -235,7 +235,7 @@ debianize <- function(
   # gpg will either be NULL, "gpg" or "gpg<version>"
   gpg <- GPGversion(key=gpg.key, version=gpg.version)
   # we also need a native tar for the extra arguments to work
-  neededTools <- c("dpkg-buildpackage", "fakeroot", "dpkg-source", "dpkg-genchanges", "apt-ftparchive", "tar", gpg)
+  neededTools <- c("apt-ftparchive", "dch", "dpkg-buildpackage", "dpkg-genchanges", "dpkg-parsechangelog", "dpkg-source", "fakeroot", "tar", gpg)
 
   # basic checks:
   #  - is this a UNIX system?
