@@ -3,9 +3,12 @@ Type: Package
 Title: Utilities to automate package builds
 Author: m.eik michalke [aut, cre]
 Maintainer: m.eik michalke <meik.michalke@hhu.de>
-Depends: R (>= 2.9.0),methods,roxygen2,XiMpLe (>= 0.03-20)
-Suggests: testthat
-Imports: tools
+Depends:
+    R (>= 2.9.0),methods,roxygen2,XiMpLe (>= 0.03-20)
+Suggests:
+    testthat
+Imports:
+    tools
 Description: The intention of this package is to make packaging R code as easy
     as possible. 'roxyPackage' uses tools from the 'roxygen2' package to generate
     documentation. It also automatically generates and updates files like *-
@@ -23,15 +26,26 @@ URL: http://reaktanz.de/?c=hacking&s=roxyPackage
 Authors@R: c(person(given="m.eik", family="michalke", email="meik.michalke@hhu.de", role=c("aut", "cre")))
 Version: 0.04-3
 Date: 2015-06-29
-Collate: '00_classes_01_ChangeLog_internal.R'
-        '00_classes_02_sandbox_internal.R' '01_methods_01_ChangeLog.R'
-        '01_methods_02_ChangeLog_internal.R'
-        '01_methods_03_sandbox_internal.R' 'ChangeLog_functions.R'
-        'archive.packages.R' 'citationText.R' 'cl2news.R' 'debianize.R'
-        'debianizeKeyring.R' 'dep4deb.R' 'entities.R' 'news2rss.R'
-        'roxy.description.R' 'roxy.html.R' 'roxy.package.R'
-        'roxyPackage-internal.R' 'roxyPackage-internal_debianize.R'
-        'roxyPackage-internal_sandbox.R' 'roxyPackage-package.R'
-        'sandbox.R'
-NeedsCompilation: no
-Packaged: 2015-06-29 18:25:38 UTC; m
+Collate:
+    '00_classes_01_ChangeLog_internal.R'
+    '00_classes_02_sandbox_internal.R'
+    '01_methods_01_ChangeLog.R'
+    '01_methods_02_ChangeLog_internal.R'
+    '01_methods_03_sandbox_internal.R'
+    'ChangeLog_functions.R'
+    'archive.packages.R'
+    'citationText.R'
+    'cl2news.R'
+    'debianize.R'
+    'debianizeKeyring.R'
+    'dep4deb.R'
+    'entities.R'
+    'news2rss.R'
+    'roxy.description.R'
+    'roxy.html.R'
+    'roxy.package.R'
+    'roxyPackage-internal.R'
+    'roxyPackage-internal_debianize.R'
+    'roxyPackage-internal_sandbox.R'
+    'roxyPackage-package.R'
+    'sandbox.R'
