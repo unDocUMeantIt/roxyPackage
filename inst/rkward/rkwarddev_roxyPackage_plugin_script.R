@@ -36,16 +36,25 @@ rxp.tab.about <- rk.XML.col(
         rxp.input.package.version <- rk.XML.input("Package version", required=TRUE,
           help="Set the version number of the R package.")
       ),
-      rk.XML.row(
-        rxp.browser.package.root <- rk.XML.browser("Root directory of the package sources", type="dir", required=TRUE,
-        help="Set the directory where your package code can be found. It is the directory containing at least a subdirectory
-          R with the actual code, and it must be named after the package.")
-      ),
       rk.XML.row(rxp.input.short.desc <- rk.XML.input("Title (short description)", required=TRUE,
         help="Describe your package in a sentence: What does it do? Will be used for the \"Title:\" field of
           the DESCRIPTION file.")),
       rk.XML.row(rxp.input.long.desc <- rk.XML.input("Long description", size="large", required=TRUE,
         help="Give a summary of the package, to be used as the \"Description:\" field of the DESCRIPTION file.")
+      ),
+      rk.XML.row(
+        rxp.browser.package.root <- rk.XML.browser("Root directory of the package sources", type="dir", required=TRUE,
+        help="Set the directory where your package code can be found. It is the directory containing at least a subdirectory
+          R with the actual code, and it must be named after the package.")
+      ),
+      rk.XML.row(
+        rxp.browser.repo.root <- rk.XML.browser("Root directory of the local repository", type="dir", required=TRUE,
+        help="Set the directory where your local package repository should be maintained. It will be created if necessary.",
+        id.name="brw_RootLocRepo"),
+        id.name="row_RootLocRepo"
+      ),
+      rk.XML.row(rxp.input.package.homepage <- rk.XML.input("Package homepage", required=TRUE,
+        help="Provide an URL for the package homepage, to be used as the \"URL:\" field of the DESCRIPTION file.")
       ),
       label="Basic information"
     )
@@ -311,7 +320,7 @@ rxp.tab.create <- rk.XML.col(
   )
 )
 
-rxp.tab.multiR <- rk.XML.col(
+rxp.tab.environment <- rk.XML.col(
   rk.XML.row(
     rk.XML.frame(
       rk.XML.row(
@@ -326,7 +335,7 @@ rxp.tab.multiR <- rk.XML.col(
       label="Build agains multiple R versions"
     ),
     rk.XML.stretch()
-  )
+  )#, rk.XML.row(repository info)
 )
 
 #       deb.description=list(
@@ -387,7 +396,7 @@ rxp.dialog <- rk.XML.dialog(
       "Authors"=rxp.tab.authors,
       "Create options"=rxp.tab.create,
       "Dependencies"=rxp.tab.depends,
-      "R homes"=rxp.tab.multiR,
+      "Environment"=rxp.tab.environment,
       "Debianize"=rxp.tab.debianize
 #       "Sandboxing"=rk.XML.col()
     )
@@ -404,7 +413,9 @@ JS.preprocess <- rk.paste.JS(
     rxp.input.package.name,
     rxp.input.short.desc,
     rxp.input.long.desc,
+    rxp.input.package.homepage,
     rxp.browser.package.root,
+    rxp.browser.repo.root,
     rxp.frame.sndbx,
     rxp.cbox.sndbx.source,
     rxp.cbox.sndbx.Rlibs,
@@ -443,6 +454,55 @@ JS.preprocess <- rk.paste.JS(
       echo("\n\t\t)\",\n")
     )
   ),
+  rk.JS.optionset(rxp.oset.depends, vars=TRUE, guess.getter=guess.getter),
+  ite(id(rxp.optioncol.dep.dep.name, " != \"\""),
+    rk.paste.JS(
+      echo("\tDepends=\""),
+      rk.JS.optionset(rxp.oset.depends,
+        echo(rxp.optioncol.dep.dep.name),
+        ite(rxp.optioncol.dep.dep.version, echo(" (", rxp.optioncol.dep.dep.version, ")")),
+        collapse=","
+      ),
+      echo("\",\n")
+    )
+  ),
+  rk.JS.optionset(rxp.oset.imports, vars=TRUE, guess.getter=guess.getter),
+  ite(id(rxp.optioncol.dep.imp.name, " != \"\""),
+    rk.paste.JS(
+      echo("\tImports=\""),
+      rk.JS.optionset(rxp.oset.imports,
+        echo(rxp.optioncol.dep.imp.name),
+        ite(rxp.optioncol.dep.imp.version, echo(" (", rxp.optioncol.dep.imp.version, ")")),
+        collapse=","
+      ),
+      echo("\",\n")
+    )
+  ),
+  rk.JS.optionset(rxp.oset.suggests, vars=TRUE, guess.getter=guess.getter),
+  ite(id(rxp.optioncol.dep.sug.name, " != \"\""),
+    rk.paste.JS(
+      echo("\tSuggests=\""),
+      rk.JS.optionset(rxp.oset.suggests,
+        echo(rxp.optioncol.dep.sug.name),
+        ite(rxp.optioncol.dep.sug.version, echo(" (", rxp.optioncol.dep.sug.version, ")")),
+        collapse=","
+      ),
+      echo("\",\n")
+    )
+  ),
+  rk.JS.optionset(rxp.oset.enhances, vars=TRUE, guess.getter=guess.getter),
+  ite(id(rxp.optioncol.dep.enh.name, " != \"\""),
+    rk.paste.JS(
+      echo("\tEnhances=\""),
+      rk.JS.optionset(rxp.oset.enhances,
+        echo(rxp.optioncol.dep.enh.name),
+        ite(rxp.optioncol.dep.enh.version, echo(" (", rxp.optioncol.dep.enh.version, ")")),
+        collapse=","
+      ),
+      echo("\",\n")
+    )
+  ),
+  ite(id(rxp.input.package.homepage), echo("\tURL=\"", rxp.input.package.homepage, "\",\n")),
   echo("\tstringsAsFactors=FALSE\n)\n\n"),
   ## multiple R homes
   ite(id(rxp.valsl.Rhomes, " != \"\""),
@@ -505,7 +565,7 @@ JS.calculate <- rk.paste.JS(
     echo("\tpck.version=packageVersion,\n"),
     echo("\tR.homes=all.homes,\n"),
     echo("\tR.libs=all.libs,\n"),
-    echo("\trepo.root=repositoryRoot,\n"),
+    ite(id(rxp.browser.repo.root), echo("\trepo.root=\"", rxp.browser.repo.root, "\",\n")),
 # #   pck.date="2014-01-22","),
 #     roxy.unlink.target=FALSE,"),
     echo("\tcleanup=TRUE,\n"),
