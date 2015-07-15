@@ -42,21 +42,10 @@ rxp.tab.about <- rk.XML.col(
       rk.XML.row(rxp.input.long.desc <- rk.XML.input("Long description", size="large", required=TRUE,
         help="Give a summary of the package, to be used as the \"Description:\" field of the DESCRIPTION file.")
       ),
-      rk.XML.row(
-        rxp.browser.package.root <- rk.XML.browser("Root directory of the package sources", type="dir", required=TRUE,
-        help="Set the directory where your package code can be found. It is the directory containing at least a subdirectory
-          R with the actual code, and it must be named after the package.")
-      ),
-      rk.XML.row(
-        rxp.browser.repo.root <- rk.XML.browser("Root directory of the local repository", type="dir", required=TRUE,
-        help="Set the directory where your local package repository should be maintained. It will be created if necessary.",
-        id.name="brw_RootLocRepo"),
-        id.name="row_RootLocRepo"
-      ),
       rk.XML.row(rxp.input.package.homepage <- rk.XML.input("Package homepage", required=TRUE,
         help="Provide an URL for the package homepage, to be used as the \"URL:\" field of the DESCRIPTION file.")
       ),
-      label="Basic information"
+      label="About the package"
     )
   ),
   rk.XML.stretch()
@@ -320,11 +309,25 @@ rxp.tab.create <- rk.XML.col(
   )
 )
 
-rxp.tab.environment <- rk.XML.col(
-  rk.XML.row(
-    rk.XML.frame(
+rxp.tab.environment <- rk.XML.row(
+  rk.XML.col(
+    rk.XML.row(
+      rxp.browser.package.root <- rk.XML.browser("Root directory of the package sources", type="dir", required=TRUE,
+      help="Set the directory where your package code can be found. It is the directory containing at least a subdirectory
+        R with the actual code, and it must be named after the package.")
+    ),
+    rk.XML.row(
+      rxp.browser.repo.root <- rk.XML.browser("Root directory of the local repository", type="dir", required=TRUE,
+      help="Set the directory where your local package repository should be maintained. It will be created if necessary.",
+      id.name="brw_RootLocRepo"),
+      id.name="row_RootLocRepo"
+    ),
+    rk.XML.stretch()
+  ),# rk.XML.row(repository info)
+  rk.XML.col(
+    rxp.frame.Rhomes <- rk.XML.frame(
       rk.XML.row(
-        rxp.browser.Rhomes <- rk.XML.browser("R homes (defaults to R.home())", type="dir", required=FALSE, help=FALSE)
+        rxp.browser.Rhomes <- rk.XML.browser("R homes (in addition to R.home())", type="dir", required=FALSE, help=FALSE)
       ),
       rk.XML.row(
         rxp.valsl.Rhomes <- rk.XML.valueslot("R homes", source=rxp.browser.Rhomes, property="selection", multi=TRUE, min=0,
@@ -332,10 +335,12 @@ rxp.tab.environment <- rk.XML.col(
             you can define all R root directories to build against here."
         )
       ),
-      label="Build agains multiple R versions"
+      label="Build agains multiple R versions",
+      checkable=TRUE,
+      chk=FALSE
     ),
     rk.XML.stretch()
-  )#, rk.XML.row(repository info)
+  )
 )
 
 #       deb.description=list(
@@ -392,7 +397,7 @@ rxp.tab.debianize <- rk.XML.col(
 rxp.dialog <- rk.XML.dialog(
   rk.XML.tabbook("Create R package",
     tabs=list(
-      "About the package"=rxp.tab.about,
+      "Description"=rxp.tab.about,
       "Authors"=rxp.tab.authors,
       "Create options"=rxp.tab.create,
       "Dependencies"=rxp.tab.depends,
@@ -421,6 +426,7 @@ JS.preprocess <- rk.paste.JS(
     rxp.cbox.sndbx.Rlibs,
     rxp.cbox.sndbx.repo,
     rxp.cbox.sndbx.archive,
+    rxp.frame.Rhomes,
     rxp.browser.sndbx.dir
   ),
   rk.JS.vars(rxp.valsl.Rhomes, join="\\\",\\n\\t\\\""),
@@ -505,7 +511,7 @@ JS.preprocess <- rk.paste.JS(
   ite(id(rxp.input.package.homepage), echo("\tURL=\"", rxp.input.package.homepage, "\",\n")),
   echo("\tstringsAsFactors=FALSE\n)\n\n"),
   ## multiple R homes
-  ite(id(rxp.valsl.Rhomes, " != \"\""),
+  ite(id(rxp.frame.Rhomes, " && ", rxp.valsl.Rhomes, " != \"\""),
     echo(
       "R.homes <- c(\n\t\"", rxp.valsl.Rhomes, "\"\n)\n",
       "all.homes <- c(R.homes, R.home())\n",
