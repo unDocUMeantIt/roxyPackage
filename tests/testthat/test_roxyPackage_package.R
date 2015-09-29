@@ -1,7 +1,3 @@
-## these tests only work in a running R session (e.g., test_dir("path/to/this/dir")),
-## not when called by R CMD check. roxyPackage uses some setwd() calls, triggering
-## an issue with the testthat package. see https://github.com/hadley/testthat/issues/86
-
 # force some dependencies which for unknown reasons are not loaded by testthat itself
 library(roxygen2)
 
