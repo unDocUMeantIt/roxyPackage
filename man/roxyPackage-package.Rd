@@ -5,14 +5,14 @@
 \alias{roxyPackage-package}
 \title{The roxyPackage Package}
 \description{
-Utilities to automate package builds.
+Utilities to Automate Package Builds.
 }
 \details{
 \tabular{ll}{
 Package: \tab roxyPackage\cr
 Type: \tab Package\cr
-Version: \tab 0.04-3\cr
-Date: \tab 2015-06-29\cr
+Version: \tab 0.04-4\cr
+Date: \tab 2015-09-29\cr
 Depends: \tab R (>= 2.9.0),methods,roxygen2,XiMpLe (>= 0.03-20)\cr
 Encoding: \tab UTF-8\cr
 License: \tab GPL (>= 3)\cr

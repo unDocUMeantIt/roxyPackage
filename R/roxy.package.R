@@ -130,8 +130,9 @@
 #'    file. Setting it to an empty string (\code{""}) will remove the file, the default value \code{NULL} will simply keep the file, if one is present.
 #' @param ... Additional options passed through to \code{roxygenize}.
 #' @references
-#' [1] \url{http://cran.r-project.org/web/packages/roxygen2/}
+#' [1] \url{http://cran.r-project.org/package=roxygen2}
 #' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run roxy.package() in a sandbox.
+#' @import roxygen2
 #' @export
 #' @examples
 #' \dontrun{

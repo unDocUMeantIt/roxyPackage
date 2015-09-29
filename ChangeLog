@@ -9,6 +9,8 @@ fixed:
     fixing tests/testthat.R
   - removed leftover tests/test_roxyPackage_package.R
   - updated URL to roxygen2 in docs
+  - fixed title case in title field
+  - fixed imports in NAMESPACE file
 changed:
   - moved unit tests to tests/testthat
   - added dch and dpkg-parsechangelog to dependecy checks of debianize()

@@ -185,8 +185,10 @@ parseChangeLog <- function(file, head="ChangeLog for package", change="changes i
 
 
 ## methods pasteChangeLog()
+#' @import methods
 setGeneric("pasteChangeLog", function(log, ...){standardGeneric("pasteChangeLog")})
 # single ChangeLog item
+#' @import methods
 setMethod("pasteChangeLog",
   signature=signature(log="ChangeLog.items"),
   function(log, item="  -", lineEnd=78, breakAt=c(" "), breakBy="\n    "){
@@ -269,6 +271,7 @@ mergeLists <- function(list1, list2, uniq=TRUE){
 
 
 # single ChangeLog entry
+#' @import methods
 setMethod("pasteChangeLog",
   signature=signature(log="ChangeLog.entry"),
   function(log, change="changes in version", item="  -", lineEnd=78, breakAt=c(" "), breakBy="\n    "){
@@ -279,6 +282,7 @@ setMethod("pasteChangeLog",
 })
 
 # full ChangeLog
+#' @import methods
 setMethod("pasteChangeLog",
   signature=signature(log="ChangeLog"),
   function(log, file=NULL, head="ChangeLog for package", change="changes in version", item="  -", lineEnd=78, breakAt=c(" "), breakBy="\n    "){
@@ -299,12 +303,15 @@ setMethod("pasteChangeLog",
 
 
 # show methods for ChangeLog objects
+#' @import methods
 setMethod("show", signature(object="ChangeLog.items"), function(object){
   cat(pasteChangeLog(object))
 })
+#' @import methods
 setMethod("show", signature(object="ChangeLog.entry"), function(object){
   cat(pasteChangeLog(object))
 })
+#' @import methods
 setMethod("show", signature(object="ChangeLog"), function(object){
   cat(pasteChangeLog(object))
 })

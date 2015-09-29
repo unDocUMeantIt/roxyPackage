@@ -1,6 +1,30 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
+\section{Changes in roxyPackage version 0.04-4 (2015-09-29)}{
+  \subsection{unreleased}{
+    \itemize{
+      \item this release is under development
+    }
+  }
+  \subsection{fixed}{
+    \itemize{
+      \item re-activated the unit tests that were shut down with 0.03-11 due to
+        https://github.com/hadley/testthat/issues/86 as there's now a workaround
+        fixing tests/testthat.R
+      \item removed leftover tests/test_roxyPackage_package.R
+      \item updated URL to roxygen2 in docs
+      \item fixed title case in title field
+      \item fixed imports in NAMESPACE file
+    }
+  }
+  \subsection{changed}{
+    \itemize{
+      \item moved unit tests to tests/testthat
+      \item added dch and dpkg-parsechangelog to dependecy checks of \code{debianize()}
+    }
+  }
+}
 \section{Changes in roxyPackage version 0.04-3 (2015-06-29)}{
   \subsection{fixed}{
     \itemize{

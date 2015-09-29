@@ -18,6 +18,7 @@
 
 ## function rx.tr()
 # helper function to cretae HTML table rows with two columns
+#' @import XiMpLe
 rx.tr <- function(col1, col2){
   return(XMLNode("tr",
     XMLNode("td", col1, attrs=list(valign="top")),
@@ -62,6 +63,7 @@ roxy.NEWS2HTML <- function(newsRd, newsHTML, pckg, css, R.version){
 
 ## function rx.html.switch()
 # mainly for use in roxy.html() to make huge HTML trees better readable
+#' @import XiMpLe
 rx.html.switch <- function(desc, field){
   if(field %in% dimnames(desc)[[2]]){
     switch(EXPR=field,
@@ -80,6 +82,7 @@ rx.html.switch <- function(desc, field){
 
 ## function debRepoInfo()
 # generates HTML code with info how to install packages from the deb repository
+#' @import XiMpLe
 debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
   package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL, repo.path=NULL){
   apt.base.txt <- paste(paste0(URL, "/deb"), dist, comp, sep=" ")
@@ -184,6 +187,7 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
 ## function roxy.html()
 # if index=TRUE, pckg is treated as a list
 # for global repository index outside pckg dir, set index=TRUE and redirect="pckg/"
+#' @import XiMpLe
 roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
   url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, url.deb.repo=NULL, title=NULL, cite="", news="", changelog="", redirect="", rss.file=NULL) {
 
@@ -327,6 +331,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
 ## function roxy.html.cite()
 # tries to create a HTML version of the citation file
 # 'cite.obj' must be a citation object (i.e., inherit from class "bibentry")
+#' @import XiMpLe
 roxy.html.cite <- function(cite.obj, page.css="web.css", package=""){
   cite.mheader <- attr(cite.obj, "mheader")
   cite.text <- gsub("&", "&amp;", cite.obj$textVersion)
