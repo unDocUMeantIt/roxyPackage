@@ -101,7 +101,7 @@
 #'      \item{Depends}{\code{"r-base-core (>= <R vers>)"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format}
 #'      \item{Suggests}{Suggests in \code{DESCRIPTION} in debianized format}
 #'      \item{Maintainer}{generated from \code{\link[base:Sys.info]{Sys.info}} (\code{user <login@@nodename>}), with a warning.}
-#'      \item{Section}{\code{"math"}}
+#'      \item{Section}{\code{"gnu-r"}}
 #'      \item{Priority}{\code{"optional"}}
 #'      \item{Homepage}{URL in \code{DESCRIPTION}}
 #'    }
