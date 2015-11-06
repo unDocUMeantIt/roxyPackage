@@ -30,9 +30,10 @@ install.packages("roxyPackage", repo="http://R.reaktanz.de")
 ```
 
 To automatically get updates, consider adding the repository to your R configuration. You might also
-want to subscribe to the package's RSS feed to get notified of new releases.
+want to subscribe to the package's [RSS feed](http://r.reaktanz.de/pckg/roxyPackage/RSS.xml) to get notified of new releases.
 
-If you're running a Debian based operating system, you might be interested in the precompiled *.deb packages.
+If you're running a Debian based operating system, you might be interested in the
+[precompiled *.deb packages](http://r.reaktanz.de/pckg/roxyPackage/deb_repo.html).
 
 ### Not on CRAN
 
