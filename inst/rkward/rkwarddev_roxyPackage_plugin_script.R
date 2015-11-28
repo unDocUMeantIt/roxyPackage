@@ -483,8 +483,7 @@ JS.preprocess <- rk.paste.JS(
             if(ocolRoleContrib == 1){
               qp("\\\"ctb\\\"")
             } else {},
-            keep.ite=TRUE,
-            level=1
+            keep.ite=TRUE
           ),
           funct="c", option="role", collapse=""),
         echo("person("),
@@ -499,7 +498,7 @@ JS.preprocess <- rk.paste.JS(
           if(js.optionsetAuthors.role){
             echo(js.optionsetAuthors.role)
           } else {},
-          level=7
+          level=4
         ),
         echo(")"),
         collapse=",\\n\\t\\t\\t"
@@ -515,7 +514,7 @@ JS.preprocess <- rk.paste.JS(
           if(dependVersion){
             echo(" (", dependVersion, ")")
           } else {},
-          level=7
+          level=4
         ),
         collapse=","
       )
@@ -530,7 +529,7 @@ JS.preprocess <- rk.paste.JS(
           if(ocolImportVersion){
             echo(" (", ocolImportVersion, ")")
           } else {},
-          level=7
+          level=4
         ),
         collapse=","
       )
@@ -545,7 +544,7 @@ JS.preprocess <- rk.paste.JS(
           if(ocolSuggestVersion){
             echo(" (", ocolSuggestVersion, ")")
           } else {},
-          level=7
+          level=4
         ),
         collapse=","
       )
@@ -560,7 +559,7 @@ JS.preprocess <- rk.paste.JS(
           if(ocolEnhanceVersion){
             echo(" (", ocolEnhanceVersion, ")")
           } else {},
-          level=7
+          level=4
         ),
         collapse=","
       )
@@ -603,20 +602,51 @@ JS.preprocess <- rk.paste.JS(
 )
 
 rxp.opt.actions <- rk.JS.options("actions",
-  ite(actionRoxy, qp("\n\t\t\"roxy\"")),
-  ite(actionPackage, qp("\n\t\t\"package\"")),
-  ite(actionDoc, qp("\n\t\t\"doc\"")),
-  ite(actionLog, qp("\n\t\t\"log\"")),
-  ite(actionCl2news, qp("\n\t\t\"cl2news\"")),
-  ite(actionNews2rss, qp("\n\t\t\"news2rss\"")),
-  ite(actionHtml, qp("\n\t\t\"html\"")),
-  ite(actionWin, qp("\n\t\t\"win\"")),
-  ite(actionMacosx, qp("\n\t\t\"macosx\"")),
-  ite(frameDeb, qp("\n\t\t\"deb\"")),
-  ite(actionCheck, qp("\n\t\t\"check\"")),
-  ite(actionCleanRd, qp("\n\t\t\"cleanRd\"")),
-  ite(actionCite, qp("\n\t\t\"cite\"")),
-  ite(actionLicense, qp("\n\t\t\"license\"")),
+  .ite=js(
+    if(actionRoxy){
+      qp("\n\t\t\"roxy\"")
+    } else {},
+    if(actionPackage){
+      qp("\n\t\t\"package\"")
+    } else {},
+    if(actionDoc){
+      qp("\n\t\t\"doc\"")
+    } else {},
+    if(actionLog){
+      qp("\n\t\t\"log\"")
+    } else {},
+    if(actionCl2news){
+      qp("\n\t\t\"cl2news\"")
+    } else {},
+    if(actionNews2rss){
+      qp("\n\t\t\"news2rss\"")
+    } else {},
+    if(actionHtml){
+      qp("\n\t\t\"html\"")
+    } else {},
+    if(actionWin){
+      qp("\n\t\t\"win\"")
+    } else {},
+    if(actionMacosx){
+      qp("\n\t\t\"macosx\"")
+    } else {},
+    if(frameDeb){
+      qp("\n\t\t\"deb\"")
+    } else {},
+    if(actionCheck){
+      qp("\n\t\t\"check\"")
+    } else {},
+    if(actionCleanRd){
+      qp("\n\t\t\"cleanRd\"")
+    } else {},
+    if(actionCite){
+      qp("\n\t\t\"cite\"")
+    } else {},
+    if(actionLicense){
+      qp("\n\t\t\"license\"")
+    } else {},
+    keep.ite=TRUE
+  ),
   collapse="",
   option="actions",
   funct="c",
@@ -632,39 +662,42 @@ JS.calculate <- rk.paste.JS(
     echo("\tpck.version=packageVersion,\n"),
     echo("\tR.homes=all.homes,\n"),
     echo("\tR.libs=all.libs,\n"),
-    ite(id(envRepoRoot), echo("\trepo.root=\"", envRepoRoot, "\",\n")),
+    js(
+      if(envRepoRoot){
+        echo("\trepo.root=\"", envRepoRoot, "\",\n")
+      } else {},
 # #   pck.date="2014-01-22","),
 #     roxy.unlink.target=FALSE,"),
-    echo("\tcleanup=TRUE,\n"),
-    echo("\tURL=\"http://R.reaktanz.de\",\n"),
-    ite(frameDeb,
-      rk.paste.JS(
-        echo("\tdeb.options=list(\n"),
-          echo("\t\tbuild.dir=file.path(main.root,pck.name),\n"),
-          echo("\t\trevision=deb.revision,\n"),
-          echo("\t\torigin=\"other-reaktanz\",\n"),
-          echo("\t\tdistribution=\"unstable\",\n"),
-          echo("\t\tcomponent=\"main\",\n"),
-          echo("\t\turgency=\"low\",\n"),
-          echo("\t\tchangelog=deb.changelog,\n"),
-          echo("\t\tdeb.description=list(\n"),
-            echo("\t\t\tBuild.Depends.Indep=\"debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs\",\n"),
-            echo("\t\t\tDepends=\"r-base (>= 3.0.0)\",\n"),
-            ite(debMaintainerGivenName,
-              echo("\t\t\tMaintainer=\"", debMaintainerGivenName, " ", debMaintainerFamilyName, " <", debMaintainerEMail, ">\"\n")
-            ),
-          echo("\t\t),\n"),
-          echo("\t\tSection=\"math\",\n"),
-          echo("\t\tPriority=\"optional\"\n"),
-          echo("\t\tactions=c(\"deb\", \"bin\", \"src\"),\n"),
-          echo("\t\toverwrite=c(\"changelog\", \"control\", \"copyright\", \"rules\"),\n"),
-          echo("\t\tbin.opts=\"-rfakeroot -b -uc\",\n"),
-          echo("\t\tarch=\"all\",\n"),
-          echo("\t\tgpg.key=\"DDCDA632\",\n"),
-          echo("\t\tkeep.build=FALSE\n"),
+      echo("\tcleanup=TRUE,\n"),
+      echo("\tURL=\"http://R.reaktanz.de\",\n"),
+      if(frameDeb){
+        echo("\tdeb.options=list(\n")
+        echo("\t\tbuild.dir=file.path(main.root,pck.name),\n")
+        echo("\t\trevision=deb.revision,\n")
+        echo("\t\torigin=\"other-reaktanz\",\n")
+        echo("\t\tdistribution=\"unstable\",\n")
+        echo("\t\tcomponent=\"main\",\n")
+        echo("\t\turgency=\"low\",\n")
+        echo("\t\tchangelog=deb.changelog,\n")
+        echo("\t\tdeb.description=list(\n")
+        echo("\t\t\tBuild.Depends.Indep=\"debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs\",\n")
+        echo("\t\t\tDepends=\"r-base (>= 3.0.0)\",\n")
+        if(debMaintainerGivenName){
+          echo("\t\t\tMaintainer=\"", debMaintainerGivenName, " ", debMaintainerFamilyName, " <", debMaintainerEMail, ">\"\n")
+        } else {}
+        echo("\t\t),\n")
+        echo("\t\tSection=\"math\",\n")
+        echo("\t\tPriority=\"optional\"\n")
+        echo("\t\tactions=c(\"deb\", \"bin\", \"src\"),\n")
+        echo("\t\toverwrite=c(\"changelog\", \"control\", \"copyright\", \"rules\"),\n")
+        echo("\t\tbin.opts=\"-rfakeroot -b -uc\",\n")
+        echo("\t\tarch=\"all\",\n")
+        echo("\t\tgpg.key=\"DDCDA632\",\n")
+        echo("\t\tkeep.build=FALSE\n")
         echo("\t)\n")
-      ),
-      echo("\tdeb.options=list()\n")
+      } else {
+        echo("\tdeb.options=list()\n")
+      }
     ),
     echo("\tChangeLog=ChangeLog.entry,\n"),
     echo("\tRbuildignore=pckg.Rbuildignore,\n"),
