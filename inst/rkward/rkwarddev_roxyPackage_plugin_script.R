@@ -1,7 +1,7 @@
 local({
 ## Vorbereiten
 require(rkwarddev)
-rkwarddev.required("0.06-6")
+rkwarddev.required("0.07-4")
 
 # define where the plugin should write its files
 output.dir <- tempdir()
@@ -9,6 +9,9 @@ output.dir <- tempdir()
 overwrite <- TRUE
 # if you set guess.getters to TRUE, the resulting code will need RKWard >= 0.6.0
 guess.getter <- TRUE
+rk.set.indent(by="  ")
+rk.set.empty.e(TRUE)
+update.translations <- FALSE
 
 ## Berechne
 about.plugin <- rk.XML.about(
@@ -27,127 +30,138 @@ plugin.dependencies <- rk.XML.dependencies(
 
 rk.set.comp("Create R package")
 
-rxp.tab.about <- rk.XML.col(
+tabAbout <- rk.XML.col(
   rk.XML.row(
     rk.XML.frame(
       rk.XML.row(
-        rxp.input.package.name <- rk.XML.input("Package name", required=TRUE,
-          help="Set the name of the R package."),
-        rxp.input.package.version <- rk.XML.input("Package version", required=TRUE,
-          help="Set the version number of the R package.")
+        pckgName <- rk.XML.input("Package name", required=TRUE,
+          help="Set the name of the R package.", id.name="pckgName"),
+        pckgVersion <- rk.XML.input("Package version", required=TRUE,
+          help="Set the version number of the R package.", id.name="pckgVersion")
       ),
-      rk.XML.row(rxp.input.short.desc <- rk.XML.input("Title (short description)", required=TRUE,
+      rk.XML.row(pckgShortDescription <- rk.XML.input("Title (short description)", required=TRUE,
         help="Describe your package in a sentence: What does it do? Will be used for the \"Title:\" field of
-          the DESCRIPTION file.")),
-      rk.XML.row(rxp.input.long.desc <- rk.XML.input("Long description", size="large", required=TRUE,
-        help="Give a summary of the package, to be used as the \"Description:\" field of the DESCRIPTION file.")
+          the DESCRIPTION file.", id.name="pckgShortDescription")),
+      rk.XML.row(pckgLongDescription <- rk.XML.input("Long description", size="large", required=TRUE,
+        help="Give a summary of the package, to be used as the \"Description:\" field of the DESCRIPTION file.", id.name="pckgLongDescription")
       ),
-      rk.XML.row(rxp.input.package.homepage <- rk.XML.input("Package homepage", required=TRUE,
-        help="Provide an URL for the package homepage, to be used as the \"URL:\" field of the DESCRIPTION file.")
+      rk.XML.row(pckgHomepage <- rk.XML.input("Package homepage", required=TRUE,
+        help="Provide an URL for the package homepage, to be used as the \"URL:\" field of the DESCRIPTION file.", id.name="pckgHomepage")
       ),
       label="About the package"
     )
   ),
-  rk.XML.stretch()
+  rk.XML.stretch(),
+  id.name="tabAbout"
 )
 
-rxp.tab.authors <- rk.XML.col(
+tabAuthors <- rk.XML.col(
   rk.XML.row(
     rk.XML.frame(
-      rxp.oset.authors <- rk.XML.optionset(
+      optionsetAuthors <- rk.XML.optionset(
         content=rk.XML.col(rk.XML.stretch(before=list(
           rk.XML.row(
-          about.contact <- rk.XML.row(
+          authContact <- rk.XML.row(
             rk.XML.col(
-              rxp.aut.given <- rk.XML.input("Given name", required=TRUE,
-                help="First name of the package author."),
-              rxp.aut.family <- rk.XML.input("Family name", required=TRUE,
-                help="Family name of the package author."),
-              rxp.aut.email <- rk.XML.input("E-mail", required=FALSE,
-                help="The authors e-mail address, important for bug reports and receiving a myriad of thank yous..."),
-              rk.XML.stretch()),
+              authGivenName <- rk.XML.input("Given name", required=TRUE,
+                help="First name of the package author.", id.name="authGivenName"),
+              authFamilyName <- rk.XML.input("Family name", required=TRUE,
+                help="Family name of the package author.", id.name="authFamilyName"),
+              authEMail <- rk.XML.input("E-mail", required=FALSE,
+                help="The authors e-mail address, important for bug reports and receiving a myriad of thank yous...", id.name="authEMail"),
+              rk.XML.stretch(), id.name="colAuth"),
             rk.XML.col(rk.XML.frame(
-              rxp.aut.auth <- rk.XML.cbox("Author", chk=TRUE,
-                help="Check this if this person is author of the package code."),
-              rxp.aut.maint <- rk.XML.cbox("Maintainer", chk=TRUE,
-                help="Check this if this person maintains the package."),
-              rxp.aut.cntr <- rk.XML.cbox("Contributor", chk=FALSE,
-                help="Check this if this person is a contributor to the package code (e.g., translations)."),
-              rk.XML.stretch(), label="Roles")))
+              roleAuthor <- rk.XML.cbox("Author", chk=TRUE,
+                help="Check this if this person is author of the package code.", id.name="roleAuthor"),
+              roleMaintain <- rk.XML.cbox("Maintainer", chk=TRUE,
+                help="Check this if this person maintains the package.", id.name="roleMaintain"),
+              roleContrib <- rk.XML.cbox("Contributor", chk=FALSE,
+                help="Check this if this person is a contributor to the package code (e.g., translations).", id.name="roleContrib"),
+              rk.XML.stretch(), label="Roles")),
+              id.name="authContact"
+            )
           )
         )),
         id.name="col_rPckgAuthCont"),
         optioncolumn=list(
-          rxp.optioncol.aut.given <- rk.XML.optioncolumn(connect=rxp.aut.given, modifier="text"),
-          rxp.optioncol.aut.family <- rk.XML.optioncolumn(connect=rxp.aut.family, modifier="text"),
-          rxp.optioncol.aut.email <- rk.XML.optioncolumn(connect=rxp.aut.email, modifier="text"),
-          rxp.optioncol.aut.auth <- rk.XML.optioncolumn(connect=rxp.aut.auth, modifier="state"),
-          rxp.optioncol.aut.maint <- rk.XML.optioncolumn(connect=rxp.aut.maint, modifier="state"),
-          rxp.optioncol.aut.cntr <- rk.XML.optioncolumn(connect=rxp.aut.cntr, modifier="state")
+          ocolAuthGivenName <- rk.XML.optioncolumn(connect=authGivenName, modifier="text", id.name="ocolAuthGivenName"),
+          ocolAuthFamilyName <- rk.XML.optioncolumn(connect=authFamilyName, modifier="text", id.name="ocolAuthFamilyName"),
+          ocolAuthEMail <- rk.XML.optioncolumn(connect=authEMail, modifier="text", id.name="ocolAuthEMail"),
+          ocolRoleAuthor <- rk.XML.optioncolumn(connect=roleAuthor, modifier="state", id.name="ocolRoleAuthor"),
+          ocolRoleMaintain <- rk.XML.optioncolumn(connect=roleMaintain, modifier="state", id.name="ocolRoleMaintain"),
+          ocolRoleContrib <- rk.XML.optioncolumn(connect=roleContrib, modifier="state", id.name="ocolRoleContrib")
         ),
         logic=rk.XML.logic(
-          rk.XML.connect(governor=rxp.aut.maint, client=rxp.aut.email, set="required")
-        )
+          rk.XML.connect(governor=roleMaintain, client=authEMail, set="required")
+        ),
+        id.name="optionsetAuthors"
       ),
       label="Authors and contributors"
     ),
     rk.XML.stretch()
-  )
+  ),
+  id.name="tabAuthors"
 )
 
-rxp.tab.depends <- rk.XML.row(
+tabDepends <- rk.XML.row(
   rk.XML.col(
     rk.XML.row(
       rk.XML.frame(
-        rxp.oset.depends <- rk.XML.optionset(
+        optionsetDepends <- rk.XML.optionset(
           content=rk.XML.col(rk.XML.stretch(before=list(
             rk.XML.row(
-              rxp.frm.dep.depends <- rk.XML.row(
+              rowDepends <- rk.XML.row(
                 rk.XML.col(
-                  rxp.dep.dep.name <- rk.XML.input("Package name", required=TRUE,
-                    help="Name of a package that this package depends on.", id.name="inp_depDepName"),
-                  rxp.dep.dep.version <- rk.XML.input("Version", required=FALSE,
-                    help="Optional version information on the package.", id.name="inp_depDepVers"),
-                  rk.XML.stretch()
-                )
+                  dependPackage <- rk.XML.input("Package name", required=TRUE,
+                    help="Name of a package that this package depends on.", id.name="dependPackage"),
+                  dependVersion <- rk.XML.input("Version", required=FALSE,
+                    help="Optional version information on the package.", id.name="dependVersion"),
+                  rk.XML.stretch(),
+                  id.name="colDep"
+                ),
+                id.name="rowDepends"
               )
             )
           )),
           id.name="col_rDepDepCont"),
           optioncolumn=list(
-            rxp.optioncol.dep.dep.name <- rk.XML.optioncolumn(connect=rxp.dep.dep.name, modifier="text"),
-            rxp.optioncol.dep.dep.version <- rk.XML.optioncolumn(connect=rxp.dep.dep.version, modifier="text")
+            ocolDependPackage <- rk.XML.optioncolumn(connect=dependPackage, modifier="text", id.name="ocolDependPackage"),
+            dependVersion <- rk.XML.optioncolumn(connect=dependVersion, modifier="text", id.name="ocolDependVersion")
           ),
           optiondisplay=FALSE
         ),
-        label="Depends on"
+        label="Depends on",
+        id.name="optionsetDepends"
       ),
       rk.XML.stretch()
     ),
     rk.XML.row(
       rk.XML.frame(
-        rxp.oset.imports <- rk.XML.optionset(
+        optionsetImports <- rk.XML.optionset(
           content=rk.XML.col(rk.XML.stretch(before=list(
             rk.XML.row(
-              rxp.frm.dep.imports <- rk.XML.row(
+              rowImports <- rk.XML.row(
                 rk.XML.col(
-                  rxp.dep.imp.name <- rk.XML.input("Package name", required=TRUE,
-                    help="Name of a package that this package imports from.", id.name="inp_depImpName"),
-                  rxp.dep.imp.version <- rk.XML.input("Version", required=FALSE,
-                    help="Optional version information on the imported package.", id.name="inp_depImpVers"),
-                  rk.XML.stretch()
-                )
+                  importPackage <- rk.XML.input("Package name", required=TRUE,
+                    help="Name of a package that this package imports from.", id.name="importPackage"),
+                  importVersion <- rk.XML.input("Version", required=FALSE,
+                    help="Optional version information on the imported package.", id.name="importVersion"),
+                  rk.XML.stretch(),
+                  id.name="colImports"
+                ),
+                id.name="rowImports"
               )
             )
           )),
           id.name="col_rDepImpCont"),
           optioncolumn=list(
-            rxp.optioncol.dep.imp.name <- rk.XML.optioncolumn(connect=rxp.dep.imp.name, modifier="text"),
-            rxp.optioncol.dep.imp.version <- rk.XML.optioncolumn(connect=rxp.dep.imp.version, modifier="text")
+            ocolImportPackage <- rk.XML.optioncolumn(connect=importPackage, modifier="text", id.name="ocolImportPackage"),
+            ocolImportVersion <- rk.XML.optioncolumn(connect=importVersion, modifier="text", id.name="ocolImportVersion")
           ),
           optiondisplay=FALSE
         ),
-        label="Imports from"
+        label="Imports from",
+        id.name="optionsetImports"
       ),
       rk.XML.stretch()
     )
@@ -156,60 +170,67 @@ rxp.tab.depends <- rk.XML.row(
   rk.XML.col(
     rk.XML.row(
       rk.XML.frame(
-        rxp.oset.suggests <- rk.XML.optionset(
+        optionsetSuggests <- rk.XML.optionset(
           content=rk.XML.col(rk.XML.stretch(before=list(
             rk.XML.row(
               rxp.frm.dep.suggests <- rk.XML.row(
                 rk.XML.col(
-                  rxp.dep.sug.name <- rk.XML.input("Package name", required=TRUE,
-                    help="Name of a package that this package suggests.", id.name="inp_depSugName"),
-                  rxp.dep.sug.version <- rk.XML.input("Version", required=FALSE,
-                    help="Optional version information on the suggested package.", id.name="inp_depSugVers"),
-                  rk.XML.stretch()
-                )
+                  suggestPackage <- rk.XML.input("Package name", required=TRUE,
+                    help="Name of a package that this package suggests.", id.name="suggestPackage"),
+                  suggestVersion <- rk.XML.input("Version", required=FALSE,
+                    help="Optional version information on the suggested package.", id.name="suggestVersion"),
+                  rk.XML.stretch(),
+                  id.name="colSuggests"
+                ),
+                id.name="rowSuggests"
               )
             )
           )),
           id.name="col_rDepSugCont"),
           optioncolumn=list(
-            rxp.optioncol.dep.sug.name <- rk.XML.optioncolumn(connect=rxp.dep.sug.name, modifier="text"),
-            rxp.optioncol.dep.sug.version <- rk.XML.optioncolumn(connect=rxp.dep.sug.version, modifier="text")
+            ocolSuggestPackage <- rk.XML.optioncolumn(connect=suggestPackage, modifier="text", id.name="ocolSuggestPackage"),
+            ocolSuggestVersion <- rk.XML.optioncolumn(connect=suggestVersion, modifier="text", id.name="ocolSuggestVersion")
           ),
           optiondisplay=FALSE
         ),
-        label="Suggests"
+        label="Suggests",
+        id.name="optionsetSuggests"
       ),
       rk.XML.stretch()
     ),
     rk.XML.row(
       rk.XML.frame(
-        rxp.oset.enhances <- rk.XML.optionset(
+        optionsetEnhances <- rk.XML.optionset(
           content=rk.XML.col(rk.XML.stretch(before=list(
             rk.XML.row(
-              rxp.frm.dep.enhances <- rk.XML.row(
+              rowEnhances <- rk.XML.row(
                 rk.XML.col(
-                  rxp.dep.enh.name <- rk.XML.input("Package name", required=TRUE,
-                    help="Name of a package that this package enhances.", id.name="inp_depEnhName"),
-                  rxp.dep.enh.version <- rk.XML.input("Version", required=FALSE,
-                    help="Optional version information on the enhanced package.", id.name="inp_depEnhVers"),
-                  rk.XML.stretch()
-                )
+                  enhancePackage <- rk.XML.input("Package name", required=TRUE,
+                    help="Name of a package that this package enhances.", id.name="enhancePackage"),
+                  enhanceVersion <- rk.XML.input("Version", required=FALSE,
+                    help="Optional version information on the enhanced package.", id.name="enhanceVersion"),
+                  rk.XML.stretch(),
+                  id.name="colEnhances"
+                ),
+                id.name="rowEnhances"
               )
             )
           )),
           id.name="col_rDepEnhCont"),
           optioncolumn=list(
-            rxp.optioncol.dep.enh.name <- rk.XML.optioncolumn(connect=rxp.dep.enh.name, modifier="text"),
-            rxp.optioncol.dep.enh.version <- rk.XML.optioncolumn(connect=rxp.dep.enh.version, modifier="text")
+            ocolEnhancePackage <- rk.XML.optioncolumn(connect=enhancePackage, modifier="text", id.name="ocolEnhancePackage"),
+            ocolEnhanceVersion <- rk.XML.optioncolumn(connect=enhanceVersion, modifier="text", id.name="ocolEnhanceVersion")
           ),
           optiondisplay=FALSE
         ),
-        label="Enhances"
+        label="Enhances",
+        id.name="optionsetEnhances"
       ),
       rk.XML.stretch()
     )
 
-  )
+  ),
+  id.name="tabDepends"
 )
 
 # pckg.dscrptn <- data.frame(
@@ -232,39 +253,39 @@ rxp.tab.depends <- rk.XML.row(
 #     URL="http://example.com/foo/stuff",
 #     stringsAsFactors=FALSE)
 
-rxp.tab.create <- rk.XML.col(
+tabCreate <- rk.XML.col(
   rk.XML.row(
     rk.XML.frame(
       rk.XML.row(
         rk.XML.col(
-          rxp.cbox.action.roxy <- rk.XML.cbox("Roxygenize the docs", chk=TRUE,
+          actionRoxy <- rk.XML.cbox("Roxygenize the docs", chk=TRUE, id.name="actionRoxy",
             help="If this is checked, the roxygenize() function of the roxygen package is called to rebuild the documentation."),
-          rxp.cbox.action.package <- rk.XML.cbox("Build & install the package", chk=TRUE,
+          actionPackage <- rk.XML.cbox("Build & install the package", chk=TRUE, id.name="actionPackage",
             help="If this is checked, the main package will be built and installed to the specified R library location."),
-          rxp.cbox.action.doc <- rk.XML.cbox("Update PDF documentation", chk=TRUE,
+          actionDoc <- rk.XML.cbox("Update PDF documentation", chk=TRUE, id.name="actionDoc",
             help="If this is checked, all PDF documentation (manual and vignettes) will be re-created."),
-          rxp.cbox.action.log <- rk.XML.cbox("Update the ChangeLog file", chk=TRUE,
+          actionLog <- rk.XML.cbox("Update the ChangeLog file", chk=TRUE, id.name="actionLog",
             help="If this is checked, the ChangeLog file will be updated."),
-          rxp.cbox.action.cl2news <- rk.XML.cbox("Transform ChangeLog to NEWS.Rd", chk=TRUE,
+          actionCl2news <- rk.XML.cbox("Transform ChangeLog to NEWS.Rd", chk=TRUE, id.name="actionCl2news",
             help="If this is checked, the ChangeLog file will be translated into a NEWS.Rd file."),
-          rxp.cbox.action.news2rss <- rk.XML.cbox("Transform NEWS.Rd to RSS feed", chk=TRUE,
+          actionNews2rss <- rk.XML.cbox("Transform NEWS.Rd to RSS feed", chk=TRUE, id.name="actionNews2rss",
             help="If this is checked, the NEWS.Rd file will be translated into a RSS feed (available in the repository HTML pages)."),
-          rxp.cbox.action.html <- rk.XML.cbox("Update repository HTML files", chk=TRUE,
+          actionHtml <- rk.XML.cbox("Update repository HTML files", chk=TRUE, id.name="actionHtml",
             help="If this is checked, all relevant repository HTML files will be re-written."),
           rk.XML.stretch()
         ),
         rk.XML.col(
-          rxp.cbox.action.win <- rk.XML.cbox("Windows binary package", chk=FALSE,
+          actionWin <- rk.XML.cbox("Windows binary package", chk=FALSE, id.name="actionWin",
             help="If this is checked, a Windows binary package is being built as well. Only produces proper results if the package was written in pure R code."),
-          rxp.cbox.action.macosx <- rk.XML.cbox("Mac OS X binary package", chk=FALSE,
+          actionMacosx <- rk.XML.cbox("Mac OS X binary package", chk=FALSE, id.name="actionMacosx",
             help="If this is checked, a Mac OS X binary package is being built as well. Only produces proper results if the package was written in pure R code."),
-          rxp.cbox.action.check <- rk.XML.cbox("Run R package check", chk=FALSE,
+          actionCheck <- rk.XML.cbox("Run R package check", chk=FALSE, id.name="actionCheck",
             help="If this is checked, \"R CMD check\" is performed on the package sources."),
-          rxp.cbox.action.cleanRd <- rk.XML.cbox("Clean line breaks in *.Rd files", chk=TRUE,
+          actionCleanRd <- rk.XML.cbox("Clean line breaks in *.Rd files", chk=TRUE, id.name="actionCleanRd",
             help="If this is checked, all manual pages will get a line break after 90 characters. CRAN won't accept the package otherwise."),
-          rxp.cbox.action.cite <- rk.XML.cbox("Update CITATION file", chk=TRUE,
+          actionCite <- rk.XML.cbox("Update CITATION file", chk=TRUE, id.name="actionCite",
             help="If this is checked, the CITATION file will be re-written."),
-          rxp.cbox.action.license <- rk.XML.cbox("Update the LICENSE file", chk=FALSE,
+          actionLicense <- rk.XML.cbox("Update the LICENSE file", chk=FALSE, id.name="actionLicense",
             help="If this is checked, the LICENSE file will be re-written."),
           rk.XML.stretch()
         )
@@ -273,74 +294,77 @@ rxp.tab.create <- rk.XML.col(
     )
   ),
   rk.XML.row(
-    rxp.frame.sndbx <- rk.XML.frame(
+    frameSandbox <- rk.XML.frame(
       rk.XML.row(
-        rxp.cbox.sndbx.source <- rk.XML.cbox("Source directory", chk=TRUE,
+        sandboxSource <- rk.XML.cbox("Source directory", chk=TRUE, id.name="sandboxSource",
           help="If this is checked, a copy of the package sources will be made below the sandbox directory and all
             changes will be applied to this copy. This means, running roxy.package() will not change your actual
             sources, unless you turn sandboxing off."
         ),
-        rxp.cbox.sndbx.Rlibs <- rk.XML.cbox("R library", chk=TRUE,
+        sandboxRLibs <- rk.XML.cbox("R library", chk=TRUE, id.name="sandboxRLibs",
           help="If this is checked, the resulting package will not be installed to your pre-defined R library,
             but a new R library below the sandbox directory, unless you turn sandboxing off."
         )
       ),
       rk.XML.row(
-        rxp.cbox.sndbx.repo <- rk.XML.cbox("Repository", chk=TRUE,
+        sandboxRepo <- rk.XML.cbox("Repository", chk=TRUE, id.name="sandboxRepo",
           help="If this is checked, built packages (be it R source packages or binary packages) will not be
             copied to the defiend repository, but a new repository below the sandboxing directory, unless you turn sandboxing off. 
             In addition, all other repository files, like HTML files, vignettes, RSS feeds etc., are also only copied to the sandboxed
             repositry."
         ),
-        rxp.cbox.sndbx.archive <- rk.XML.cbox("Repository archive", chk=TRUE,
+        sandboxArchive <- rk.XML.cbox("Repository archive", chk=TRUE, id.name="sandboxArchive",
           help="If this is checked, archiving of ord packages will not be done in the defined archive directory, but a new archive
             below the sandbox directory, unless you turn sandboxing off. It is recommended to keep this in sync with the repository setting."
         )
       ),
       rk.XML.row(
-        rxp.browser.sndbx.dir <- rk.XML.browser("Sandbox directory (default: $TEMPDIR/roxyPackage/sandbox)", type="dir", required=FALSE,
+        sandboxDir <- rk.XML.browser("Sandbox directory (default: $TEMPDIR/roxyPackage/sandbox)", type="dir", required=FALSE, id.name="sandboxDir",
           help=list("Set the directory to use as the sandbox root.
           It is recommended to leave this as is and use the default value (", XMLNode("code", "$TEMPDIR/roxyPackage/sandbox"), ").")
         )
       ),
       label="Use sandbox",
       checkable=TRUE,
-      chk=TRUE)
-  )
+      chk=TRUE,
+      id.name="frameSandbox")
+  ),
+  id.name="tabCreate"
 )
 
-rxp.tab.environment <- rk.XML.row(
+tabEnvironment <- rk.XML.row(
   rk.XML.col(
     rk.XML.row(
-      rxp.browser.package.root <- rk.XML.browser("Root directory of the package sources", type="dir", required=TRUE,
+      envPckgRoot <- rk.XML.browser("Root directory of the package sources", type="dir", required=TRUE, id.name="envPckgRoot",
       help="Set the directory where your package code can be found. It is the directory containing at least a subdirectory
         R with the actual code, and it must be named after the package.")
     ),
     rk.XML.row(
-      rxp.browser.repo.root <- rk.XML.browser("Root directory of the local repository", type="dir", required=TRUE,
-      help="Set the directory where your local package repository should be maintained. It will be created if necessary.",
-      id.name="brw_RootLocRepo"),
-      id.name="row_RootLocRepo"
+      envRepoRoot <- rk.XML.browser("Root directory of the local repository", type="dir", required=TRUE, id.name="envRepoRoot",
+      help="Set the directory where your local package repository should be maintained. It will be created if necessary."),
+      id.name="rowRootLocRepo"
     ),
     rk.XML.stretch()
   ),# rk.XML.row(repository info)
   rk.XML.col(
-    rxp.frame.Rhomes <- rk.XML.frame(
+    frameRhomes <- rk.XML.frame(
       rk.XML.row(
-        rxp.browser.Rhomes <- rk.XML.browser("R homes (in addition to R.home())", type="dir", required=FALSE, help=FALSE)
+        envRhomes <- rk.XML.browser("R homes (in addition to R.home())", type="dir", required=FALSE, id.name="envRhomes", help=FALSE)
       ),
       rk.XML.row(
-        rxp.valsl.Rhomes <- rk.XML.valueslot("R homes", source=rxp.browser.Rhomes, property="selection", multi=TRUE, min=0,
+        envRhomesVarslot <- rk.XML.valueslot("R homes", source=envRhomes, property="selection", multi=TRUE, min=0, id.name="envRhomesVarslot",
           help="In case you want to build for multiple R versions and have all of them installed an this machine,
             you can define all R root directories to build against here."
         )
       ),
       label="Build agains multiple R versions",
       checkable=TRUE,
-      chk=FALSE
+      chk=FALSE,
+      id.name="frameRhomes"
     ),
     rk.XML.stretch()
-  )
+  ),
+  id.name="tabEnvironment"
 )
 
 #       deb.description=list(
@@ -361,19 +385,19 @@ rxp.tab.environment <- rk.XML.row(
 #       Rbuildignore=pckg.Rbuildignore,
 #       Rinstignore=c("inst/doc/koRpus_lit.bib", "inst/doc/ttr.pdf")
 
-rxp.tab.debianize <- rk.XML.col(
+tabDebianize <- rk.XML.col(
   rk.XML.row(
-    rxp.frame.action.deb <- rk.XML.frame(
+    frameDeb <- rk.XML.frame(
       rk.XML.frame(
         rk.XML.col(
           rk.XML.row(
-            rxp.deb.mnt.given <- rk.XML.input("Given name", id.name="debMaintainerGivenName", required=TRUE,
+            debMaintainerGivenName <- rk.XML.input("Given name", id.name="debMaintainerGivenName", required=TRUE,
               help="First name of the Debian package maintainer."),
-            rxp.deb.mnt.family <- rk.XML.input("Family name", id.name="debMaintainerFamilyName", required=TRUE,
+            debMaintainerFamilyName <- rk.XML.input("Family name", id.name="debMaintainerFamilyName", required=TRUE,
               help="Family name of the Debian package maintainer.")
           ),
           rk.XML.row(
-            rxp.deb.mnt.email <- rk.XML.input("E-mail", id.name="debMaintainerEMail", required=TRUE,
+            debMaintainerEMail <- rk.XML.input("E-mail", id.name="debMaintainerEMail", required=TRUE,
               help="The Debian package maintainers' e-mail address.")
           ),
           rk.XML.stretch()
@@ -388,21 +412,23 @@ rxp.tab.debianize <- rk.XML.col(
       ),
       label="Debianize the package",
       checkable=TRUE,
-      chk=FALSE
+      chk=FALSE,
+      id.name="frameDeb"
     )
-  )
+  ),
+  id.name="tabDebianize"
 )
 
 
 rxp.dialog <- rk.XML.dialog(
   rk.XML.tabbook("Create R package",
     tabs=list(
-      "Description"=rxp.tab.about,
-      "Authors"=rxp.tab.authors,
-      "Create options"=rxp.tab.create,
-      "Dependencies"=rxp.tab.depends,
-      "Environment"=rxp.tab.environment,
-      "Debianize"=rxp.tab.debianize
+      "Description"=tabAbout,
+      "Authors"=tabAuthors,
+      "Create options"=tabCreate,
+      "Dependencies"=tabDepends,
+      "Environment"=tabEnvironment,
+      "Debianize"=tabDebianize
 #       "Sandboxing"=rk.XML.col()
     )
   ),
@@ -414,106 +440,132 @@ rxp.dialog <- rk.XML.dialog(
 ## JavaScript
 JS.preprocess <- rk.paste.JS(
   rk.JS.vars(
-    rxp.input.package.version,
-    rxp.input.package.name,
-    rxp.input.short.desc,
-    rxp.input.long.desc,
-    rxp.input.package.homepage,
-    rxp.browser.package.root,
-    rxp.browser.repo.root,
-    rxp.frame.sndbx,
-    rxp.cbox.sndbx.source,
-    rxp.cbox.sndbx.Rlibs,
-    rxp.cbox.sndbx.repo,
-    rxp.cbox.sndbx.archive,
-    rxp.frame.Rhomes,
-    rxp.browser.sndbx.dir
+    pckgVersion,
+    pckgName,
+    pckgShortDescription,
+    pckgLongDescription,
+    pckgHomepage,
+    envPckgRoot,
+    envRepoRoot,
+    frameSandbox,
+    sandboxSource,
+    sandboxRLibs,
+    sandboxRepo,
+    sandboxArchive,
+    frameRhomes,
+    sandboxDir
   ),
-  rk.JS.vars(rxp.valsl.Rhomes, join="\\\",\\n\\t\\\""),
-  echo("\npackageVersion <- \"", rxp.input.package.version, "\"\n"),
-  echo("packageName <- \"", rxp.input.package.name, "\"\n"),
-  echo("packageRoot <- \"", rxp.browser.package.root, "\"\n\n"),
+  rk.JS.vars(envRhomesVarslot, join="\\\",\\n\\t\\\""),
+  echo("\npackageVersion <- \"", pckgVersion, "\"\n"),
+  echo("packageName <- \"", pckgName, "\"\n"),
+  echo("packageRoot <- \"", envPckgRoot, "\"\n\n"),
   echo("packageDescription <- data.frame(\n",
     "\tPackage=packageName,\n", 
     "\tType=\"Package\",\n"
   ),
-  ite(rxp.input.short.desc, echo("\tTitle=\"", rxp.input.short.desc, "\",\n")),
-  ite(rxp.input.long.desc, echo("\tDescription=\"", rxp.input.long.desc, "\",\n")),
-  rk.JS.optionset(rxp.oset.authors, vars=TRUE, guess.getter=guess.getter),
-  ite(id(rxp.optioncol.aut.given, " != \"\""),
+  js(
+    if(pckgShortDescription){
+      echo("\tTitle=\"", pckgShortDescription, "\",\n")
+    } else {},
+    if(pckgLongDescription){
+      echo("\tDescription=\"", pckgLongDescription, "\",\n")
+    } else {}
+  ),
+  rk.JS.optionset(optionsetAuthors, vars=TRUE, guess.getter=guess.getter),
+  ite(js(ocolAuthGivenName != ""),
     rk.paste.JS(
       echo("\tAuthorsR=\"c(\n\t\t\t"),
-      rk.JS.optionset(rxp.oset.authors,
-        js.rxp.oset.authors.role <- rk.JS.options("optAuthorRole",
-          ite(id(rxp.optioncol.aut.auth, " == 1"), qp("\\\"aut\\\"")),
-          ite(id(rxp.optioncol.aut.maint, " == 1"), qp("\\\"cre\\\"")),
-          ite(id(rxp.optioncol.aut.cntr, " == 1"), qp("\\\"ctb\\\"")),
+      rk.JS.optionset(optionsetAuthors,
+        js.optionsetAuthors.role <- rk.JS.options("optAuthorRole",
+          .ite=js(
+            if(ocolRoleAuthor == 1){
+              qp("\\\"aut\\\"")
+            } else {},
+            if(ocolRoleMaintain == 1){
+              qp("\\\"cre\\\"")
+            } else {},
+            if(ocolRoleContrib == 1){
+              qp("\\\"ctb\\\"")
+            } else {},
+            keep.ite=TRUE,
+            level=3
+          ),
           funct="c", option="role", collapse=""),
         echo("person("),
-        echo("given=\\\"", rxp.optioncol.aut.given, "\\\""),
-        ite(rxp.optioncol.aut.family, echo(", family=\\\"", rxp.optioncol.aut.family, "\\\"")),
-        ite(rxp.optioncol.aut.email, echo(", email=\\\"", rxp.optioncol.aut.email, "\\\"")),
-        ite(js.rxp.oset.authors.role, echo(js.rxp.oset.authors.role)),
+        echo("given=\\\"", ocolAuthGivenName, "\\\""),
+        js(
+          if(ocolAuthFamilyName){
+            echo(", family=\\\"", ocolAuthFamilyName, "\\\"")
+          } else {},
+          if(ocolAuthEMail){
+            echo(", email=\\\"", ocolAuthEMail, "\\\"")
+          } else {},
+          if(js.optionsetAuthors.role){
+            echo(js.optionsetAuthors.role)
+          } else {},
+          level=3
+        ),
         echo(")"),
         collapse=",\\n\\t\\t\\t"
       ),
-      echo("\n\t\t)\",\n")
+      echo("\n\t\t)\",\n"),
+      level=3
     )
   ),
-  rk.JS.optionset(rxp.oset.depends, vars=TRUE, guess.getter=guess.getter),
-  ite(id(rxp.optioncol.dep.dep.name, " != \"\""),
+  rk.JS.optionset(optionsetDepends, vars=TRUE, guess.getter=guess.getter),
+  ite(id(ocolDependPackage, " != \"\""),
     rk.paste.JS(
       echo("\tDepends=\""),
-      rk.JS.optionset(rxp.oset.depends,
-        echo(rxp.optioncol.dep.dep.name),
-        ite(rxp.optioncol.dep.dep.version, echo(" (", rxp.optioncol.dep.dep.version, ")")),
+      rk.JS.optionset(optionsetDepends,
+        echo(ocolDependPackage),
+        ite(dependVersion, echo(" (", dependVersion, ")")),
         collapse=","
       ),
       echo("\",\n")
     )
   ),
-  rk.JS.optionset(rxp.oset.imports, vars=TRUE, guess.getter=guess.getter),
-  ite(id(rxp.optioncol.dep.imp.name, " != \"\""),
+  rk.JS.optionset(optionsetImports, vars=TRUE, guess.getter=guess.getter),
+  ite(id(ocolImportPackage, " != \"\""),
     rk.paste.JS(
       echo("\tImports=\""),
-      rk.JS.optionset(rxp.oset.imports,
-        echo(rxp.optioncol.dep.imp.name),
-        ite(rxp.optioncol.dep.imp.version, echo(" (", rxp.optioncol.dep.imp.version, ")")),
+      rk.JS.optionset(optionsetImports,
+        echo(ocolImportPackage),
+        ite(ocolImportVersion, echo(" (", ocolImportVersion, ")")),
         collapse=","
       ),
       echo("\",\n")
     )
   ),
-  rk.JS.optionset(rxp.oset.suggests, vars=TRUE, guess.getter=guess.getter),
-  ite(id(rxp.optioncol.dep.sug.name, " != \"\""),
+  rk.JS.optionset(optionsetSuggests, vars=TRUE, guess.getter=guess.getter),
+  ite(id(ocolSuggestPackage, " != \"\""),
     rk.paste.JS(
       echo("\tSuggests=\""),
-      rk.JS.optionset(rxp.oset.suggests,
-        echo(rxp.optioncol.dep.sug.name),
-        ite(rxp.optioncol.dep.sug.version, echo(" (", rxp.optioncol.dep.sug.version, ")")),
+      rk.JS.optionset(optionsetSuggests,
+        echo(ocolSuggestPackage),
+        ite(ocolSuggestVersion, echo(" (", ocolSuggestVersion, ")")),
         collapse=","
       ),
       echo("\",\n")
     )
   ),
-  rk.JS.optionset(rxp.oset.enhances, vars=TRUE, guess.getter=guess.getter),
-  ite(id(rxp.optioncol.dep.enh.name, " != \"\""),
+  rk.JS.optionset(optionsetEnhances, vars=TRUE, guess.getter=guess.getter),
+  ite(id(ocolEnhancePackage, " != \"\""),
     rk.paste.JS(
       echo("\tEnhances=\""),
-      rk.JS.optionset(rxp.oset.enhances,
-        echo(rxp.optioncol.dep.enh.name),
-        ite(rxp.optioncol.dep.enh.version, echo(" (", rxp.optioncol.dep.enh.version, ")")),
+      rk.JS.optionset(optionsetEnhances,
+        echo(ocolEnhancePackage),
+        ite(ocolEnhanceVersion, echo(" (", ocolEnhanceVersion, ")")),
         collapse=","
       ),
       echo("\",\n")
     )
   ),
-  ite(id(rxp.input.package.homepage), echo("\tURL=\"", rxp.input.package.homepage, "\",\n")),
+  ite(id(pckgHomepage), echo("\tURL=\"", pckgHomepage, "\",\n")),
   echo("\tstringsAsFactors=FALSE\n)\n\n"),
   ## multiple R homes
-  ite(id(rxp.frame.Rhomes, " && ", rxp.valsl.Rhomes, " != \"\""),
+  ite(id(frameRhomes, " && ", envRhomesVarslot, " != \"\""),
     echo(
-      "R.homes <- c(\n\t\"", rxp.valsl.Rhomes, "\"\n)\n",
+      "R.homes <- c(\n\t\"", envRhomesVarslot, "\"\n)\n",
       "all.homes <- c(R.homes, R.home())\n",
       "all.libs <- c(file.path(R.homes,\"lib64\",\"R\",\"library\"))\n\n"
     ),
@@ -523,17 +575,17 @@ JS.preprocess <- rk.paste.JS(
     )
   ),
   ## sandbox
-  ite(rxp.frame.sndbx,
+  ite(frameSandbox,
     rk.paste.JS(
       echo("sandbox(TRUE"),
-      ite(id(rxp.browser.sndbx.dir, " != \"\""),
-        echo(",\n\tsandbox.dir=\"", rxp.browser.sndbx.dir, "\"")
+      ite(id(sandboxDir, " != \"\""),
+        echo(",\n\tsandbox.dir=\"", sandboxDir, "\"")
       ),
-      tf(rxp.cbox.sndbx.source, opt="pck.source.dir", ifelse=TRUE, level=2),
-      tf(rxp.cbox.sndbx.Rlibs, opt="R.libs", ifelse=TRUE, level=2),
-      tf(rxp.cbox.sndbx.repo, opt="repo.root", ifelse=TRUE, level=2),
-      ite(id(rxp.cbox.sndbx.archive, " != ", rxp.cbox.sndbx.repo),
-        tf(rxp.cbox.sndbx.archive, opt="archive", ifelse=TRUE, level=2)
+      tf(sandboxSource, opt="pck.source.dir", ifelse=TRUE, level=2),
+      tf(sandboxRLibs, opt="R.libs", ifelse=TRUE, level=2),
+      tf(sandboxRepo, opt="repo.root", ifelse=TRUE, level=2),
+      ite(id(sandboxArchive, " != ", sandboxRepo),
+        tf(sandboxArchive, opt="archive", ifelse=TRUE, level=2)
       ),
       echo("\n)\n\n")
     ),
@@ -542,20 +594,20 @@ JS.preprocess <- rk.paste.JS(
 )
 
 rxp.opt.actions <- rk.JS.options("actions",
-  ite(rxp.cbox.action.roxy, qp("\n\t\t\"roxy\"")),
-  ite(rxp.cbox.action.package, qp("\n\t\t\"package\"")),
-  ite(rxp.cbox.action.doc, qp("\n\t\t\"doc\"")),
-  ite(rxp.cbox.action.log, qp("\n\t\t\"log\"")),
-  ite(rxp.cbox.action.cl2news, qp("\n\t\t\"cl2news\"")),
-  ite(rxp.cbox.action.news2rss, qp("\n\t\t\"news2rss\"")),
-  ite(rxp.cbox.action.html, qp("\n\t\t\"html\"")),
-  ite(rxp.cbox.action.win, qp("\n\t\t\"win\"")),
-  ite(rxp.cbox.action.macosx, qp("\n\t\t\"macosx\"")),
-  ite(rxp.frame.action.deb, qp("\n\t\t\"deb\"")),
-  ite(rxp.cbox.action.check, qp("\n\t\t\"check\"")),
-  ite(rxp.cbox.action.cleanRd, qp("\n\t\t\"cleanRd\"")),
-  ite(rxp.cbox.action.cite, qp("\n\t\t\"cite\"")),
-  ite(rxp.cbox.action.license, qp("\n\t\t\"license\"")),
+  ite(actionRoxy, qp("\n\t\t\"roxy\"")),
+  ite(actionPackage, qp("\n\t\t\"package\"")),
+  ite(actionDoc, qp("\n\t\t\"doc\"")),
+  ite(actionLog, qp("\n\t\t\"log\"")),
+  ite(actionCl2news, qp("\n\t\t\"cl2news\"")),
+  ite(actionNews2rss, qp("\n\t\t\"news2rss\"")),
+  ite(actionHtml, qp("\n\t\t\"html\"")),
+  ite(actionWin, qp("\n\t\t\"win\"")),
+  ite(actionMacosx, qp("\n\t\t\"macosx\"")),
+  ite(frameDeb, qp("\n\t\t\"deb\"")),
+  ite(actionCheck, qp("\n\t\t\"check\"")),
+  ite(actionCleanRd, qp("\n\t\t\"cleanRd\"")),
+  ite(actionCite, qp("\n\t\t\"cite\"")),
+  ite(actionLicense, qp("\n\t\t\"license\"")),
   collapse="",
   option="actions",
   funct="c",
@@ -563,7 +615,7 @@ rxp.opt.actions <- rk.JS.options("actions",
 )
 
 JS.calculate <- rk.paste.JS(
-  rk.JS.vars(rxp.frame.action.deb),
+  rk.JS.vars(frameDeb),
   rxp.opt.actions,
   echo("roxy.package(", rxp.opt.actions, ",\n"),
     echo("\tpck.description=packageDescription,\n"),
@@ -571,12 +623,12 @@ JS.calculate <- rk.paste.JS(
     echo("\tpck.version=packageVersion,\n"),
     echo("\tR.homes=all.homes,\n"),
     echo("\tR.libs=all.libs,\n"),
-    ite(id(rxp.browser.repo.root), echo("\trepo.root=\"", rxp.browser.repo.root, "\",\n")),
+    ite(id(envRepoRoot), echo("\trepo.root=\"", envRepoRoot, "\",\n")),
 # #   pck.date="2014-01-22","),
 #     roxy.unlink.target=FALSE,"),
     echo("\tcleanup=TRUE,\n"),
     echo("\tURL=\"http://R.reaktanz.de\",\n"),
-    ite(rxp.frame.action.deb,
+    ite(frameDeb,
       rk.paste.JS(
         echo("\tdeb.options=list(\n"),
           echo("\t\tbuild.dir=file.path(main.root,pck.name),\n"),
@@ -589,8 +641,8 @@ JS.calculate <- rk.paste.JS(
           echo("\t\tdeb.description=list(\n"),
             echo("\t\t\tBuild.Depends.Indep=\"debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs\",\n"),
             echo("\t\t\tDepends=\"r-base (>= 3.0.0)\",\n"),
-            ite(rxp.deb.mnt.given,
-              echo("\t\t\tMaintainer=\"", rxp.deb.mnt.given, " ", rxp.deb.mnt.family, " <", rxp.deb.mnt.email, ">\"\n")
+            ite(debMaintainerGivenName,
+              echo("\t\t\tMaintainer=\"", debMaintainerGivenName, " ", debMaintainerFamilyName, " <", debMaintainerEMail, ">\"\n")
             ),
           echo("\t\t),\n"),
           echo("\t\tSection=\"math\",\n"),
@@ -715,7 +767,13 @@ plugin.dir <- rk.plugin.skeleton(
   tests=FALSE,
   edit=FALSE,
   load=TRUE,
-  show=TRUE
+  show=TRUE,
+  gen.info="$SRC/inst/rkward/rkwarddev_roxyPackage_plugin_script.R",
+  hints=FALSE
 )
+
+if(isTRUE(update.translations)){
+  rk.updatePluginMessages(file.path(output.dir,"roxyPackage","inst","rkward","roxyPackage.pluginmap"))
+} else {}
 
 })
