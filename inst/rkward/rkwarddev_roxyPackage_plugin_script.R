@@ -1,8 +1,7 @@
-local({
-## Vorbereiten
 require(rkwarddev)
-rkwarddev.required("0.07-4")
+rkwarddev.required("0.08-1")
 
+rk.local({
 # define where the plugin should write its files
 output.dir <- tempdir()
 # overwrite an existing plugin in output.dir?
@@ -13,7 +12,6 @@ rk.set.indent(by="  ")
 rk.set.empty.e(TRUE)
 update.translations <- FALSE
 
-## Berechne
 about.plugin <- rk.XML.about(
   name="rk.roxyPackage",
   author=person(given="m.eik", family="michalke", email="meik.michalke@hhu.de", role=c("aut", "cre")),
@@ -469,12 +467,10 @@ JS.preprocess <- rk.paste.JS(
     } else {},
     if(pckgLongDescription){
       echo("\tDescription=\"", pckgLongDescription, "\",\n")
-    } else {}
-  ),
-  rk.JS.optionset(optionsetAuthors, vars=TRUE, guess.getter=guess.getter),
-  ite(js(ocolAuthGivenName != ""),
-    rk.paste.JS(
-      echo("\tAuthorsR=\"c(\n\t\t\t"),
+    } else {},
+    rk.JS.optionset(optionsetAuthors, vars=TRUE, guess.getter=guess.getter),
+    if(ocolAuthGivenName != ""){
+      echo("\tAuthorsR=\"c(\n\t\t\t")
       rk.JS.optionset(optionsetAuthors,
         js.optionsetAuthors.role <- rk.JS.options("optAuthorRole",
           .ite=js(
@@ -488,7 +484,7 @@ JS.preprocess <- rk.paste.JS(
               qp("\\\"ctb\\\"")
             } else {},
             keep.ite=TRUE,
-            level=3
+            level=1
           ),
           funct="c", option="role", collapse=""),
         echo("person("),
@@ -503,93 +499,106 @@ JS.preprocess <- rk.paste.JS(
           if(js.optionsetAuthors.role){
             echo(js.optionsetAuthors.role)
           } else {},
-          level=3
+          level=7
         ),
         echo(")"),
         collapse=",\\n\\t\\t\\t"
-      ),
-      echo("\n\t\t)\",\n"),
-      level=3
-    )
-  ),
-  rk.JS.optionset(optionsetDepends, vars=TRUE, guess.getter=guess.getter),
-  ite(id(ocolDependPackage, " != \"\""),
-    rk.paste.JS(
-      echo("\tDepends=\""),
+      )
+      echo("\n\t\t)\",\n")
+    } else {},
+    rk.JS.optionset(optionsetDepends, vars=TRUE, guess.getter=guess.getter),
+    if(ocolDependPackage != ""){
+      echo("\tDepends=\"")
       rk.JS.optionset(optionsetDepends,
         echo(ocolDependPackage),
-        ite(dependVersion, echo(" (", dependVersion, ")")),
+        js(
+          if(dependVersion){
+            echo(" (", dependVersion, ")")
+          } else {},
+          level=7
+        ),
         collapse=","
-      ),
+      )
       echo("\",\n")
-    )
-  ),
-  rk.JS.optionset(optionsetImports, vars=TRUE, guess.getter=guess.getter),
-  ite(id(ocolImportPackage, " != \"\""),
-    rk.paste.JS(
-      echo("\tImports=\""),
+    } else {},
+    rk.JS.optionset(optionsetImports, vars=TRUE, guess.getter=guess.getter),
+    if(ocolImportPackage != ""){
+      echo("\tImports=\"")
       rk.JS.optionset(optionsetImports,
         echo(ocolImportPackage),
-        ite(ocolImportVersion, echo(" (", ocolImportVersion, ")")),
+        js(
+          if(ocolImportVersion){
+            echo(" (", ocolImportVersion, ")")
+          } else {},
+          level=7
+        ),
         collapse=","
-      ),
+      )
       echo("\",\n")
-    )
-  ),
-  rk.JS.optionset(optionsetSuggests, vars=TRUE, guess.getter=guess.getter),
-  ite(id(ocolSuggestPackage, " != \"\""),
-    rk.paste.JS(
-      echo("\tSuggests=\""),
+    } else {},
+    rk.JS.optionset(optionsetSuggests, vars=TRUE, guess.getter=guess.getter),
+    if(ocolSuggestPackage != ""){
+      echo("\tSuggests=\"")
       rk.JS.optionset(optionsetSuggests,
         echo(ocolSuggestPackage),
-        ite(ocolSuggestVersion, echo(" (", ocolSuggestVersion, ")")),
+        js(
+          if(ocolSuggestVersion){
+            echo(" (", ocolSuggestVersion, ")")
+          } else {},
+          level=7
+        ),
         collapse=","
-      ),
+      )
       echo("\",\n")
-    )
-  ),
-  rk.JS.optionset(optionsetEnhances, vars=TRUE, guess.getter=guess.getter),
-  ite(id(ocolEnhancePackage, " != \"\""),
-    rk.paste.JS(
-      echo("\tEnhances=\""),
+    } else {},
+    rk.JS.optionset(optionsetEnhances, vars=TRUE, guess.getter=guess.getter),
+    if(ocolEnhancePackage != ""){
+      echo("\tEnhances=\"")
       rk.JS.optionset(optionsetEnhances,
         echo(ocolEnhancePackage),
-        ite(ocolEnhanceVersion, echo(" (", ocolEnhanceVersion, ")")),
+        js(
+          if(ocolEnhanceVersion){
+            echo(" (", ocolEnhanceVersion, ")")
+          } else {},
+          level=7
+        ),
         collapse=","
-      ),
+      )
       echo("\",\n")
-    )
-  ),
-  ite(id(pckgHomepage), echo("\tURL=\"", pckgHomepage, "\",\n")),
-  echo("\tstringsAsFactors=FALSE\n)\n\n"),
-  ## multiple R homes
-  ite(id(frameRhomes, " && ", envRhomesVarslot, " != \"\""),
-    echo(
-      "R.homes <- c(\n\t\"", envRhomesVarslot, "\"\n)\n",
-      "all.homes <- c(R.homes, R.home())\n",
-      "all.libs <- c(file.path(R.homes,\"lib64\",\"R\",\"library\"))\n\n"
-    ),
-    echo(
-      "all.homes <- R.home()\n",
-      "all.libs <- c(file.path(R.home(),\"lib64\",\"R\",\"library\"))\n\n"
-    )
-  ),
-  ## sandbox
-  ite(frameSandbox,
-    rk.paste.JS(
-      echo("sandbox(TRUE"),
-      ite(id(sandboxDir, " != \"\""),
+    } else {},
+    if(pckgHomepage){
+      echo("\tURL=\"", pckgHomepage, "\",\n")
+    } else {},
+    echo("\tstringsAsFactors=FALSE\n)\n\n"),
+    ## multiple R homes
+    if(frameRhomes && envRhomesVarslot != ""){
+      echo(
+        "R.homes <- c(\n\t\"", envRhomesVarslot, "\"\n)\n",
+        "all.homes <- c(R.homes, R.home())\n",
+        "all.libs <- c(file.path(R.homes,\"lib64\",\"R\",\"library\"))\n\n"
+      )
+    } else {
+      echo(
+        "all.homes <- R.home()\n",
+        "all.libs <- c(file.path(R.home(),\"lib64\",\"R\",\"library\"))\n\n"
+      )
+    },
+    ## sandbox
+    if(frameSandbox){
+      echo("sandbox(TRUE")
+      if(sandboxDir != ""){
         echo(",\n\tsandbox.dir=\"", sandboxDir, "\"")
-      ),
-      tf(sandboxSource, opt="pck.source.dir", ifelse=TRUE, level=2),
-      tf(sandboxRLibs, opt="R.libs", ifelse=TRUE, level=2),
-      tf(sandboxRepo, opt="repo.root", ifelse=TRUE, level=2),
-      ite(id(sandboxArchive, " != ", sandboxRepo),
+      } else {}
+      tf(sandboxSource, opt="pck.source.dir", ifelse=TRUE, level=2)
+      tf(sandboxRLibs, opt="R.libs", ifelse=TRUE, level=2)
+      tf(sandboxRepo, opt="repo.root", ifelse=TRUE, level=2)
+      if(sandboxArchive != sandboxRepo){
         tf(sandboxArchive, opt="archive", ifelse=TRUE, level=2)
-      ),
+      } else {}
       echo("\n)\n\n")
-    ),
-    echo("sandbox(FALSE)\n\n")
+    } else {
+      echo("sandbox(FALSE)\n\n")
+    }
   )
 )
 
