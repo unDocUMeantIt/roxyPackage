@@ -15,8 +15,12 @@ update.translations <- FALSE
 about.plugin <- rk.XML.about(
   name="rk.roxyPackage",
   author=person(given="m.eik", family="michalke", email="meik.michalke@hhu.de", role=c("aut", "cre")),
-  about=list(desc="RKWard GUI dialogs to create and maintain your own R packages",
-  version="0.01-0", license="GPL (>= 3)")
+  about=list(
+    desc="RKWard GUI dialogs to create and maintain your own R packages",
+    version="0.01-0",
+    license="GPL (>= 3)",
+    url="http://reaktanz.de/?c=hacking&s=roxyPackage"
+  )
 )
 
 plugin.dependencies <- rk.XML.dependencies(
@@ -75,6 +79,8 @@ tabAuthors <- rk.XML.col(
                 help="Check this if this person maintains the package.", id.name="roleMaintain"),
               roleContrib <- rk.XML.cbox("Contributor", chk=FALSE,
                 help="Check this if this person is a contributor to the package code (e.g., translations).", id.name="roleContrib"),
+              roleCopyright <- rk.XML.cbox("Copyright holder", chk=FALSE,
+                help="Check this if this person is a copyright holder of the package code.", id.name="roleCopyright"),
               rk.XML.stretch(), label="Roles")),
               id.name="authContact"
             )
@@ -87,7 +93,8 @@ tabAuthors <- rk.XML.col(
           ocolAuthEMail <- rk.XML.optioncolumn(connect=authEMail, modifier="text", id.name="ocolAuthEMail"),
           ocolRoleAuthor <- rk.XML.optioncolumn(connect=roleAuthor, modifier="state", id.name="ocolRoleAuthor"),
           ocolRoleMaintain <- rk.XML.optioncolumn(connect=roleMaintain, modifier="state", id.name="ocolRoleMaintain"),
-          ocolRoleContrib <- rk.XML.optioncolumn(connect=roleContrib, modifier="state", id.name="ocolRoleContrib")
+          ocolRoleContrib <- rk.XML.optioncolumn(connect=roleContrib, modifier="state", id.name="ocolRoleContrib"),
+          ocolRoleCopyright <- rk.XML.optioncolumn(connect=roleCopyright, modifier="state", id.name="ocolRoleCopyright")
         ),
         logic=rk.XML.logic(
           rk.XML.connect(governor=roleMaintain, client=authEMail, set="required")
@@ -482,6 +489,9 @@ JS.preprocess <- rk.paste.JS(
             } else {},
             if(ocolRoleContrib == 1){
               qp("\\\"ctb\\\"")
+            } else {},
+            if(ocolRoleCopyright == 1){
+              qp("\\\"cph\\\"")
             } else {},
             keep.ite=TRUE
           ),
