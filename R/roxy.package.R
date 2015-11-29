@@ -97,7 +97,7 @@
 #'      \item{"macosx"}{Update the Mac OS X binary package}
 #'      \item{"log"}{Generate initial ChangeLog or update a present ChangeLog file}
 #'      \item{"deb"}{Update the Debian binary package with \code{\link[roxyPackage:debianize]{debianize}} (works only on Debian systems;
-#'        see \code{deb.options}, too)}
+#'        see \code{deb.options}, too). \code{URL} must also be set to generate Debian repository information.}
 #'      \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
 #'    }
 #'    Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources, which will overwrite
@@ -115,7 +115,7 @@
 #'    Will be passed on as given here. To deactivate, options must explicitly be se to \code{""}, missing options will be used with the default values.
 #' @param URL A character string defining the URL to the root of the repository (i.e., which holds the directories \code{src}
 #'    etc.). This is not the path to the local file system, but should be the URL to the repository as it is available
-#'    via internet. This option is neccessary for (and only interpreted by) the action \code{"news2rss"}.
+#'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"} and \code{"deb"}.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
 #'    will be used.

@@ -47,8 +47,11 @@ tabAbout <- rk.XML.col(
       rk.XML.row(pckgLongDescription <- rk.XML.input("Long description", size="large", required=TRUE,
         help="Give a summary of the package, to be used as the \"Description:\" field of the DESCRIPTION file.", id.name="pckgLongDescription")
       ),
-      rk.XML.row(pckgHomepage <- rk.XML.input("Package homepage", required=TRUE,
-        help="Provide an URL for the package homepage, to be used as the \"URL:\" field of the DESCRIPTION file.", id.name="pckgHomepage")
+      rk.XML.row(
+        pckgHomepage <- rk.XML.input("Package homepage", required=TRUE,
+          help="Provide an URL for the package homepage, to be used as the \"URL:\" field of the DESCRIPTION file.", id.name="pckgHomepage"),
+        pckgLicense <- rk.XML.input("License", initial="GPL (>= 3)", required=TRUE, id.name="pckgLicense",
+          help="Define the license for the package. A short form should be sufficient.")
       ),
       label="About the package"
     )
@@ -375,20 +378,21 @@ tabEnvironment <- rk.XML.row(
 #       deb.description=list(
 # #         Build.Depends.Indep="debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs",
 # #         Depends="r-base (>= 3.0.0)",
-#         Maintainer="foo foo <foo@example.com>",
-#         Section="math",
-#         Priority="optional"
 #       ),
-#       actions=c("deb", "bin", "src"),
-# #     actions=c("deb"),
-#       overwrite=c("changelog", "control", "copyright", "rules"),
 #       bin.opts="-rfakeroot -b -uc",
-#       arch="all",
-#       gpg.key="DDCDA632",
 #       keep.build=FALSE),
+
 #       ChangeLog=ChangeLog.entry,
 #       Rbuildignore=pckg.Rbuildignore,
 #       Rinstignore=c("inst/doc/koRpus_lit.bib", "inst/doc/ttr.pdf")
+
+#         echo("\t\tchangelog=deb.changelog,\n")
+#         echo("\t\tdeb.description=list(\n")
+#         echo("\t\t\tBuild.Depends.Indep=\"debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs\",\n")
+#         echo("\t\t\tDepends=\"r-base (>= 3.0.0)\",\n")
+#         echo("\t\tbin.opts=\"-rfakeroot -b -uc\",\n")
+#         echo("\t\tkeep.build=FALSE\n")
+
 
 tabDebianize <- rk.XML.col(
   rk.XML.row(
@@ -403,21 +407,89 @@ tabDebianize <- rk.XML.col(
           ),
           rk.XML.row(
             debMaintainerEMail <- rk.XML.input("E-mail", id.name="debMaintainerEMail", required=TRUE,
-              help="The Debian package maintainers' e-mail address.")
+              help="The Debian package maintainers' e-mail address."),
+            debMaintainerPGP <- rk.XML.input("OpenPGP key ID", id.name="debMaintainerPGP", required=TRUE,
+              help="To sign the package and use secure apt features, you must provide the ID (8 alphanumeric characters) of your OpenPGP key.")
           ),
           rk.XML.stretch()
-  #         rk.XML.col(
-  #           rxp.cbox.action.deb <- rk.XML.cbox("Debianize the package", chk=FALSE,
-  #             help="If this is checked, the package sources are properly debianized and a .deb package is being built as well. Only works if run on a Debian based
-  #               installation with a proper packaging setup."),
-  #           rk.XML.stretch()
-  #         )
         ),
-         label="Debain package maintainer"
+        label="Debain package maintainer"
       ),
+      rk.XML.frame(
+        rk.XML.col(
+          rk.XML.row(
+            debRepoURL <- rk.XML.input("Repository URL", initial="http://R.reaktanz.de", required=TRUE,
+              help="Provide an URL for the Debian package repository.", id.name="debRepoURL"),
+            debOrigin <- rk.XML.input("Package origin", initial="other-reaktanz", required=TRUE, id.name="debOrigin",
+              help="The package origin becomes part of the file name. It's custom to start with \"other-\" followed by
+                your unique identifier if the package is not from one of the mainstream R repositories.")
+          ),
+          rk.XML.stretch()
+        ),
+        label="Repository"
+      ),
+      rk.XML.row(
+        rk.XML.frame(
+          rk.XML.col(
+            rk.XML.row(
+              debDistribution <- rk.XML.input("Distribution", initial="unstable", required=TRUE,
+                help="Identify the distribution this package was built for.", id.name="debDistribution"),
+              debComponent <- rk.XML.input("Component", initial="main", required=TRUE,
+                help="The component of the distribution this package belongs to.", id.name="debComponent")
+            ),
+            rk.XML.stretch()
+          ),
+          label="Distribution"
+        ),
+        rk.XML.frame(
+          rk.XML.col(
+            rk.XML.row(
+              debUrgency <- rk.XML.input("Urgency", initial="low", required=TRUE,
+                help="Urgency flag of the package.", id.name="debUrgency"),
+              debPriority <- rk.XML.input("Priority", initial="optional", required=TRUE,
+                help="Priority flag of the package.", id.name="debPriority")
+            ),
+            rk.XML.stretch()
+          ),
+          label="Importance"
+        )
+      ),
+      rk.XML.frame(
+        rk.XML.row(
+          rk.XML.col(
+            debActionDeb <- rk.XML.cbox("Debianize package sources", chk=TRUE, id.name="debActionDeb",
+              help="If this is checked, the package sources are being debianized (i.e, the \"debian\" directory will be created and populated)."),
+            debActionBin <- rk.XML.cbox("Build Debian package", chk=TRUE, id.name="debActionBin",
+              help="If this is checked, a Debian binary package will be built."),
+            debActionSrc <- rk.XML.cbox("Build Debian source package", chk=TRUE, id.name="debActionSrc",
+              help="If this is checked, a Debian source package will be built."),
+            debOverwritePGP <- rk.XML.cbox("Re-build OpenPGP keyring package", chk=FALSE, id.name="debOverwritePGP",
+              help="Re-write the keyring package in the repository (by default present packages are left unchanged)."),
+            debKeepBuild <- rk.XML.cbox("Keep build", chk=FALSE, id.name="debKeepBuild",
+              help="Work is done in a generated folder with a random name. Usually it is removed afterwards, unless you check this option.")
+          ),
+          rk.XML.col(
+            debOverwriteChangelog <- rk.XML.cbox("Overwrite 'changelog'", chk=TRUE, id.name="debOverwriteChangelog",
+              help="Update ./debian/changelog, but only if no entry for this package version and revision is there yet."),
+            debOverwriteControl <- rk.XML.cbox("Overwrite 'control'", chk=TRUE, id.name="debOverwriteControl",
+              help="Re-write ./debian/control."),
+            debOverwriteCopyright <- rk.XML.cbox("Overwrite 'copyright'", chk=TRUE, id.name="debOverwriteCopyright",
+              help="Re-write ./debian/copyright."),
+            debOverwriteRules <- rk.XML.cbox("Overwrite 'rules'", chk=TRUE, id.name="debOverwriteRules",
+              help="Re-write ./debian/rules."),
+            debOverwriteCompat <- rk.XML.cbox("Overwrite 'compat'", chk=FALSE, id.name="debOverwriteCompat",
+              help="Re-write ./debian/compat."),
+            rk.XML.stretch()
+          )
+        ),
+        label="Debianize actions"
+      ),
+      rk.XML.stretch(),
       label="Debianize the package",
       checkable=TRUE,
       chk=FALSE,
+      help="If this is checked, the package sources are properly debianized and a .deb package is being built as well. Only works if run on a Debian based
+        installation with a proper packaging setup.",
       id.name="frameDeb"
     )
   ),
@@ -450,6 +522,7 @@ JS.preprocess <- rk.paste.JS(
     pckgShortDescription,
     pckgLongDescription,
     pckgHomepage,
+    pckgLicense,
     envPckgRoot,
     envRepoRoot,
     frameSandbox,
@@ -578,6 +651,9 @@ JS.preprocess <- rk.paste.JS(
     if(pckgHomepage){
       echo("\tURL=\"", pckgHomepage, "\",\n")
     } else {},
+    if(pckgLicense){
+      echo("\tLicense=\"", pckgLicense, "\",\n")
+    } else {},
     echo("\tstringsAsFactors=FALSE\n)\n\n"),
     ## multiple R homes
     if(frameRhomes && envRhomesVarslot != ""){
@@ -663,9 +739,58 @@ rxp.opt.actions <- rk.JS.options("actions",
   opt.sep=",\\n\\t"
 )
 
+rxp.opt.debActions <- rk.JS.options("debActions",
+  .ite=js(
+    if(debActionDeb){
+      qp("\n\t\t\t\"deb\"")
+    } else {},
+    if(debActionBin){
+      qp("\n\t\t\t\"bin\"")
+    } else {},
+    if(debActionSrc){
+      qp("\n\t\t\t\"src\"")
+    } else {},
+    keep.ite=TRUE
+  ),
+  collapse="",
+  option="actions",
+  funct="c",
+  opt.sep="\\t\\t"
+)
+
+rxp.opt.debOverwrite <- rk.JS.options("debOverwrite",
+  .ite=js(
+    if(debOverwriteChangelog){
+      qp("\n\t\t\t\"changelog\"")
+    } else {},
+    if(debOverwriteControl){
+      qp("\n\t\t\t\"control\"")
+    } else {},
+    if(debOverwriteCopyright){
+      qp("\n\t\t\t\"copyright\"")
+    } else {},
+    if(debOverwriteRules){
+      qp("\n\t\t\t\"rules\"")
+    } else {},
+    if(debOverwriteCompat){
+      qp("\n\t\t\t\"compat\"")
+    } else {},
+    if(debOverwritePGP){
+      qp("\n\t\t\t\"gpg.key\"")
+    } else {},
+    keep.ite=TRUE
+  ),
+  collapse="",
+  option="overwrite",
+  funct="c",
+  opt.sep="\\t\\t"
+)
+
 JS.calculate <- rk.paste.JS(
   rk.JS.vars(frameDeb),
   rxp.opt.actions,
+  rxp.opt.debActions,
+  rxp.opt.debOverwrite,
   echo("roxy.package(", rxp.opt.actions, ",\n"),
     echo("\tpck.description=packageDescription,\n"),
     echo("\tpck.source.dir=packageRoot,\n"),
@@ -677,17 +802,26 @@ JS.calculate <- rk.paste.JS(
         echo("\trepo.root=\"", envRepoRoot, "\",\n")
       } else {},
 # #   pck.date="2014-01-22","),
-#     roxy.unlink.target=FALSE,"),
       echo("\tcleanup=TRUE,\n"),
-      echo("\tURL=\"http://R.reaktanz.de\",\n"),
+      if(debRepoURL){
+        echo("\tURL=\"", debRepoURL, "\",\n")
+      } else {},
       if(frameDeb){
         echo("\tdeb.options=list(\n")
         echo("\t\tbuild.dir=file.path(main.root,pck.name),\n")
         echo("\t\trevision=deb.revision,\n")
-        echo("\t\torigin=\"other-reaktanz\",\n")
-        echo("\t\tdistribution=\"unstable\",\n")
-        echo("\t\tcomponent=\"main\",\n")
-        echo("\t\turgency=\"low\",\n")
+        if(debOrigin){
+          echo("\t\torigin=\"", debOrigin, "\",\n")
+        } else {}
+        if(debDistribution){
+          echo("\t\tdistribution=\"", debDistribution, "\",\n")
+        } else {}
+        if(debComponent){
+          echo("\t\tcomponent=\"", debComponent, "\",\n")
+        } else {}
+        if(debUrgency){
+          echo("\t\turgency=\"", debUrgency, "\",\n")
+        } else {}
         echo("\t\tchangelog=deb.changelog,\n")
         echo("\t\tdeb.description=list(\n")
         echo("\t\t\tBuild.Depends.Indep=\"debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs\",\n")
@@ -697,13 +831,21 @@ JS.calculate <- rk.paste.JS(
         } else {}
         echo("\t\t),\n")
         echo("\t\tSection=\"math\",\n")
-        echo("\t\tPriority=\"optional\"\n")
-        echo("\t\tactions=c(\"deb\", \"bin\", \"src\"),\n")
-        echo("\t\toverwrite=c(\"changelog\", \"control\", \"copyright\", \"rules\"),\n")
+        if(debPriority){
+          echo("\t\tPriority=\"", debPriority, "\",\n")
+        } else {}
+        echo(rxp.opt.debActions, ",\n")
+        echo(rxp.opt.debOverwrite, ",\n")
         echo("\t\tbin.opts=\"-rfakeroot -b -uc\",\n")
         echo("\t\tarch=\"all\",\n")
-        echo("\t\tgpg.key=\"DDCDA632\",\n")
-        echo("\t\tkeep.build=FALSE\n")
+        if(debMaintainerPGP){
+          echo("\t\tgpg.key=\"", debMaintainerPGP, "\",\n")
+        } else {}
+        if(debKeepBuild){
+          echo("\t\tkeep.build=TRUE\n")
+        } else {
+          echo("\t\tkeep.build=FALSE\n")
+        }
         echo("\t)\n")
       } else {
         echo("\tdeb.options=list()\n")
