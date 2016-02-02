@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.04-4 (2015-11-02)
+changes in version 0.04-4 (2016-02-02)
 unreleased:
   - this release is under development
 fixed:
@@ -15,6 +15,9 @@ changed:
   - moved unit tests to tests/testthat
   - added dch and dpkg-parsechangelog to dependecy checks of debianize()
   - default section for debian R packages is now "gnu-r" instead of "math"
+added:
+  - new option "OSX.repo" to deal with the constantly changing paths of
+    binary repos for max OS X
 
 changes in version 0.04-3 (2015-06-29)
 fixed:

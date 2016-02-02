@@ -12,7 +12,8 @@ roxy.package(pck.source.dir, pck.version, pck.description, R.libs, repo.root,
   "--no-manual --no-build-vignettes", check = "--as-cran", Rd2pdf =
   "--pdf --no-preview"), URL = NULL, deb.options = NULL,
   ChangeLog = list(changed = c("initial release"), fixed =
-  c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL, ...)
+  c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
+  OSX.repo = list(main = "contrib", symlinks = "mavericks"), ...)
 }
 \arguments{
 \item{pck.source.dir}{Character string,
@@ -51,7 +52,8 @@ include \code{"roxy"}, then this information is read from the present DESCRIPTIO
   \item{"macosx"}{Update the Mac OS X binary package}
   \item{"log"}{Generate initial ChangeLog or update a present ChangeLog file}
   \item{"deb"}{Update the Debian binary package with \code{\link[roxyPackage:debianize]{debianize}} (works only on Debian systems;
-    see \code{deb.options}, too)}
+    see \code{deb.options},
+      too). \code{URL} must also be set to generate Debian repository information.}
   \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
 }
 Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources,
@@ -84,7 +86,7 @@ Will be passed on as given here. To deactivate,
       which holds the directories \code{src}
 etc.). This is not the path to the local file system,
       but should be the URL to the repository as it is available
-via internet. This option is neccessary for (and only interpreted by) the action \code{"news2rss"}.}
+via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"} and \code{"deb"}.}
 
 \item{deb.options}{A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default,
       \code{pck.source.dir}
@@ -110,6 +112,13 @@ file. Setting it to an empty string (\code{""}) will remove the file,
       this will replace an existing \code{.Rinstignore}
 file. Setting it to an empty string (\code{""}) will remove the file,
       the default value \code{NULL} will simply keep the file, if one is present.}
+
+\item{OSX.repo}{A named list of character vectors,
+      one named \code{"main"} defines the main directory below \code{./bin/macosx/} where packages for
+Mac OS X should be copied,
+      and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="mavericks"}
+would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
+make sure they're correctly transferred to your server, where applicable.}
 
 \item{...}{Additional options passed through to \code{roxygenize}.}
 }
@@ -145,7 +154,7 @@ The repository will have this directory structure, that is,
 \describe{
    \item{\code{./src/contrib}}{Here go the source packages}
    \item{\code{./bin/windows/contrib/$RVERSION}}{Here go the Windows binaries}
-   \item{\code{./bin/macosx/leopard/contrib/$RVERSION}}{Here go the Mac OS X binaries}
+   \item{\code{./bin/macosx/contrib/$RVERSION}}{Here go the Mac OS X binaries (see \code{OSX.repo} for further options)}
    \item{\code{./pckg/index.html}}{A global package index with links to packages' index files,
       if actions included \code{"html"}}
    \item{\code{./pckg/web.css}}{A CRAN-style CSS file, if actions included \code{"html"}}
@@ -169,11 +178,11 @@ to build packages for different R versions,
       provided you installed them on your system. If you're running GNU/Linux, an easy way
 of doing so is to fetch the R sources from CRAN,
       calling \code{"./configure"} with something like \code{"--prefix=$HOME/R/<R version>"},
-so that \code{"make install"} installs to that path. Let's assume you did that with R 2.12.2 and 2.11.1,
+so that \code{"make install"} installs to that path. Let's assume you did that with R 3.2.2 and 3.1.3,
       you could then call \code{roxy.package}
-with options like \code{R.homes=c("home/user/R/R-2.11.1",
-      "home/user/R/R-2.12.2")} and \code{R.libs=c("home/user/R/R-2.11.1/lib64/R/library",}
-\code{"home/user/R/R-2.12.2/lib64/R/library")}. \code{roxy.package} will then call itself recursively for each given R installation.
+with options like \code{R.homes=c("home/user/R/R-3.1.3",
+      "home/user/R/R-3.2.2")} and \code{R.libs=c("home/user/R/R-3.1.3/lib64/R/library",}
+\code{"home/user/R/R-3.2.2/lib64/R/library")}. \code{roxy.package} will then call itself recursively for each given R installation.
 
 One thing you should be aware of is that \code{roxy.package} will not perform all actions each time. That is because some of them,
       namely
