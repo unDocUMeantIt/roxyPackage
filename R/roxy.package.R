@@ -862,7 +862,7 @@ roxy.package <- function(
     } else {}
     package.html <- roxy.html(pckg.dscrptn, index=FALSE, css="web.css", R.version=R.Version.win,
       url.src=url.src, url.win=url.win, url.mac=url.mac, url.doc=url.doc, url.vgn=url.vgn,
-      url.deb.repo=url.deb.repo,
+      url.deb.repo=url.deb.repo, main.path.mac=OSX.repo[["main"]],
       title=html.title, cite=pckg.cite.file.html, news=url.NEWS,
       changelog=pckg.changelog, rss.file=RSS.file.name)
     target.file.pckg <- file.path(repo.pckg.info, "index.html")

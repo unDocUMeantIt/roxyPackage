@@ -267,7 +267,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
          if(!is.null(url.mac)){
           rx.tr("MacOS X binary:", XMLNode("a",
             url.mac,
-            attrs=list(href=paste0("../../bin/macosx/leopard/contrib/", R.version, "/", url.mac))))},
+            attrs=list(href=paste0("../../bin/macosx/", main.path.mac, "/", R.version, "/", url.mac))))},
          if(!is.null(url.win)){
           rx.tr("Windows binary:", XMLNode("a",
             url.win,
