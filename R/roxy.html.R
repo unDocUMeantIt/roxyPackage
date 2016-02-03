@@ -189,7 +189,7 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
 # for global repository index outside pckg dir, set index=TRUE and redirect="pckg/"
 #' @import XiMpLe
 roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
-  url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, url.deb.repo=NULL, title=NULL, cite="", news="", changelog="", redirect="", rss.file=NULL) {
+  url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, url.deb.repo=NULL, main.path.mac=NULL, title=NULL, cite="", news="", changelog="", redirect="", rss.file=NULL) {
 
   rss.header <- rss.feed <- NULL
 
