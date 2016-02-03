@@ -32,7 +32,7 @@
 #' @param package A character vector with package names to check. If set, \code{archive.packages} will only
 #'    take actions on these packages. If \code{NULL}, all packages are affected.
 #' @param type A character vector defining the package formats to keep. Valid entries are \code{"source"},
-#'    \code{"win.binary"} and \code{"mac.binary.leopard"}. By default, only the source packages are archived, all other
+#'    \code{"win.binary"} and \code{"mac.binary"}. By default, only the source packages are archived, all other
 #'    packages are deleted.
 #' @param archive.root Path to the archive root, i.e., the directory to which files should be moved. Usually 
 #'    the Archive is kept i \code{repo.root}
@@ -56,7 +56,7 @@
 #' # versions from /var/www/repo to /var/www/archive. to suppress the
 #' # creation of a special archive directory, we set to.dir=""
 #' archive.packages("file:///var/www/repo", to.dir="", keep=2,
-#'   type=c("source", "win.binary", "mac.binary.leopard"),
+#'   type=c("source", "win.binary", "mac.binary"),
 #'   archive.root="/var/www/archive", reallyDoIt=TRUE)
 #' }
 archive.packages <- function(repo.root, to.dir="Archive", keep=1, package=NULL, type="source",
@@ -66,7 +66,7 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, package=NULL, 
   on.exit(options(available_packages_filters=old.opts))
   options(available_packages_filters=list(noFilter=function(x){x}))
 
-  all.valid.types <- c("source", "win.binary", "mac.binary.leopard")
+  all.valid.types <- c("source", "win.binary", "mac.binary")
   if(any(!type %in% all.valid.types)){
     stop(simpleError("archive: invalid package type specified!"))
   } else {}
@@ -111,16 +111,16 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, package=NULL, 
       return(filter.repo.packages(available.packages(this.R, type="win.binary"), packages=package))
     })
 
-  # in.repo[["mac.binary.leopard"]] will be an empty list() if the directory doesn't exist
-  repo.mac <- listRDirs(file.path(clean.repo.root, "bin", "macosx", "leopard", "contrib"), full.path=TRUE)
+  # in.repo[["mac.binary"]] will be an empty list() if the directory doesn't exist
+  repo.mac <- listRDirs(file.path(clean.repo.root, "bin", "macosx", "contrib"), full.path=TRUE)
   if(isTRUE(archInRepo)){
     archive.mac <- repo.mac
   } else {
-    archive.mac <- file.path(clean.archive.root, "bin", "macosx", "leopard", "contrib",
-      listRDirs(file.path(clean.repo.root, "bin", "macosx", "leopard", "contrib"), full.path=FALSE))
+    archive.mac <- file.path(clean.archive.root, "bin", "macosx", "contrib",
+      listRDirs(file.path(clean.repo.root, "bin", "macosx", "contrib"), full.path=FALSE))
   }
-  in.repo[["mac.binary.leopard"]] <- lapply(repo.mac, function(this.R){
-      return(filter.repo.packages(available.packages(this.R, type="mac.binary.leopard"), packages=package))
+  in.repo[["mac.binary"]] <- lapply(repo.mac, function(this.R){
+      return(filter.repo.packages(available.packages(this.R, type="mac.binary"), packages=package))
     })
 
   ## now go through all type entries in the inventory and check for each package seperately

@@ -25,7 +25,7 @@ with the option \code{package}.}
 take actions on these packages. If \code{NULL}, all packages are affected.}
 
 \item{type}{A character vector defining the package formats to keep. Valid entries are \code{"source"},
-\code{"win.binary"} and \code{"mac.binary.leopard"}. By default,
+\code{"win.binary"} and \code{"mac.binary"}. By default,
       only the source packages are archived, all other
 packages are deleted.}
 
@@ -62,7 +62,7 @@ archive.packages("file:///var/www/repo", reallyDoIt=TRUE)
 # versions from /var/www/repo to /var/www/archive. to suppress the
 # creation of a special archive directory, we set to.dir=""
 archive.packages("file:///var/www/repo", to.dir="", keep=2,
-  type=c("source", "win.binary", "mac.binary.leopard"),
+  type=c("source", "win.binary", "mac.binary"),
   archive.root="/var/www/archive", reallyDoIt=TRUE)
 }
 }
