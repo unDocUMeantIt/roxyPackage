@@ -437,7 +437,7 @@ queryDescription <- function(description, dep=c("Depends")){
 # basic checks of the description file with ability to autogenerate some fields
 # - isRpackage: if FALSE, it's assumed to become a GnuPG keyring package
 deb.prepare.description <- function(deb.description=NULL, R.description=NULL, origin="cran", origin.alt=list(),
-  arch="all", defaults=list(Section="math", Priority="optional"), replace.dots=FALSE,
+  arch="all", defaults=list(Section="gnu-r", Priority="optional"), replace.dots=FALSE,
   maintainer=NULL, isRpackage=TRUE, action=ifelse(isRpackage, "deb", "deb-key")){
   if(all(isRpackage, is.null(deb.description), is.null(R.description))){
     stop(simpleError(paste0(action, ": can't prepare dependencies, because neither R nor debian description was given!")))

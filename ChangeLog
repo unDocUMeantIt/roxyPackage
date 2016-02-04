@@ -1,5 +1,24 @@
 ChangeLog for package roxyPackage
 
+changes in version 0.04-4 (2016-02-04)
+fixed:
+  - re-activated the unit tests that were shut down with 0.03-11 due to
+    https://github.com/hadley/testthat/issues/86 as there's now a workaround fixing
+    tests/testthat.R
+  - removed leftover tests/test_roxyPackage_package.R
+  - updated URL to roxygen2 in docs
+  - fixed title case in title field
+  - fixed imports in NAMESPACE file
+changed:
+  - moved unit tests to tests/testthat
+  - added dch and dpkg-parsechangelog to dependecy checks of debianize()
+  - default section for debian R packages is now "gnu-r" instead of "math"
+  - archive.packages() now uses type "mac.binary" instead of the deprecated
+    "mac.binary.leopard"
+added:
+  - new option "OSX.repo" to deal with the constantly changing paths of
+    binary repos for max OS X
+
 changes in version 0.04-3 (2015-06-29)
 fixed:
   - internal function parseChangeLog() now checks for proper version and date

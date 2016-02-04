@@ -101,7 +101,7 @@
 #'      \item{Depends}{\code{"r-base-core (>= <R vers>)"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format}
 #'      \item{Suggests}{Suggests in \code{DESCRIPTION} in debianized format}
 #'      \item{Maintainer}{generated from \code{\link[base:Sys.info]{Sys.info}} (\code{user <login@@nodename>}), with a warning.}
-#'      \item{Section}{\code{"math"}}
+#'      \item{Section}{\code{"gnu-r"}}
 #'      \item{Priority}{\code{"optional"}}
 #'      \item{Homepage}{URL in \code{DESCRIPTION}}
 #'    }
@@ -235,7 +235,7 @@ debianize <- function(
   # gpg will either be NULL, "gpg" or "gpg<version>"
   gpg <- GPGversion(key=gpg.key, version=gpg.version)
   # we also need a native tar for the extra arguments to work
-  neededTools <- c("dpkg-buildpackage", "fakeroot", "dpkg-source", "dpkg-genchanges", "apt-ftparchive", "tar", gpg)
+  neededTools <- c("apt-ftparchive", "dch", "dpkg-buildpackage", "dpkg-genchanges", "dpkg-parsechangelog", "dpkg-source", "fakeroot", "tar", gpg)
 
   # basic checks:
   #  - is this a UNIX system?

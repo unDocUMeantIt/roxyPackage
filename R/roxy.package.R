@@ -36,7 +36,7 @@
 #' \describe{
 #'    \item{\code{./src/contrib}}{Here go the source packages}
 #'    \item{\code{./bin/windows/contrib/$RVERSION}}{Here go the Windows binaries}
-#'    \item{\code{./bin/macosx/leopard/contrib/$RVERSION}}{Here go the Mac OS X binaries}
+#'    \item{\code{./bin/macosx/contrib/$RVERSION}}{Here go the Mac OS X binaries (see \code{OSX.repo} for further options)}
 #'    \item{\code{./pckg/index.html}}{A global package index with links to packages' index files, if actions included \code{"html"}}
 #'    \item{\code{./pckg/web.css}}{A CRAN-style CSS file, if actions included \code{"html"}}
 #'    \item{\code{./pckg/$PACKAGENAME}}{Here go documentation PDF and vignette, as well as a \code{ChangeLog} file, if found.
@@ -51,9 +51,9 @@
 #' The options \code{R.libs} and \code{R.homes} can actually take more than one string, but a vector of strings. This can be used
 #' to build packages for different R versions, provided you installed them on your system. If you're running GNU/Linux, an easy way
 #' of doing so is to fetch the R sources from CRAN, calling \code{"./configure"} with something like \code{"--prefix=$HOME/R/<R version>"},
-#' so that \code{"make install"} installs to that path. Let's assume you did that with R 2.12.2 and 2.11.1, you could then call \code{roxy.package}
-#' with options like \code{R.homes=c("home/user/R/R-2.11.1", "home/user/R/R-2.12.2")} and \code{R.libs=c("home/user/R/R-2.11.1/lib64/R/library",}
-#' \code{"home/user/R/R-2.12.2/lib64/R/library")}. \code{roxy.package} will then call itself recursively for each given R installation.
+#' so that \code{"make install"} installs to that path. Let's assume you did that with R 3.2.2 and 3.1.3, you could then call \code{roxy.package}
+#' with options like \code{R.homes=c("home/user/R/R-3.1.3", "home/user/R/R-3.2.2")} and \code{R.libs=c("home/user/R/R-3.1.3/lib64/R/library",}
+#' \code{"home/user/R/R-3.2.2/lib64/R/library")}. \code{roxy.package} will then call itself recursively for each given R installation.
 #' 
 #' One thing you should be aware of is that \code{roxy.package} will not perform all actions each time. That is because some of them, namely
 #' \code{"roxy"}, \code{"cite"}, \code{"license"}, \code{"doc"}, \code{"cl2news"} and \code{"news2rss"}, should produce identical
@@ -97,7 +97,7 @@
 #'      \item{"macosx"}{Update the Mac OS X binary package}
 #'      \item{"log"}{Generate initial ChangeLog or update a present ChangeLog file}
 #'      \item{"deb"}{Update the Debian binary package with \code{\link[roxyPackage:debianize]{debianize}} (works only on Debian systems;
-#'        see \code{deb.options}, too)}
+#'        see \code{deb.options}, too). \code{URL} must also be set to generate Debian repository information.}
 #'      \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
 #'    }
 #'    Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources, which will overwrite
@@ -115,7 +115,7 @@
 #'    Will be passed on as given here. To deactivate, options must explicitly be se to \code{""}, missing options will be used with the default values.
 #' @param URL A character string defining the URL to the root of the repository (i.e., which holds the directories \code{src}
 #'    etc.). This is not the path to the local file system, but should be the URL to the repository as it is available
-#'    via internet. This option is neccessary for (and only interpreted by) the action \code{"news2rss"}.
+#'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"} and \code{"deb"}.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
 #'    will be used.
@@ -128,10 +128,15 @@
 #'    file. Setting it to an empty string (\code{""}) will remove the file, the default value \code{NULL} will simply keep the file, if one is present.
 #' @param Rinstignore A character vector to be used as lines of an \code{.Rinstignore} file. If set, this will replace an existing \code{.Rinstignore}
 #'    file. Setting it to an empty string (\code{""}) will remove the file, the default value \code{NULL} will simply keep the file, if one is present.
+#' @param OSX.repo A named list of character vectors, one named \code{"main"} defines the main directory below \code{./bin/macosx/} where packages for
+#'    Mac OS X should be copied, and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="mavericks"}
+#'    would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
+#'    make sure they're correctly transferred to your server, where applicable.
 #' @param ... Additional options passed through to \code{roxygenize}.
 #' @references
-#' [1] \url{http://cran.r-project.org/web/packages/roxygen2/}
+#' [1] \url{http://cran.r-project.org/package=roxygen2}
 #' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run roxy.package() in a sandbox.
+#' @import roxygen2
 #' @export
 #' @examples
 #' \dontrun{
@@ -194,6 +199,7 @@ roxy.package <- function(
   ChangeLog=list(changed=c("initial release"), fixed=c("missing ChangeLog")),
   Rbuildignore=NULL,
   Rinstignore=NULL,
+  OSX.repo=list(main="contrib", symlinks="mavericks"),
   ...){
 
   # avoid some NOTEs from R CMD check
@@ -254,6 +260,7 @@ roxy.package <- function(
         ChangeLog=ChangeLog,
         Rbuildignore=Rbuildignore,
         Rinstignore=Rinstignore,
+        OSX.repo=OSX.repo,
         ...)
     }
     return(invisible(NULL))
@@ -346,10 +353,11 @@ roxy.package <- function(
 
   repo.src.contrib <- file.path(repo.root, "src", "contrib")
   repo.win <- file.path(repo.root, "bin", "windows", "contrib", R.Version.win)
-  # repo trees have changed with R 3.0.0
-  repo.macosx <-  ifelse(isTRUE(R_system_version(R.Version.full) < "3.0"),
-    file.path(repo.root, "bin", "macosx","leopard", "contrib", R.Version.win),
-    file.path(repo.root, "bin", "macosx","contrib", R.Version.win))
+  # we'll do proper checks in the mac section, no need to freak out here just yet
+  # if OSX.repo is set incorrectly
+  repo.macosx <- file.path(repo.root, "bin", "macosx")
+  repo.macosx.main <- file.path(repo.macosx, OSX.repo[["main"]])
+  repo.macosx.R <- file.path(repo.macosx.main, R.Version.win)
   repo.pckg.info.main <- file.path(repo.root, "pckg")
   repo.pckg.info <- file.path(repo.pckg.info.main, pck.package)
   pckg.basename <- paste0(pck.package, "_", pck.version)
@@ -363,7 +371,7 @@ roxy.package <- function(
   pckg.changelog <- file.path(repo.pckg.info, "ChangeLog")
   repo.src.gz <- file.path(repo.src.contrib, pckg.name.src)
   win.package <- file.path(repo.win, pckg.name.win)
-  macosx.package <- file.path(repo.macosx, pckg.name.mac)
+  macosx.package <- file.path(repo.macosx.R, pckg.name.mac)
   pckg.NEWS.Rd <- file.path(pckg.inst.dir, "NEWS.Rd")
   pckg.NEWS.inst <- file.path(pckg.inst.dir, "NEWS")
   pckg.NEWS <- file.path(pck.source.dir, "NEWS")
@@ -703,7 +711,29 @@ roxy.package <- function(
 
   ## fill macosx repo
   if("macosx" %in% actions){
-    createMissingDir(dirPath=repo.macosx, action="repo")
+    # sanity check
+    if(nchar(OSX.repo[["main"]]) > 0){
+      createMissingDir(dirPath=repo.macosx.R, action="repo")
+      if(!is.null(OSX.repo[["symlinks"]])){
+        for (thisSymlink in OSX.repo[["symlinks"]]){
+          thisSymPath <- file.path(repo.macosx, thisSymlink)
+          if(isTRUE(unix.OS)){
+            if(!file.exists(thisSymPath)){
+              jmp.back <- getwd()
+              setwd(repo.macosx)
+              r.cmd.symlink.call <- paste0(Sys.which("ln"), " -s . ", thisSymlink)
+              message(paste0("repo: creating symbolic link ", thisSymPath))
+              system(r.cmd.symlink.call, ignore.stdout=TRUE, ignore.stderr=TRUE, intern=FALSE)
+              setwd(jmp.back)
+            } else {}
+          } else {
+            message(paste0("repo: skip creating symbolic link ", thisSymPath, " (windows)"))
+          }
+        }
+      } else {}
+    } else {
+      stop(simpleError("repo: you *must* provide a character string for \"main\" via OSX.repo (mac)!"))
+    }
     removeIfExists(filePath=macosx.package)
     # since not all tar implementations (especially the BSD default on Mac OS X) support --exclude-vcs,
     # we'll exclude these manually
@@ -733,7 +763,7 @@ roxy.package <- function(
       compression="gzip", extra_flags=paste("-h ", tar.extraFlags))
     message(paste0("repo: created ", pckg.name.mac, " (mac OS X)"))
     setwd(jmp.back)
-    tools::write_PACKAGES(dir=repo.macosx, type="mac.binary", verbose=TRUE, latestOnly=FALSE)
+    tools::write_PACKAGES(dir=repo.macosx.R, type="mac.binary", verbose=TRUE, latestOnly=FALSE)
     message("repo: updated bin/PACKAGES (mac OS X)")
   } else {}
 
@@ -832,7 +862,7 @@ roxy.package <- function(
     } else {}
     package.html <- roxy.html(pckg.dscrptn, index=FALSE, css="web.css", R.version=R.Version.win,
       url.src=url.src, url.win=url.win, url.mac=url.mac, url.doc=url.doc, url.vgn=url.vgn,
-      url.deb.repo=url.deb.repo,
+      url.deb.repo=url.deb.repo, main.path.mac=OSX.repo[["main"]],
       title=html.title, cite=pckg.cite.file.html, news=url.NEWS,
       changelog=pckg.changelog, rss.file=RSS.file.name)
     target.file.pckg <- file.path(repo.pckg.info, "index.html")

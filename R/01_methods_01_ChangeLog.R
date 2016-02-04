@@ -37,6 +37,7 @@
 #' @seealso \code{\link[roxyPackage:readChangeLog]{readChangeLog}},
 #'   \code{\link[roxyPackage:updateChangeLog]{updateChangeLog}}
 #' @docType methods
+#' @import methods
 #' @rdname getChangeLogEntry-methods
 #' @include 00_classes_01_ChangeLog_internal.R
 setGeneric("getChangeLogEntry", function(log, ...){
@@ -45,6 +46,7 @@ setGeneric("getChangeLogEntry", function(log, ...){
 
 #' @rdname getChangeLogEntry-methods
 #' @param version Character string, version number to look up.
+#' @import methods
 #' @aliases
 #'    getChangeLogEntry,-methods
 #'    getChangeLogEntry,ChangeLog-method
@@ -79,6 +81,7 @@ setMethod("getChangeLogEntry",
 #' @return An object of class \code{ChangeLog}.
 #' @export
 #' @seealso \code{\link[roxyPackage:readChangeLog]{readChangeLog}}
+#' @import methods
 #' @docType methods
 #' @rdname updateChangeLog-methods
 # @examples
@@ -92,6 +95,7 @@ setGeneric("updateChangeLog", function(log, entry, version, date=Sys.Date(), app
   })
 
 #' @rdname updateChangeLog-methods
+#' @import methods
 #' @aliases
 #'    updateChangeLog,-methods
 #'    updateChangeLog,ChangeLog-method

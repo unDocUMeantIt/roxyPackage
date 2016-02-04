@@ -19,6 +19,7 @@
 # this class will only be used internally, in one single instance.
 # it holds all information needed for sandboxing and will be stored
 # in the package internal environment .roxyPackage.env
+#' @import methods
 setClass("roxySandbox",
   representation=representation(
     active="logical",

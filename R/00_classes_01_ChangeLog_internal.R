@@ -19,6 +19,7 @@
 # this file covers all internal functions to manage ChangeLogs
 
 # classes for ChangeLog objects
+#' @import methods
 setClass("ChangeLog.items",
   representation=representation(
     plain="character",

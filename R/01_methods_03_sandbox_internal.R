@@ -17,6 +17,7 @@
 
 
 # show method, used internally to print status reports
+#' @import methods
 setMethod("show", signature(object="roxySandbox"), function(object){
   missionMessage <- paste("sandbox settings\n")
 

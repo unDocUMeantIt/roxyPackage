@@ -481,7 +481,7 @@ mvToArchive <- function(package, repo, archive, versions, type=NA, file=NA, over
   file.ending <- switch(type,
       source=".tar.gz",
       win.binary=".zip",
-      mac.binary.leopard=".tgz"
+      mac.binary=".tgz"
     )
   pkg.names <- paste0(package, "_", versions, file.ending)
   sapply(pkg.names, function(this.package){
