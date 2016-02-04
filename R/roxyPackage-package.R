@@ -3,7 +3,7 @@
 #' \tabular{ll}{
 #' Package: \tab roxyPackage\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.04-4\cr
+#' Version: \tab 0.04-5\cr
 #' Date: \tab 2016-02-04\cr
 #' Depends: \tab R (>= 2.9.0),methods,roxygen2,XiMpLe (>= 0.03-20)\cr
 #' Encoding: \tab UTF-8\cr
