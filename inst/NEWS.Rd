@@ -1,12 +1,7 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
-\section{Changes in roxyPackage version 0.04-4 (2015-11-02)}{
-  \subsection{unreleased}{
-    \itemize{
-      \item this release is under development
-    }
-  }
+\section{Changes in roxyPackage version 0.04-4 (2016-02-04)}{
   \subsection{fixed}{
     \itemize{
       \item re-activated the unit tests that were shut down with 0.03-11 due to
@@ -23,6 +18,14 @@
       \item moved unit tests to tests/testthat
       \item added dch and dpkg-parsechangelog to dependecy checks of \code{debianize()}
       \item default section for debian R packages is now "gnu-r" instead of \code{"math"}
+      \item \code{archive.packages()} now uses type \code{"mac.binary"} instead of the deprecated
+        \code{"mac.binary.leopard"}
+    }
+  }
+  \subsection{added}{
+    \itemize{
+      \item new option \code{"OSX.repo"} to deal with the constantly changing paths of
+        binary repos for max OS X
     }
   }
 }
