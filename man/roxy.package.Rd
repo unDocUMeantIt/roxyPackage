@@ -66,7 +66,8 @@ news files will be linked by the \code{"html"} action.}
       if \code{TRUE} will remove backup files (matching \code{.*~$} or \code{.*backup$}) from the source directory.}
 
 \item{rm.vignette}{Logical,
-      if \code{TRUE} and a vignette PDF was build during the \code{"doc"} action, it will not be kept
+      if \code{TRUE} and a vignette PDF was build during the \code{"doc"} action,
+      it will not be kept
 in the source package but just be moved to the \code{./pckg/$PACKAGENAME} directory of the repository.}
 
 \item{R.homes}{Path to the R installation to use. Can be set manually to build packages for other R versions than the default one,
@@ -80,7 +81,8 @@ if you have installed them in parallel. Should probably be used together with \c
 \code{R CMD INSTALL},
       \code{R CMD check} and \code{R CMD Rd2pdf} (or \code{R CMD Rd2dvi} for R < 2.15). Change these only if you know what you're doing!
 Will be passed on as given here. To deactivate,
-      options must explicitly be se to \code{""}, missing options will be used with the default values.}
+      options must explicitly be se to \code{""},
+      missing options will be used with the default values.}
 
 \item{URL}{A character string defining the URL to the root of the repository (i.e.,
       which holds the directories \code{src}
@@ -116,7 +118,8 @@ file. Setting it to an empty string (\code{""}) will remove the file,
 \item{OSX.repo}{A named list of character vectors,
       one named \code{"main"} defines the main directory below \code{./bin/macosx/} where packages for
 Mac OS X should be copied,
-      and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="mavericks"}
+      and the second optional one named \code{"symlink"} can be used to set symbolic links,
+      e.g., \code{symlinks="mavericks"}
 would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
 make sure they're correctly transferred to your server, where applicable.}
 
@@ -191,7 +194,8 @@ One thing you should be aware of is that \code{roxy.package} will not perform al
 results anyway,
       so they are only considered during the first run. You should always place the R version which should be linked to from the
 HTML index last in line,
-      because \code{"html"} will overwrite previous results. For a similar reason, the \code{"deb"} action will only actually
+      because \code{"html"} will overwrite previous results. For a similar reason,
+      the \code{"deb"} action will only actually
 build a binary package during the last run,
       but debianizing it will be done during the first.
 }

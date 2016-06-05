@@ -32,7 +32,8 @@ This key must be available in your keyring (or in the one specified by \code{key
 \code{firstName lastName <your@mail.address>}.}
 
 \item{build.dir}{Character string,
-      valid path to a directory where to build the package. If this directory is not empty, a temporary
+      valid path to a directory where to build the package. If this directory is not empty,
+      a temporary
 directory will be created inside automatically.}
 
 \item{keyname}{Character string,

@@ -513,29 +513,6 @@ roxy.package <- function(
     } else {}
   } else {}
 
-  if("check" %in% actions){
-    # check for examples check file before
-    chk.ex.file <- file.path(pck.source.dir, paste0(pck.package, "-Ex.R"))
-    chk.ex.file.present <- ifelse(file_test("-f", chk.ex.file), TRUE, FALSE)
-    tryCatch(chk.out.dir <- tempdir(), error=function(e) stop(e))
-    message(paste0("check: calling R CMD check, this might take a while..."))
-    if(isTRUE(unix.OS)){
-      r.cmd.check.call <- paste0("R_LIBS_USER=", R.libs, " ; ",
-        R.bin, " CMD check --output=", chk.out.dir, " ", Rcmd.opt.check, pck.source.dir)
-      print(system(r.cmd.check.call, intern=TRUE))
-    } else {
-      r.cmd.check.call <- paste0("set R_LIBS_USER=", shQuote(R.libs, type="cmd"), " && ",
-        R.bin, " CMD check --output=", chk.out.dir, " ", Rcmd.opt.check, shQuote(pck.source.dir, type="cmd"))
-      print(shell(r.cmd.check.call, translate=TRUE, intern=TRUE))
-    }
-    on.exit(message(paste0("check: saved results to ", chk.out.dir, "/", pck.package, ".Rcheck")), add=TRUE)
-    # need to clean up?
-    if(!isTRUE(chk.ex.file.present) & file_test("-f", chk.ex.file)){
-      # there's an example file which wasn't here before
-      unlink(chk.ex.file)
-    } else {}
-  } else {}
-
   if("log" %in% actions){
     if(!file.exists(src.changelog)){
       newLog <- initChangeLog(entry=ChangeLog, package=pck.package, version=pck.version, date=pck.date)
@@ -885,6 +862,35 @@ roxy.package <- function(
     global.html <- roxy.html(all.descs, index=TRUE, css="web.css", title=html.index, redirect="pckg/")
     cat(global.html, file=target.file.glob)
     message(paste0("html: updated global index ", target.file.glob))
+  } else {}
+
+  if("check" %in% actions){
+    # check for examples check file before
+    chk.ex.file <- file.path(pck.source.dir, paste0(pck.package, "-Ex.R"))
+    chk.ex.file.present <- ifelse(file_test("-f", chk.ex.file), TRUE, FALSE)
+    tryCatch(chk.out.dir <- tempdir(), error=function(e) stop(e))
+    # checks should better be performed on built packages not source directories
+    if("package" %in% actions & file_test("-f", repo.src.gz)){
+      pck.check.target <- repo.src.gz
+    } else {
+      pck.check.target <- pck.source.dir
+    }
+    message(paste0("check: calling R CMD check, this might take a while..."))
+    if(isTRUE(unix.OS)){
+      r.cmd.check.call <- paste0("R_LIBS_USER=", R.libs, " ; ",
+        R.bin, " CMD check --output=", chk.out.dir, " ", Rcmd.opt.check, pck.check.target)
+      print(system(r.cmd.check.call, intern=TRUE))
+    } else {
+      r.cmd.check.call <- paste0("set R_LIBS_USER=", shQuote(R.libs, type="cmd"), " && ",
+        R.bin, " CMD check --output=", chk.out.dir, " ", Rcmd.opt.check, shQuote(pck.check.target, type="cmd"))
+      print(shell(r.cmd.check.call, translate=TRUE, intern=TRUE))
+    }
+    on.exit(message(paste0("check: saved results to ", chk.out.dir, "/", pck.package, ".Rcheck")), add=TRUE)
+    # need to clean up?
+    if(!isTRUE(chk.ex.file.present) & file_test("-f", chk.ex.file)){
+      # there's an example file which wasn't here before
+      unlink(chk.ex.file)
+    } else {}
   } else {}
 
   return(invisible(NULL))
