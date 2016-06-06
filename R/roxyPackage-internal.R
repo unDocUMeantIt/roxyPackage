@@ -485,8 +485,8 @@ mvToArchive <- function(package, repo, archive, versions, type=NA, file=NA, over
     )
   pkg.names <- paste0(package, "_", versions, file.ending)
   sapply(pkg.names, function(this.package){
-    pkg.from <- file.path(repo, this.package)
-    pkg.to <- file.path(archive, this.package)
+    pkg.from <- normalizePathByOS(file.path(repo, this.package))
+    pkg.to <- normalizePathByOS(file.path(archive, this.package))
     if(!file.exists(pkg.from)){
       stop(simpleError(paste0("file doesn't exist:\n  ", pkg.from)))
     } else {}

@@ -6,8 +6,12 @@ unreleased:
 fixed:
   - R CMD check should be performed on built packages, not source directories. this is
     now the case if you run the "check" action also with "package" enabled
+  - fixed a path issue causing problems to find package sources when in full sandboxing mode
+  - normalized paths in internal function mvToArchive(), called by archive.packages()
 changed:
   - the code for checks was moved to the end of roxy.package()
+  - rewrote the construction of deb.repo.path and deb.repo.path.part, two path strings
+    used internally in roxy.package()
   
 changes in version 0.04-4 (2016-02-04)
 fixed:

@@ -397,8 +397,10 @@ roxy.package <- function(
   )
   # try to set pckg.name.deb and deb.repo.path
   # this will only work if repo.root is unchanged, the rest is too messy now...
-  deb.repo.path.part <- paste0("deb/dists/", deb.defaults[["distribution"]], "/", deb.defaults[["component"]], "/", deb.defaults[["arch"]])
-  deb.repo.path <- paste0("../../", deb.repo.path.part)
+  deb.repo.path <- file.path("deb/dists", deb.defaults[["distribution"]])
+  deb.repo.path.part <- file.path(deb.repo.path, deb.defaults[["component"]], deb.defaults[["arch"]])
+#   deb.repo.path.part <- paste0("deb/dists/", deb.defaults[["distribution"]], "/", deb.defaults[["component"]], "/", deb.defaults[["arch"]])
+#   deb.repo.path <- paste0("../../", deb.repo.path.part)
   # need to get repo.name to be able to call eval() on deb.defaults[["origin"]], because that pastes repo.name
   repo.name <- deb.defaults[["repo.name"]]
   deb.defaults[["origin"]] <- eval(deb.defaults[["origin"]])
@@ -609,7 +611,8 @@ roxy.package <- function(
     createMissingDir(dirPath=repo.src.contrib, action="repo")
     ## TODO: find a solution without sedwd()
     jmp.back <- getwd()
-    setwd(file.path(pck.source.dir, ".."))
+    pck.source.dir.parent <- dirname(file.path(pck.source.dir))
+    setwd(pck.source.dir.parent)
     if(isTRUE(unix.OS)){
       r.cmd.build.call <- paste0(R.bin, " CMD build ", Rcmd.opt.build, pck.source.dir)
       system(r.cmd.build.call, intern=TRUE)
@@ -617,7 +620,7 @@ roxy.package <- function(
       r.cmd.build.call <- paste0(R.bin, " CMD build ", Rcmd.opt.build, shQuote(pck.source.dir, type="cmd"))
       shell(r.cmd.build.call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
     }
-    file.mv(from=file.path(pck.source.dir,"..",pckg.name.src), to=repo.src.gz, overwrite=TRUE)
+    file.mv(from=file.path(pck.source.dir.parent,pckg.name.src), to=repo.src.gz, overwrite=TRUE)
     setwd(jmp.back)
     message(paste0("repo: copied ", pckg.name.src, " to src/contrib."))
     # install.packages() doesn't work if we want to build for/with other R installations than
