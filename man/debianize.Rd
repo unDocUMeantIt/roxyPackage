@@ -17,8 +17,7 @@ debianize(pck.source.dir, repo.root, build.dir = tempdir(), revision = 1,
 }
 \arguments{
 \item{pck.source.dir}{Character string,
-      path pointing to the root directory of your package sources,
-      to a local R package source tarball, or
+      path pointing to the root directory of your package sources, to a local R package source tarball, or
 a full URL to such a package tarball. Tarballs will be downloaded to a temporary directory,
       if needed, extracted, and then debianized.}
 
@@ -26,8 +25,7 @@ a full URL to such a package tarball. Tarballs will be downloaded to a temporary
       valid path to a directory where to build/update a local package repository.}
 
 \item{build.dir}{Character string,
-      valid path to a directory where to build the package. If this directory is not empty,
-      a temporary
+      valid path to a directory where to build the package. If this directory is not empty, a temporary
 directory will be created inside automatically.}
 
 \item{revision}{Numeric or a character string, the Debian package revision information.}
@@ -79,16 +77,14 @@ like \code{Build.Depends} or \code{Depends} rather than replacing them,
 
 \item{depends.origin}{A character string to set the default origin for packages which are a dependency of this one. In case all dependencies can be
 met by Debian packages from CRAN releases,
-      you can leave this to the default setting. If you need more control,
-      see \code{depends.origin.alt}.}
+      you can leave this to the default setting. If you need more control, see \code{depends.origin.alt}.}
 
 \item{depends.origin.alt}{A named list of alternative origins for packages which are a dependency of this one. By default,
       \code{depends.origin} is used,
 but if you know that certain dependencies are of different origin (e.g.,
       your own repository), you can set this here. Each list element must be named after
 the R package you want to set an origin for,
-      and must be a character vector or single string,
-      like \code{list(foo="other-janedoe")}. If more than one origin
+      and must be a character vector or single string, like \code{list(foo="other-janedoe")}. If more than one origin
 is given, they will be set as alternatives (using the pipe \code{"|"} as "or").}
 
 \item{actions}{Character vector, naming the actions to perform:
@@ -168,8 +164,7 @@ Once created,
 files from being re-written, e.g. if you altered them manually.
 
 The \code{./debian/changelog} is special here,
-      as \code{overwrite} doesn't mean the whole file will be overwritten,
-      but rather that the
+      as \code{overwrite} doesn't mean the whole file will be overwritten, but rather that the
 function checks if the changelog already contains an entry for this particular package version and revision,
       and only if this is not the
 case will add one at the beginning of the file,
@@ -199,8 +194,7 @@ but it would likely fail when it comes to signing the .changes/.dsc files,
 You'd have to sign those files later, e.g. with \code{debsign},
       if you really need this. However, secure-apt can still be ensured, if you provide
 a valid GnuPG key ID from your keyring,
-      which will then be used to sign the generated \code{Release} file. If not present yet,
-      a copy of
+      which will then be used to sign the generated \code{Release} file. If not present yet, a copy of
 the public key will automatically be saved to the repository,
       in a file named \code{<key ID>.asc}.
 
@@ -223,8 +217,7 @@ have a hard time figuring out how to get your package to work,
       if the building process doesn't fail in the first place.
 
 That said,
-      you should always try to debianize the package without manual dependencies set first. After that,
-      look at the generated \code{control}
+      you should always try to debianize the package without manual dependencies set first. After that, look at the generated \code{control}
 file and see if there are problems at all. Usually the default method is supposed to be quite clever when it comes to detect dependencies from the
 actual package \code{DESCRIPTION} file (it will automatically translate those into proper Debain package names,
       where tuning is possible via the

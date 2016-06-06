@@ -19,10 +19,15 @@
 ## function rx.tr()
 # helper function to cretae HTML table rows with two columns
 #' @import XiMpLe
-rx.tr <- function(col1, col2){
+rx.tr <- function(col1, col2, isList=FALSE){
   return(XMLNode("tr",
     XMLNode("td", col1, attrs=list(valign="top")),
-    XMLNode("td", col2)))
+    if(isTRUE(isList)){
+      XMLNode("td", children=col2)
+    } else {
+      XMLNode("td", col2)
+    }  
+  ))
 } ## function rx.tr()
 
 
@@ -260,18 +265,47 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         attrs=list(summary=paste0("Package ", pckg.name, " summary."))),
       XMLNode("h4", "Downloads:"),
       XMLNode("table",
-         if(!is.null(url.src)){
+        if(!is.null(url.src)){
           rx.tr("Package source:", XMLNode("a",
             url.src,
-            attrs=list(href=paste0("../../src/contrib/", url.src))))},
-         if(!is.null(url.mac)){
-          rx.tr("MacOS X binary:", XMLNode("a",
-            url.mac,
-            attrs=list(href=paste0("../../bin/macosx/", main.path.mac, "/", R.version, "/", url.mac))))},
-         if(!is.null(url.win)){
-          rx.tr("Windows binary:", XMLNode("a",
-            url.win,
-            attrs=list(href=paste0("../../bin/windows/contrib/", R.version, "/", url.win))))},
+            attrs=list(href=paste0("../../src/contrib/", url.src))))
+        },
+        if(length(url.mac) > 0){
+          rx.tr("MacOS X binaries:",
+            lapply(
+              length(url.mac):1,
+              function(this.num){
+                this.R <- names(url.mac)[this.num]
+                XMLNode("span",
+                  paste0("R ", this.R, ": "),
+                  XMLNode("a",
+                    ifelse(this.num > 1, paste0(url.mac[[this.num]], ", "), url.mac[[this.num]]),
+                    attrs=list(href=paste0("../../bin/macosx/", main.path.mac, "/", this.R, "/", url.mac[[this.num]]))
+                  )
+                )
+              }
+            ),
+            isList=TRUE
+          )
+        },
+        if(length(url.win) > 0){
+          rx.tr("Windows binaries:", 
+            lapply(
+              length(url.win):1,
+              function(this.num){
+                this.R <- names(url.win)[this.num]
+                XMLNode("span",
+                  paste0("R ", this.R, ": "),
+                  XMLNode("a",
+                    ifelse(this.num > 1, paste0(url.win[[this.num]], ", "), url.win[[this.num]]),
+                    attrs=list(href=paste0("../../bin/windows/contrib/", this.R, "/", url.win[[this.num]]))
+                  )
+                )
+              }
+            ),
+            isList=TRUE
+          )
+        },
         if(!is.null(url.deb.repo)){
           rx.tr("Debain binary package:", XMLNode("a", "Learn how to install Debian packages from this repository", attrs=list(href=url.deb.repo)))},
         if(!is.null(url.doc)){

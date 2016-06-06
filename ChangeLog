@@ -1,18 +1,26 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.04-5 (2016-02-04)
+changes in version 0.04-5 (2016-06-06)
 unreleased:
   - this version is under development
 fixed:
-  - R CMD check should be performed on built packages, not source directories. this is
-    now the case if you run the "check" action also with "package" enabled
-  - fixed a path issue causing problems to find package sources when in full sandboxing mode
-  - normalized paths in internal function mvToArchive(), called by archive.packages()
+  - R CMD check should be performed on built packages, not source
+    directories. this is now the case if you run the "check" action also with "package"
+    enabled
+  - fixed a path issue causing problems to find package sources when in full
+    sandboxing mode, most importantly, this affected the internal function
+    prep.sndbx.source.dir()
+  - normalized paths in internal function mvToArchive(), called by
+    archive.packages()
+  - using tools::package_dependencies() instead of
+    tools::package.dependencies() if R >= 3.3
 changed:
   - the code for checks was moved to the end of roxy.package()
-  - rewrote the construction of deb.repo.path and deb.repo.path.part, two path strings
-    used internally in roxy.package()
-  
+added:
+  - new action "binonly" to enable binary-only rebuilds
+  - HTML page now lists all found binary packages for a package if it is
+    available for more than one R version in the repository 
+
 changes in version 0.04-4 (2016-02-04)
 fixed:
   - re-activated the unit tests that were shut down with 0.03-11 due to

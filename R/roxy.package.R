@@ -88,6 +88,7 @@
 #'      \item{"license"}{Update LICENSE.txt file; it's not called LICENSE to prevent an automatic installation}
 #'      \item{"check"}{Do a full package check, calling \code{R CMD check}}
 #'      \item{"package"}{Build & install the package, update source repository, calling \code{R CMD build} and \code{R CMD INSTALL}}
+#'      \item{"binonly"}{Like \code{"package"}, but doesn't copy the source package to the repository, to enable binary-only rebuilds}
 #'      \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
 #'      \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
 #'        \code{URL} accordingly.}
@@ -397,10 +398,9 @@ roxy.package <- function(
   )
   # try to set pckg.name.deb and deb.repo.path
   # this will only work if repo.root is unchanged, the rest is too messy now...
-  deb.repo.path <- file.path("deb/dists", deb.defaults[["distribution"]])
-  deb.repo.path.part <- file.path(deb.repo.path, deb.defaults[["component"]], deb.defaults[["arch"]])
-#   deb.repo.path.part <- paste0("deb/dists/", deb.defaults[["distribution"]], "/", deb.defaults[["component"]], "/", deb.defaults[["arch"]])
-#   deb.repo.path <- paste0("../../", deb.repo.path.part)
+  # don't ry to replace this without checking the outcome in the HTML file!
+  deb.repo.path.part <- file.path("deb", "dists", deb.defaults[["distribution"]], deb.defaults[["component"]], deb.defaults[["arch"]])
+  deb.repo.path <- file.path("..", "..", deb.repo.path.part)
   # need to get repo.name to be able to call eval() on deb.defaults[["origin"]], because that pastes repo.name
   repo.name <- deb.defaults[["repo.name"]]
   deb.defaults[["origin"]] <- eval(deb.defaults[["origin"]])
@@ -606,7 +606,7 @@ roxy.package <- function(
     message("build: created PDF docs")
   } else {}
 
-  if("package" %in% actions){
+  if(any(c("package", "binonly") %in% actions)){
     ## fill source repo
     createMissingDir(dirPath=repo.src.contrib, action="repo")
     ## TODO: find a solution without sedwd()
@@ -620,9 +620,11 @@ roxy.package <- function(
       r.cmd.build.call <- paste0(R.bin, " CMD build ", Rcmd.opt.build, shQuote(pck.source.dir, type="cmd"))
       shell(r.cmd.build.call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
     }
-    file.mv(from=file.path(pck.source.dir.parent,pckg.name.src), to=repo.src.gz, overwrite=TRUE)
+    if(!"binonly" %in% actions){
+      file.mv(from=file.path(pck.source.dir.parent,pckg.name.src), to=repo.src.gz, overwrite=TRUE)
+      message(paste0("repo: copied ", pckg.name.src, " to src/contrib."))
+    } else {}
     setwd(jmp.back)
-    message(paste0("repo: copied ", pckg.name.src, " to src/contrib."))
     # install.packages() doesn't work if we want to build for/with other R installations than
     # the actual running one, so we'll use  R CMD INSTALL instead
     if(isTRUE(unix.OS)){
@@ -635,13 +637,16 @@ roxy.package <- function(
       shell(r.cmd.install.call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
     }
     message("build: built and installed package")
-    tools::write_PACKAGES(dir=repo.src.contrib, type="source", verbose=TRUE, latestOnly=FALSE)
-    message("repo: updated src/contrib/PACKAGES (source)")
 
-    ## update ChangeLog
-    if(file.exists(src.changelog)){
-      stopifnot(file.copy(src.changelog, pckg.changelog, overwrite=TRUE))
-      message("pckg: updated ChangeLog")
+    if(!"binonly" %in% actions){
+      tools::write_PACKAGES(dir=repo.src.contrib, type="source", verbose=TRUE, latestOnly=FALSE)
+      message("repo: updated src/contrib/PACKAGES (source)")
+
+      ## update ChangeLog
+      if(file.exists(src.changelog)){
+        stopifnot(file.copy(src.changelog, pckg.changelog, overwrite=TRUE))
+        message("pckg: updated ChangeLog")
+      } else {}
     } else {}
   } else {}
 
@@ -778,10 +783,10 @@ roxy.package <- function(
       url.src <- pckg.name.src
     } else {}
     if(file_test("-f", win.package)){
-      url.win <- pckg.name.win
+      url.win <- binPackageLinks(package=pck.package, version=pck.version, repo.root=repo.root, type="win")[["win"]]
     } else {}
     if(file_test("-f", macosx.package)){
-      url.mac <- pckg.name.mac
+      url.mac <- binPackageLinks(package=pck.package, version=pck.version, repo.root=repo.root, type="mac")[["mac"]]
     } else {}
     url.debRepo.info <- NULL
     if(file_test("-f", deb.package)){

@@ -1,10 +1,38 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
-\section{Changes in roxyPackage version 0.04-5 (2016-02-04)}{
+\section{Changes in roxyPackage version 0.04-5 (2016-06-06)}{
   \subsection{unreleased}{
     \itemize{
       \item this version is under development
+    }
+  }
+  \subsection{fixed}{
+    \itemize{
+      \item R CMD check should be performed on built packages, not source
+        directories. this is now the case if you run the \code{"check"} action also with \code{"package"}
+        enabled
+      \item fixed a path issue causing problems to find package sources when in full
+        sandboxing mode, most importantly, this affected the internal function
+        \code{prep.sndbx.source.dir()}
+      \item normalized paths in internal function \code{mvToArchive()}, called by
+        \code{archive.packages()}
+      \item using \code{tools::package_dependencies()} instead of
+        \code{tools::package.dependencies()} if R >= 3.3
+    }
+  }
+  \subsection{changed}{
+    \itemize{
+      \item the code for checks was moved to the end of \code{roxy.package()}
+      \item rewrote the construction of deb.repo.path and deb.repo.path.part, two
+        path strings used internally in \code{roxy.package()}
+    }
+  }
+  \subsection{added}{
+    \itemize{
+      \item new action \code{"binonly"} to enable binary-only rebuilds
+      \item HTML page now lists all found binary packages for a package if it is
+        available for more than one R version in the repository 
     }
   }
 }

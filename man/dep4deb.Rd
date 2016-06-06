@@ -11,8 +11,7 @@ dep4deb(pck.source.dir, pck.name = NULL, destdir = file.path(tempdir(),
 }
 \arguments{
 \item{pck.source.dir}{Character string,
-      path pointing to the root directory of your package sources,
-      to a local R package source tarball, or
+      path pointing to the root directory of your package sources, to a local R package source tarball, or
 a full URL to such a package tarball. Tarballs will be downloaded to \code{destdir},
       if needed, extracted, and then checked for dependencies.
 Will be ignored if \code{pck.name} is not \code{NULL}.}

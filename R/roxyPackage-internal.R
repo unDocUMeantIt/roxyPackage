@@ -613,3 +613,44 @@ mergeOptions <- function(someFunction, customOptions=NULL, newDefaults=NULL){
   defaults[args.set[args.set %in% args.def]] <- customOptions[args.set[args.set %in% args.def]]
   return(defaults)
 }
+## end function mergeOptions()
+
+
+## function binPackageLinks()
+# takes a package name and repository root, and looks up all binary packages compiled against different R versions
+# returns a list with the results
+binPackageLinks <- function(package, version, repo.root, type="win"){
+  pckg.basename <- paste0(package, "_", version)
+  clean.repo.root <- gsub("/$", "", repo.root)
+  win.results <- mac.results <- list()
+
+  if("win" %in% type){
+    pckg.name.win <- paste0(pckg.basename, ".zip")
+    repo.win <- listRDirs(file.path(clean.repo.root,  "bin", "windows", "contrib"), full.path=TRUE)
+    for (this.repo in repo.win){
+      if(file.exists(file.path(this.repo, pckg.name.win))){
+        R.vers <- basename(this.repo)
+        win.results[[R.vers]] <- pckg.name.win
+      } else {}
+    }
+    
+  } else {}
+
+  if("mac" %in% type){
+    pckg.name.mac <- paste0(pckg.basename, ".tgz")
+    repo.mac <- listRDirs(file.path(clean.repo.root, "bin", "macosx", "contrib"), full.path=TRUE)
+    for (this.repo in repo.mac){
+      if(file.exists(file.path(this.repo, pckg.name.mac))){
+        R.vers <- basename(this.repo)
+        mac.results[[R.vers]] <- pckg.name.mac
+      } else {}
+    }
+  } else {}
+  
+  result <- list(
+    win=win.results,
+    mac=mac.results
+  )
+  return(result)
+}
+## end function binPackageLinks()
