@@ -254,7 +254,8 @@ debianizeKeyring <- function(
     deb.dir=deb.dir.debian,
     overwrite="copyright" %in% overwrite,
     repo.name=repo.name,
-    isRpackage=FALSE
+    isRpackage=FALSE,
+    URL=URL
   )
 
   ## debian/changelog
@@ -263,7 +264,6 @@ debianizeKeyring <- function(
     version=deb.pckg.vers,
     maintainer=deb.description[["Maintainer"]], 
     logs=changelog,
-#    date=dateRFC2822(), ##TODO: no longer needed, remove if new deb.gen.changelog() is stable
     distribution=distribution,
     urgency=urgency,
     deb.dir=deb.dir.debian,

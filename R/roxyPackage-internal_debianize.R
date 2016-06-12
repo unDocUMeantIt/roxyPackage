@@ -646,9 +646,9 @@ deb.gen.control <- function(srcs.name, deb.name, description, R.dscrptn, deb.dir
 } ## end function deb.gen.control()
 
 
-## function deb.gen.copyright()
+## function deb.gen.copyright.old()
 # deb.maintainer: "name <mail@address.org>"
-deb.gen.copyright <- function(R.dscrptn, deb.name, description, year, deb.dir,
+deb.gen.copyright.old <- function(R.dscrptn, deb.name, description, year, deb.dir,
   overwrite=TRUE, repo.name=NULL, isRpackage=TRUE, action=ifelse(isRpackage, "deb", "deb-key")){
   file <- file.path(deb.dir, "copyright")
   if(is.null(R.dscrptn[["Authors@R"]])){
@@ -738,6 +738,126 @@ deb.gen.copyright <- function(R.dscrptn, deb.name, description, year, deb.dir,
     message(paste0(action, ": debian/copyright updated."))
   } else {}
   return(TRUE)
+} ## end function deb.gen.copyright.old()
+
+## function deb.gen.copyright()
+deb.gen.copyright <- function(R.dscrptn, deb.name, description, year, deb.dir,
+  overwrite=TRUE, repo.name=NULL, isRpackage=TRUE, action=ifelse(isRpackage, "deb", "deb-key"),
+  URL=NULL){
+  file <- file.path(deb.dir, "copyright")
+  if(is.null(R.dscrptn[["Authors@R"]])){
+    maintainer <- as.character(R.dscrptn[["Maintainer"]])
+    author <- as.character(R.dscrptn[["Author"]])
+    author.nomail <- gsub("[[:space:]]*<[^>]*>", "", author)
+  } else {
+    pck.persons <- as.character(R.dscrptn[["Authors@R"]])
+    maintainer <- paste(
+      format(get.by.role(eval(parse(text=pck.persons)), "cre"),
+        include=c("given", "family", "email"), braces=list(email=c("<", ">"))),
+      collapse=", "
+    )
+    author <- paste(
+      format(get.by.role(eval(parse(text=pck.persons)), "aut"),
+        include=c("given", "family", "email"), braces=list(email=c("<", ">"))),
+      collapse=", "
+    )
+    author.nomail <- paste(
+      format(get.by.role(eval(parse(text=pck.persons)), "aut"),
+        include=c("given", "family")),
+      collapse=", "
+    )
+  }
+  license <- as.character(R.dscrptn[["License"]])
+  R.name <- as.character(R.dscrptn[["Package"]])
+
+  if(!file_test("-f", file) | isTRUE(overwrite)){
+    if(checkLicence(license)){
+      licenseInfo <- checkLicence(license, deb=TRUE, logical=FALSE)
+      includeLicense <- paste0("  ", R.name, " Copyright (C) ", year, " ", author.nomail, ", released under the\n  ",
+      licenseInfo[["name"]],
+      if(!is.na(licenseInfo[["version"]])){
+        paste0(" version ", licenseInfo[["version"]])
+      } else {},
+      if(grepl(">", license)){
+        paste0(" or (at your option) any later version")
+      } else {},
+      ".\n  .\n",
+      "  This software is distributed in the hope that it will be useful, but\n",
+      "  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
+      "  or FITNESS FOR A PARTICULAR PURPOSE.\n  .\n",
+      "  You should have received a copy of the license with your Debian system,\n",
+      "  in the file /usr/share/common-licenses/", licenseInfo[["file"]], ", or with the\n",
+      "  source package as the file COPYING or LICENSE.\n")
+    } else {
+      includeLicense <- paste0("  ", R.name, " Copyright (C) ", year, " ", author.nomail, ", released under the\n",
+      "  terms of the ", license, " license.\n  .\n",
+      "  This software is distributed in the hope that it will be useful, but\n",
+      "  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
+      "  or FITNESS FOR A PARTICULAR PURPOSE.\n  .\n",
+      "  You should have received a copy of the license with the\n",
+      "  source package as the file COPYING or LICENSE.\n")
+    }
+    if(isTRUE(isRpackage)){
+      txt.copyright <- paste0(
+        "Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n",
+        "Upstream-Name: ", R.name, "\n",
+        "Upstream-Contact: ", maintainer, "\n",
+        if("Homepage" %in% names(description)){
+          paste0("Source: ", description[["Homepage"]], "\n")
+        } else {},
+        "Comment:\n",
+        if(identical(author, maintainer)){
+          paste0("  The R library ", R.name, " was originally written and is maintained by ", author, ".\n  .\n")
+        } else {
+          paste0("  The R library ", R.name, " was originally written by ", author, "\n",
+          "  and is maintained by ", maintainer, ".\n  .\n")
+        },
+        "  This Debian package was put together by ", maintainer, ",\n",
+        "  using the GNU R package roxyPackage.\n  .\n",
+        "  The package was renamed from its upstream name '" ,R.name, "' to\n",
+        "  '" , deb.name, "' in harmony with the R packaging policy to indicate\n",
+        "  that the package is external to the CRAN or BioC repositories.\n  .\n",
+        "  The copyright information given here was offered by the GNU R package\n",
+        "  DESCRIPTION. The DESCRIPTION file for the original GNU R package can be\n",
+        "  found in /usr/lib/R/site-library/", R.name, "/DESCRIPTION.\n\n",
+        "Files: *\n",
+        "Copyright: ", year, " ", author.nomail, "\n",
+        "License: ", license, "\n",
+        includeLicense
+      )
+    } else {
+      txt.copyright <- paste0(
+        "Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n",
+        "Upstream-Name: ", R.name, "\n",
+        "Upstream-Contact: ", maintainer, "\n",
+        if(!is.null(URL)){
+          paste0("Source: ", URL, "\n")
+        } else {},
+        "Comment:\n",
+        "  This is the OpenPGP keyring for packages hosted at the\n  ", repo.name, " repository",
+        if(is.null(URL)){
+          paste0(".\n  .\n")
+        } else {
+          paste0(": ", URL, "\n  .\n")
+        },
+        "  This Debian package was put together by ", description[["Maintainer"]], ".\n  .\n",
+        "  The keys in the keyring don't fall under any copyright. Everything\n",
+        "  else in the package is licensed as follows.\n\n",
+        "Files: *\n",
+        "Copyright: ", year, " ", author.nomail, "\n",
+        "License: ", license, "\n",
+        includeLicense,
+        "\nFiles: keyrings/*.gpg\n",
+        "Copyright: public-domain\n",
+        "License: public-domain\n"
+      )
+    }
+
+    # write the copyright file
+    cat(txt.copyright, file=file)
+    message(paste0(action, ": debian/copyright updated."))
+  } else {}
+  return(TRUE)
 } ## end function deb.gen.copyright()
 
 
@@ -749,7 +869,7 @@ deb.gen.rules <- function(deb.name, maintainer, year, origin, deb.dir, overwrite
     if(isTRUE(isRpackage)){
       txt.rules <- paste0(
         "#!/usr/bin/make -f\n",
-        "#\t\t\t\t\t\t\t\t-*- makefile -*-\n",
+        "# -*- makefile -*-\n",
         "# debian/rules file for the Debian/GNU Linux ", deb.name," package\n",
         "# Copyright ", year, " by ", maintainer, "\n\n",
         "debRreposname := ", origin, "\n\n",
@@ -758,7 +878,7 @@ deb.gen.rules <- function(deb.name, maintainer, year, origin, deb.dir, overwrite
     } else {
       txt.rules <- paste0(
         "#!/usr/bin/make -f\n",
-        "#\t\t\t\t\t\t\t\t-*- makefile -*-\n",
+        "# -*- makefile -*-\n",
         "# debian/rules file for the Debian/GNU Linux ", deb.name," package\n",
         "# Copyright ", year, " by ", maintainer, "\n\n",
         "%:\n",
@@ -780,38 +900,6 @@ deb.gen.rules <- function(deb.name, maintainer, year, origin, deb.dir, overwrite
 } ## end function deb.gen.rules()
 
 
-## function deb.gen.changelog.old()
-##TODO: just kept for comparison until the new function is considered stable
-deb.gen.changelog.old <- function(srcs.name, version, maintainer, logs, date=dateRFC2822(), distribution, urgency, deb.dir,
-  overwrite=TRUE, action="deb"){
-  file <- file.path(deb.dir, "changelog")
-  if(!file_test("-f", file) | isTRUE(overwrite)){
-    txt.changelog <- paste0(
-      srcs.name, " (", version, ") ", distribution, "; urgency=", urgency,"\n\n  * ",
-      paste(logs, collapse="\n  * "),
-      "\n\n -- ", maintainer, "  ", date, "\n\n")
-
-    # check if we need to write to the changelog at all
-    if(file_test("-f", file)){
-      current.changelog <- readLines(file)
-      alreadyInLog <- any(grepl(paste0(srcs.name, " \\(", version, "\\)"), current.changelog))
-      if(isTRUE(alreadyInLog)){
-        message(paste0("there's already a changelog entry for ", srcs.name, " (", version, "), skipping!"))
-      } else {
-        txt.changelog <- paste0(txt.changelog, paste(current.changelog, collapse="\n"), "\n")
-        # write the changelog file
-        cat(txt.changelog, file=file)
-      }
-    } else {
-      # write the changelog file
-      cat(txt.changelog, file=file)
-    }
-    message(paste0(action, ": debian/changelog updated."))
-  } else {}
-  return(TRUE)
-} ## end function deb.gen.changelog.old()
-
-
 ## function deb.append.clog()
 # use this function to append changelog entries individually
 deb.append.clog <- function(logs, file, deb.env, dch=Sys.which("dch"), dpkg.parsechangelog=Sys.which("dpkg-parsechangelog")){
@@ -828,8 +916,8 @@ deb.append.clog <- function(logs, file, deb.env, dch=Sys.which("dch"), dpkg.pars
   return(invisible(TRUE))
 } ## end function deb.append.clog()
 
+
 ## function deb.gen.changelog()
-## this version is missing (i.e., works without) date=dateRFC2822()!
 # export DEBFULLNAME="<name>" ; export DEBEMAIL="name@example.com" ; dch --create --empty --changelog <file> --package <srcs.name> --newversion="0.0X-XX-X" --distribution <distribution> --urgency <urgency>
 # export DEBFULLNAME="<name>" ; export DEBEMAIL="name@example.com" ; dch --newversion="0.0X-XX-X" "<text>"
 # export DEBFULLNAME="<name>" ; export DEBEMAIL="name@example.com" ; dch --append "<text>"

@@ -16,6 +16,10 @@ fixed:
     tools::package.dependencies() if R >= 3.3
 changed:
   - the code for checks was moved to the end of roxy.package()
+  - removed deb.gen.changelog.old(), it was unused since 0.04-2
+  - debianize() now generates machine-readable copyright files
+  - when debianizeKeyring() is called from debinaize() or roxy.rackage(),
+    it is now able to fetch the repo URL
 added:
   - new action "binonly" to enable binary-only rebuilds
   - HTML page now lists all found binary packages for a package if it is

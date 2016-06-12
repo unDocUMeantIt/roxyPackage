@@ -393,7 +393,8 @@ roxy.package <- function(
     customOptions=deb.options,
     newDefaults=list(
       pck.source.dir=pck.source.dir,
-      repo.root=repo.root
+      repo.root=repo.root,
+      deb.keyring.options=list(URL=URL)
     )
   )
   # try to set pckg.name.deb and deb.repo.path
