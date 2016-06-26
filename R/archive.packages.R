@@ -29,13 +29,16 @@
 #' @param keep An integer value defining the maximum nuber of versions to keep. Setting this to 0 will
 #'    completely remove all packages from the repository, which is probably only useful in combination
 #'    with the option \code{package}.
+#' @param keep.revisions An integer value defining the maximum nuber of revisions to keep. This is only
+#'    used when archiving Debian packages, i.e., if \code{type} includes \code{"deb"}. Setting this to
+#'    \code{NULL} will keep all revisions of package versions that are to be kept.
 #' @param package A character vector with package names to check. If set, \code{archive.packages} will only
 #'    take actions on these packages. If \code{NULL}, all packages are affected.
 #' @param type A character vector defining the package formats to keep. Valid entries are \code{"source"},
-#'    \code{"win.binary"} and \code{"mac.binary"}. By default, only the source packages are archived, all other
-#'    packages are deleted.
+#'    \code{"win.binary"}, \code{"mac.binary"}, and \code{"deb"}. By default, only the source packages are
+#'    archived, all other packages are deleted.
 #' @param archive.root Path to the archive root, i.e., the directory to which files should be moved. Usually 
-#'    the Archive is kept i \code{repo.root}
+#'    the Archive is kept in \code{repo.root}.
 #' @param overwrite Logical, indicated whether existing files in the archive can be overwritten.
 #' @param reallyDoIt Logical, real actions are only taken if set to \code{TRUE}, otherwise the actions
 #'    are only printed.
@@ -59,14 +62,14 @@
 #'   type=c("source", "win.binary", "mac.binary"),
 #'   archive.root="/var/www/archive", reallyDoIt=TRUE)
 #' }
-archive.packages <- function(repo.root, to.dir="Archive", keep=1, package=NULL, type="source",
+archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions=2, package=NULL, type="source",
   archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE){
 
   old.opts <- getOption("available_packages_filters")
   on.exit(options(available_packages_filters=old.opts))
   options(available_packages_filters=list(noFilter=function(x){x}))
 
-  all.valid.types <- c("source", "win.binary", "mac.binary")
+  all.valid.types <- c("source", "win.binary", "mac.binary", "deb")
   if(any(!type %in% all.valid.types)){
     stop(simpleError("archive: invalid package type specified!"))
   } else {}
@@ -107,11 +110,13 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, package=NULL, 
       listRDirs(file.path(clean.repo.root, "bin", "windows", "contrib"), full.path=FALSE))
   }
   # in.repo[["win.binary"]] will be an empty list() if the directory doesn't exist
-  in.repo[["win.binary"]] <- lapply(repo.win, function(this.R){
+  in.repo[["win.binary"]] <- lapply(
+    repo.win,
+    function(this.R){
       return(filter.repo.packages(available.packages(this.R, type="win.binary"), packages=package))
-    })
+    }
+  )
 
-  # in.repo[["mac.binary"]] will be an empty list() if the directory doesn't exist
   repo.mac <- listRDirs(file.path(clean.repo.root, "bin", "macosx", "contrib"), full.path=TRUE)
   if(isTRUE(archInRepo)){
     archive.mac <- repo.mac
@@ -119,55 +124,30 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, package=NULL, 
     archive.mac <- file.path(clean.archive.root, "bin", "macosx", "contrib",
       listRDirs(file.path(clean.repo.root, "bin", "macosx", "contrib"), full.path=FALSE))
   }
-  in.repo[["mac.binary"]] <- lapply(repo.mac, function(this.R){
+  # in.repo[["mac.binary"]] will be an empty list() if the directory doesn't exist
+  in.repo[["mac.binary"]] <- lapply(
+    repo.mac,
+    function(this.R){
       return(filter.repo.packages(available.packages(this.R, type="mac.binary"), packages=package))
-    })
+    }
+  )
 
   ## now go through all type entries in the inventory and check for each package seperately
   ## whether the maximum number of packages was reached
 
   for (this.type in all.valid.types){
-    # iterate through in.repo$this.type$Package
-    checkThisRepo <- in.repo[[this.type]]
-    if(length(checkThisRepo) > 0){
-      if(identical(this.type, "source")){
-        for (this.package in unique(checkThisRepo[,"Package"])){
-          presentPackages <- checkThisRepo[checkThisRepo[,"Package"] == this.package,]
-          # even if there's only one package, ensure it's still a matrix
-          if(!is.matrix(presentPackages)){
-            presentPackages <- t(as.matrix(presentPackages))
-          }
-          presentVersions <- presentPackages[,"Version"]
-          presentVersions <- presentVersions[order(package_version(presentVersions), decreasing=TRUE)]
-          if(keep > 0){
-            keepVersions <- presentVersions[1:keep]
-          } else {
-            keepVersions <- ""
-          }
-          moveVersions <- presentVersions[!presentVersions %in% keepVersions]
-          if(length(moveVersions) > 0){
-            if(this.type %in% type){
-              mvToArchive(this.package, repo=repo.src, archive=file.path(archive.src, to.dir), versions=moveVersions, 
-                type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt)
-            } else {
-              mvToArchive(this.package, repo=repo.src, archive=file.path(archive.src, to.dir), versions=moveVersions, 
-                type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=TRUE)
-            }
-            # update PACKAGES
-            if(isTRUE(reallyDoIt)){
-              tools::write_PACKAGES(dir=gsub("^file:(/)+", "/", repo.src), type="source", verbose=FALSE, latestOnly=FALSE)
-              message("archive: updated src/contrib/PACKAGES (source)")
-            } else {
-              message("archive: updated src/contrib/PACKAGES (source) (NOT RUN!)")
-            }
-          } else {}
-        }
-      } else {
-        for (this.R.num in 1:length(checkThisRepo)){
-          this.R <- checkThisRepo[[this.R.num]]
-          for (this.package in unique(this.R[,"Package"])){
-            presentPackages <- this.R[this.R[,"Package"] == this.package,]
-
+    if(identical(this.type, "deb")){
+      # archiving Debian packages is done by a specialised internal function,
+      # see roxyPackage-internal_debianize.R
+      deb.archive.packages(repo.root=clean.repo.root, to.dir=to.dir, keep.versions=keep, keep.revisions=keep.revisions, package=package,
+        archive.root=clean.archive.root, overwrite=overwrite, reallyDoIt=reallyDoIt)
+    } else {
+      # iterate through in.repo$this.type$Package
+      checkThisRepo <- in.repo[[this.type]]
+      if(length(checkThisRepo) > 0){
+        if(identical(this.type, "source")){
+          for (this.package in unique(checkThisRepo[,"Package"])){
+            presentPackages <- checkThisRepo[checkThisRepo[,"Package"] == this.package,]
             # even if there's only one package, ensure it's still a matrix
             if(!is.matrix(presentPackages)){
               presentPackages <- t(as.matrix(presentPackages))
@@ -181,34 +161,70 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, package=NULL, 
             }
             moveVersions <- presentVersions[!presentVersions %in% keepVersions]
             if(length(moveVersions) > 0){
-              if(identical(this.type, "win.binary")){
-                this.repo <- repo.win[this.R.num]
-                this.archive <- archive.win[this.R.num]
-                writePCKtype <- "win.binary"
-              } else {
-                this.repo <- repo.mac[this.R.num]
-                this.archive <- archive.mac[this.R.num]
-                writePCKtype <-"mac.binary"
-              }
               if(this.type %in% type){
-                mvToArchive(this.package, repo=this.repo, archive=file.path(this.archive, to.dir), versions=moveVersions, 
+                mvToArchive(this.package, repo=repo.src, archive=file.path(archive.src, to.dir), versions=moveVersions, 
                   type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt)
               } else {
-                mvToArchive(this.package, repo=this.repo, archive=file.path(this.archive, to.dir), versions=moveVersions, 
+                mvToArchive(this.package, repo=repo.src, archive=file.path(archive.src, to.dir), versions=moveVersions, 
                   type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=TRUE)
               }
               # update PACKAGES
               if(isTRUE(reallyDoIt)){
-                tools::write_PACKAGES(dir=gsub("^file:(/)+", "/", this.repo), type=writePCKtype, verbose=FALSE, latestOnly=FALSE)
-                message(paste0("archive: updated bin/PACKAGES (", this.type, ")"))
+                tools::write_PACKAGES(dir=gsub("^file:(/)+", "/", repo.src), type="source", verbose=FALSE, latestOnly=FALSE)
+                message("archive: updated src/contrib/PACKAGES (source)")
               } else {
-                message(paste0("archive: updated bin/PACKAGES (", this.type, ") (NOT RUN!)"))
+                message("archive: updated src/contrib/PACKAGES (source) (NOT RUN!)")
               }
             } else {}
           }
+        } else {
+          for (this.R.num in seq_along(checkThisRepo)){
+            this.R <- checkThisRepo[[this.R.num]]
+            for (this.package in unique(this.R[,"Package"])){
+              presentPackages <- this.R[this.R[,"Package"] == this.package,]
+
+              # even if there's only one package, ensure it's still a matrix
+              if(!is.matrix(presentPackages)){
+                presentPackages <- t(as.matrix(presentPackages))
+              }
+              presentVersions <- presentPackages[,"Version"]
+              presentVersions <- presentVersions[order(package_version(presentVersions), decreasing=TRUE)]
+              if(keep > 0){
+                keepVersions <- presentVersions[1:keep]
+              } else {
+                keepVersions <- ""
+              }
+              moveVersions <- presentVersions[!presentVersions %in% keepVersions]
+              if(length(moveVersions) > 0){
+                if(identical(this.type, "win.binary")){
+                  this.repo <- repo.win[this.R.num]
+                  this.archive <- archive.win[this.R.num]
+                  writePCKtype <- "win.binary"
+                } else {
+                  this.repo <- repo.mac[this.R.num]
+                  this.archive <- archive.mac[this.R.num]
+                  writePCKtype <-"mac.binary"
+                }
+                if(this.type %in% type){
+                  mvToArchive(this.package, repo=this.repo, archive=file.path(this.archive, to.dir), versions=moveVersions, 
+                    type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt)
+                } else {
+                  mvToArchive(this.package, repo=this.repo, archive=file.path(this.archive, to.dir), versions=moveVersions, 
+                    type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=TRUE)
+                }
+                # update PACKAGES
+                if(isTRUE(reallyDoIt)){
+                  tools::write_PACKAGES(dir=gsub("^file:(/)+", "/", this.repo), type=writePCKtype, verbose=FALSE, latestOnly=FALSE)
+                  message(paste0("archive: updated bin/PACKAGES (", this.type, ")"))
+                } else {
+                  message(paste0("archive: updated bin/PACKAGES (", this.type, ") (NOT RUN!)"))
+                }
+              } else {}
+            }
+          }
         }
-      }
-    } else {}
+      } else {}
+    }
   }
 
   return(invisible(NULL))

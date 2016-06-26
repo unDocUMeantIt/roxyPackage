@@ -335,7 +335,7 @@ dl.missing.dep.src <- function(deps, destdir=file.path(tempdir(),"roxyPackge","d
       this.debDeps <- debianizeDepends(thisDepends, R=NULL, collapse=NULL, drop.version=TRUE, origin=origin, origin.alt=origin.alt)
       if(length(this.debDeps) > 0 && nchar(this.debDeps) > 0){
         # run check.installed.deps()
-        for (this.debDeps.num in 1:length(this.debDeps)){
+        for (this.debDeps.num in seq_along(this.debDeps)){
           this.debDeps.R <- names(this.debDeps)[this.debDeps.num]
           this.debDeps.deb <- this.debDeps[this.debDeps.num]
           if(isTRUE(all)){
@@ -1348,7 +1348,7 @@ deb.check.changes <- function(packages, repo.root, column="Filename"){
   packages <- as.data.frame(packages, stringsAsFactors=FALSE)
   allPackageFiles <- packages[[column]]
   nameStubs <- gsub("_[[:alnum:]]*.deb", "", allPackageFiles)
-  for (thisStubNum in 1:length(nameStubs)){
+  for (thisStubNum in seq_along(nameStubs)){
     thisStub <- nameStubs[thisStubNum]
     directory <- gsub("/[^/]*$", "", thisStub)
     fileRoot <- file.path(repo.root, directory)

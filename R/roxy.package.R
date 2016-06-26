@@ -217,7 +217,7 @@ roxy.package <- function(
       stop(simpleError("If you specify more than one R.home, you must also define as many R.libs!"))
     } else {}
     # if so, iterate recursively through it and then end
-    for (this.R in 1:R.versions){
+    for (this.R in seq_along(R.homes)){
       this.home <- R.homes[this.R]
       this.libs <- R.libs[this.R]
       this.actions <- actions

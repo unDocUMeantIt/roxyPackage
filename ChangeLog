@@ -20,6 +20,7 @@ changed:
   - debianize() now generates machine-readable copyright files
   - when debianizeKeyring() is called from debinaize() or roxy.rackage(),
     it is now able to fetch the repo URL
+  - code cleaning (loops)
 added:
   - new action "binonly" to enable binary-only rebuilds
   - HTML page now lists all found binary packages for a package if it is
