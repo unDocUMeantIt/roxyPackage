@@ -1456,10 +1456,13 @@ deb.search.repo <- function(pckg=NULL, repo, distribution="unstable", component=
 # on debian binary and source packages. since this is like a repo-in-a-repo, the functionality
 # is outsourced to a function of its own.
 deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, keep.revisions=2, package=NULL,
-  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE){
+  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE, justDelete=FALSE){
   # a specialty is that we need to take care of revisions: there might be several revisions,
   # but only *one* source.orig tarball!
   # also, we must check *everything* below the "dists" directory
+  
+  # remove "file://" from path
+  repo.root <- gsub("^file:(/)+", "/", repo.root)
   
   # plan: run deb.list.packages.dirs() to discover dirs containig "Packages*" or "Sources*" files
   packageDirsBin <- deb.list.packages.dirs(repo=repo.root, binary=TRUE)
@@ -1491,9 +1494,68 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
     }
   }
   packagesSrcAllDirs <- unique(packagesSrcAllDirs)
-  
-  # now iterate through found package names, check respective versions and move file, if neccessary
-  ## TODO: s.o.
 
-  return(list(packagesBinAllDirs, packagesSrcAllDirs))
+  for (thisPackages in list(packagesBinAllDirs, packagesSrcAllDirs)){
+    # split version and revision
+    thisPackages[["FullVersion"]] <- thisPackages[["Version"]]
+    thisPackages[["Version"]] <- gsub("-[[:digit:]]+$", "", thisPackages[["FullVersion"]])
+    thisPackages[["Revision"]] <- gsub("(^.*)-([[:digit:]]+)$", "\\2", thisPackages[["FullVersion"]], perl=TRUE)
+    
+    # now iterate through found package names, check respective versions and move files, if neccessary
+    for (this.package in unique(thisPackages[,"Package"])){
+      presentPackages <- archiveSubset(data=thisPackages, var="Package", values=this.package)
+
+      presentVersions <- unique(presentPackages[,"Version"])
+      presentVersions <- presentVersions[order(package_version(presentVersions), decreasing=TRUE)]
+      if(keep.versions > 0){
+        keepVersions <- presentVersions[1:keep.versions]
+        keepFullVersions <- c()
+        # check revisions
+        for (thisVersion in keepVersions){
+          presentPackageVersion <- archiveSubset(data=presentPackages, var="Version", values=thisVersion)
+          if(!is.null(keep.revisions) & keep.revisions > 0){
+            allRevisions <- presentPackageVersion[["Revision"]]
+            allRevisions <- allRevisions[order(allRevisions, decreasing=TRUE)]
+            keepFullVersions <- c(
+              keepFullVersions,
+              archiveSubset(data=presentPackageVersion, var="Revision", values=allRevisions[1:keep.revisions])[["FullVersion"]]
+            )
+          } else {
+            # keep all revisions of this version
+            keepFullVersions <- c(keepFullVersions, presentPackageVersion[["FullVersion"]])
+          }
+        }
+      } else {
+        keepFullVersions <- ""
+      }
+      presentFullVersions <- unique(presentPackages[,"FullVersion"])
+      moveVersions <- presentFullVersions[!presentFullVersions %in% keepFullVersions]
+      ## TODO: moveSourceOrig <- <keep correct sources>
+      debNamesAll <- archiveSubset(presentPackages, var="FullVersion", values=moveVersions)
+      if(length(moveVersions) > 0){
+        if("Files.orig.name" %in% names(thisPackages)){
+          mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir), versions=moveVersions,
+            type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete, deb.names=debNamesAll[["Files.dsc.name"]])
+          mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir), versions=moveVersions,
+            type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete, deb.names=debNamesAll[["Files.debian.name"]])
+          message("archive: archiving Debian source files NOT IMPLEMENTED YET")
+        } else {
+          mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir), versions=moveVersions,
+            type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete, deb.names=debNamesAll[["Filename"]])
+          for(thisChanges in names(debNamesAll)[grepl("^changes", names(debNamesAll))]){
+            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir), versions=moveVersions,
+              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete, deb.names=debNamesAll[[thisChanges]])
+          }
+        }
+        ## TODO:
+        # update PACKAGES
+        if(isTRUE(reallyDoIt)){
+          # deb.update.release(......)
+          message("archive: updated Debian Packages file (NOT IMPLEMENTED YET)")
+        } else {
+          message("archive: updated Debian Packages file (NOT RUN!)")
+        }
+      } else {}
+    }
+  }
 } ## end function deb.archive.packages()

@@ -31,12 +31,13 @@
 #'    with the option \code{package}.
 #' @param keep.revisions An integer value defining the maximum nuber of revisions to keep. This is only
 #'    used when archiving Debian packages, i.e., if \code{type} includes \code{"deb"}. Setting this to
-#'    \code{NULL} will keep all revisions of package versions that are to be kept.
+#'    0 or \code{NULL} will keep all revisions of package versions that are to be kept.
 #' @param package A character vector with package names to check. If set, \code{archive.packages} will only
 #'    take actions on these packages. If \code{NULL}, all packages are affected.
 #' @param type A character vector defining the package formats to keep. Valid entries are \code{"source"},
 #'    \code{"win.binary"}, \code{"mac.binary"}, and \code{"deb"}. By default, only the source packages are
-#'    archived, all other packages are deleted.
+#'    archived, all other packages are deleted, except for Debian repos, which currently can only be archived
+#'    or be left as is.
 #' @param archive.root Path to the archive root, i.e., the directory to which files should be moved. Usually 
 #'    the Archive is kept in \code{repo.root}.
 #' @param overwrite Logical, indicated whether existing files in the archive can be overwritten.
@@ -136,22 +137,20 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
   ## whether the maximum number of packages was reached
 
   for (this.type in all.valid.types){
-    if(identical(this.type, "deb")){
+    if(identical(this.type, "deb") & "deb" %in% type){
       # archiving Debian packages is done by a specialised internal function,
       # see roxyPackage-internal_debianize.R
-      deb.archive.packages(repo.root=clean.repo.root, to.dir=to.dir, keep.versions=keep, keep.revisions=keep.revisions, package=package,
-        archive.root=clean.archive.root, overwrite=overwrite, reallyDoIt=reallyDoIt)
+      deb.archive.packages(repo.root=file.path(clean.repo.root, "deb"), to.dir=to.dir,
+        keep.versions=keep, keep.revisions=keep.revisions, package=package,
+        archive.root=clean.archive.root, overwrite=overwrite, reallyDoIt=reallyDoIt
+      )
     } else {
       # iterate through in.repo$this.type$Package
       checkThisRepo <- in.repo[[this.type]]
       if(length(checkThisRepo) > 0){
         if(identical(this.type, "source")){
           for (this.package in unique(checkThisRepo[,"Package"])){
-            presentPackages <- checkThisRepo[checkThisRepo[,"Package"] == this.package,]
-            # even if there's only one package, ensure it's still a matrix
-            if(!is.matrix(presentPackages)){
-              presentPackages <- t(as.matrix(presentPackages))
-            }
+            presentPackages <- archiveSubset(checkThisRepo, var="Package", values=this.package)
             presentVersions <- presentPackages[,"Version"]
             presentVersions <- presentVersions[order(package_version(presentVersions), decreasing=TRUE)]
             if(keep > 0){
@@ -181,12 +180,7 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
           for (this.R.num in seq_along(checkThisRepo)){
             this.R <- checkThisRepo[[this.R.num]]
             for (this.package in unique(this.R[,"Package"])){
-              presentPackages <- this.R[this.R[,"Package"] == this.package,]
-
-              # even if there's only one package, ensure it's still a matrix
-              if(!is.matrix(presentPackages)){
-                presentPackages <- t(as.matrix(presentPackages))
-              }
+              presentPackages <- archiveSubset(this.R, var="Package", values=this.package)
               presentVersions <- presentPackages[,"Version"]
               presentVersions <- presentVersions[order(package_version(presentVersions), decreasing=TRUE)]
               if(keep > 0){

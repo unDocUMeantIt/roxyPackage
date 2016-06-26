@@ -467,23 +467,32 @@ removeIfExists <- function(filePath){
 
 
 ## function mvToArchive()
+# - deb.name: debian package names are fully available via deb.archive.packages(), so they
+#       have their own argument 
 mvToArchive <- function(package, repo, archive, versions, type=NA, file=NA, overwrite=FALSE,
-  reallyDoIt=FALSE, justDelete=FALSE){
+  reallyDoIt=FALSE, justDelete=FALSE, deb.names=NULL){
 
   repo <- gsub("^file:(/)+", "/", repo)
   archive <- gsub("^file:(/)+", "/", archive)
 
   if(isTRUE(reallyDoIt) && !isTRUE(justDelete)){
-    createMissingDir(dirPath=repo, action="archive")
     createMissingDir(dirPath=archive, action="archive")
+    if(!is.null(deb.names)){
+      deb.dirs <- file.path(archive, unique(dirname(deb.names)))
+      createMissingDir(dirPath=deb.dirs, action="archive")
+    } else {}
   } else {}
 
-  file.ending <- switch(type,
+  if(is.null(deb.names)){
+    file.ending <- switch(type,
       source=".tar.gz",
       win.binary=".zip",
       mac.binary=".tgz"
     )
-  pkg.names <- paste0(package, "_", versions, file.ending)
+    pkg.names <- paste0(package, "_", versions, file.ending)
+  } else {
+    pkg.names <- deb.names
+  }
   sapply(pkg.names, function(this.package){
     pkg.from <- normalizePathByOS(file.path(repo, this.package))
     pkg.to <- normalizePathByOS(file.path(archive, this.package))
@@ -654,3 +663,15 @@ binPackageLinks <- function(package, version, repo.root, type="win"){
   return(result)
 }
 ## end function binPackageLinks()
+
+
+## function archiveSubset()
+# called by the archive functions to get proper subsets of data
+archiveSubset <- function(data, var, values){
+  result <- data[data[,var] %in% values,]
+  # even if there's only one package, ensure it's still a matrix
+  if(!is.matrix(result) & !is.data.frame(result)){
+    result <- t(as.matrix(result))
+  }
+  return(result)
+} ## end function archiveSubset()
