@@ -469,8 +469,8 @@ removeIfExists <- function(filePath){
 ## function mvToArchive()
 # - deb.name: debian package names are fully available via deb.archive.packages(), so they
 #       have their own argument 
-mvToArchive <- function(package, repo, archive, versions, type=NA, file=NA, overwrite=FALSE,
-  reallyDoIt=FALSE, justDelete=FALSE, deb.names=NULL){
+mvToArchive <- function(package, repo, archive, versions=NA, type=NA, file=NA, overwrite=FALSE,
+  reallyDoIt=FALSE, justDelete=FALSE, deb.names=NULL, graceful=FALSE){
 
   repo <- gsub("^file:(/)+", "/", repo)
   archive <- gsub("^file:(/)+", "/", archive)
@@ -496,23 +496,28 @@ mvToArchive <- function(package, repo, archive, versions, type=NA, file=NA, over
   sapply(pkg.names, function(this.package){
     pkg.from <- normalizePathByOS(file.path(repo, this.package))
     pkg.to <- normalizePathByOS(file.path(archive, this.package))
-    if(!file.exists(pkg.from)){
-      stop(simpleError(paste0("file doesn't exist:\n  ", pkg.from)))
-    } else {}
-    # don't archive, just remove files
-    if(isTRUE(justDelete)){
-      if(isTRUE(reallyDoIt)){
-        message(paste0("archive: deleting file ", pkg.from))
-        removeIfExists(pkg.from)
+    if(file.exists(pkg.from)){
+      # don't archive, just remove files
+      if(isTRUE(justDelete)){
+        if(isTRUE(reallyDoIt)){
+          message(paste0("archive: deleting file ", pkg.from))
+          removeIfExists(pkg.from)
+        } else {
+          message(paste0("archive: deleting file ", pkg.from, " (NOT RUN!)"))
+        }
       } else {
-        message(paste0("archive: deleting file ", pkg.from, " (NOT RUN!)"))
+        if(isTRUE(reallyDoIt)){
+          message(paste0("archive: moving ", pkg.from, " to ", pkg.to))
+          file.mv(from=pkg.from, to=pkg.to, overwrite=overwrite)
+        } else {
+          message(paste0("archive: moving ", pkg.from, " to ", pkg.to, " (NOT RUN!)"))
+        }
       }
     } else {
-      if(isTRUE(reallyDoIt)){
-        message(paste0("archive: moving ", pkg.from, " to ", pkg.to))
-        file.mv(from=pkg.from, to=pkg.to, overwrite=overwrite)
+      if(isTRUE(graceful)){
+        warning(paste0("file doesn't exist, skipping:\n  ", pkg.from))
       } else {
-        message(paste0("archive: moving ", pkg.from, " to ", pkg.to, " (NOT RUN!)"))
+        stop(simpleError(paste0("file doesn't exist:\n  ", pkg.from)))
       }
     }
   })

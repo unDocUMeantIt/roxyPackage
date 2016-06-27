@@ -40,9 +40,15 @@
 #'    or be left as is.
 #' @param archive.root Path to the archive root, i.e., the directory to which files should be moved. Usually 
 #'    the Archive is kept in \code{repo.root}.
-#' @param overwrite Logical, indicated whether existing files in the archive can be overwritten.
+#' @param overwrite Logical, indicates whether existing files in the archive can be overwritten.
 #' @param reallyDoIt Logical, real actions are only taken if set to \code{TRUE}, otherwise the actions
 #'    are only printed.
+#' @param graceful Logical, if \code{TRUE} the process will not freak out because of missing files. Use this
+#'    for instance if you deleted files from the repo but did not update the package indices.
+#' @deb.options A list of options that must be properly set if you want to archive Debian packages. After packages were
+#'    removed from the repo, all Packages, Sources and Release files must be re-written and signed, and this is the
+#'    minimum information required: \code{distribution}, \code{component}, \code{gpg.key}, \code{keyring}.
+#'    See \code{\link[roxyPackage:debianize]{debianize}} for details.
 #' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run archive.packages() in a sandbox.
 #' @export
 #' @examples
@@ -64,7 +70,13 @@
 #'   archive.root="/var/www/archive", reallyDoIt=TRUE)
 #' }
 archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions=2, package=NULL, type="source",
-  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE){
+  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE, graceful=FALSE,
+  deb.options=list(
+    distribution="unstable",
+    component="main",
+    gpg.key=NULL,
+    keyring=NULL
+  )){
 
   old.opts <- getOption("available_packages_filters")
   on.exit(options(available_packages_filters=old.opts))
@@ -138,12 +150,35 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
 
   for (this.type in all.valid.types){
     if(identical(this.type, "deb") & "deb" %in% type){
+      # remove "file://" from path
+      deb.repo <- gsub("^file:(/)+", "/", clean.repo.root)
       # archiving Debian packages is done by a specialised internal function,
       # see roxyPackage-internal_debianize.R
-      deb.archive.packages(repo.root=file.path(clean.repo.root, "deb"), to.dir=to.dir,
+      deb.archive.packages(repo.root=file.path(deb.repo, "deb"), to.dir=to.dir,
         keep.versions=keep, keep.revisions=keep.revisions, package=package,
         archive.root=clean.archive.root, overwrite=overwrite, reallyDoIt=reallyDoIt
       )
+      # update Packages, Sources & Release files
+      if(isTRUE(reallyDoIt)){
+        # update package information
+        deb.gen.package.index(
+          repo=file.path(deb.repo, "deb"), binary=TRUE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
+        )
+        # update sources information
+        deb.gen.package.index(
+          repo=file.path(deb.repo, "deb"), binary=FALSE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
+        )
+        deb.update.release(
+          repo.root=deb.repo,
+          gpg.key=deb.options[["gpg.key"]],
+          keyring=deb.options[["keyring"]],
+          distribution=deb.options[["distribution"]],
+          component=deb.options[["component"]]
+        )
+        message("archive: updated Debian Packages file")
+      } else {
+        message("archive: updated Debian Packages file (NOT RUN!)")
+      }
     } else {
       # iterate through in.repo$this.type$Package
       checkThisRepo <- in.repo[[this.type]]
@@ -162,10 +197,12 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
             if(length(moveVersions) > 0){
               if(this.type %in% type){
                 mvToArchive(this.package, repo=repo.src, archive=file.path(archive.src, to.dir), versions=moveVersions, 
-                  type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt)
+                  type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt, graceful=graceful
+                )
               } else {
                 mvToArchive(this.package, repo=repo.src, archive=file.path(archive.src, to.dir), versions=moveVersions, 
-                  type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=TRUE)
+                  type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=TRUE, graceful=graceful
+                )
               }
               # update PACKAGES
               if(isTRUE(reallyDoIt)){
@@ -201,10 +238,12 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
                 }
                 if(this.type %in% type){
                   mvToArchive(this.package, repo=this.repo, archive=file.path(this.archive, to.dir), versions=moveVersions, 
-                    type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt)
+                    type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt, graceful=graceful
+                  )
                 } else {
                   mvToArchive(this.package, repo=this.repo, archive=file.path(this.archive, to.dir), versions=moveVersions, 
-                    type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=TRUE)
+                    type=this.type, overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=TRUE, graceful=graceful
+                  )
                 }
                 # update PACKAGES
                 if(isTRUE(reallyDoIt)){

@@ -1068,6 +1068,40 @@ deb.prepare.buildDir <- function(source, build, tar=Sys.which("tar")){
 } ## function deb.prepare.buildDir()
 
 
+## function deb.gen.package.index()
+# updates Packages/Sources files after changes were done to a repository
+deb.gen.package.index <- function(repo, binary=TRUE, distribution="unstable", component="main", arch="all",
+  repo.all.arch=c("binary-i386","binary-amd64"), apt.ftparchive=Sys.which("apt-ftparchive")){
+  prev.wd <- getwd()
+  setwd(file.path(repo))
+  if(isTRUE(binary)){
+    af.command <- " packages "
+    af.file <- "Packages"
+    repo.rel.path <- repo.rel.pseudo.path <- file.path("dists", distribution, component, "all")
+    repo.arch.rel.paths <- file.path("dists", distribution, component, repo.all.arch)
+    repo.arch.paths <- file.path(repo, repo.arch.rel.paths)
+  } else {
+    af.command <- " sources "
+    af.file <- "Sources"
+    repo.rel.path <- file.path("dists", distribution, component, "source")
+    repo.rel.pseudo.path <- file.path("source", distribution)
+    repo.real.path <- file.path(repo, repo.rel.pseudo.path)
+  }
+  # update packages/sources information; paths must be relative to the debian repo root
+  dpkg.scan.call <- paste0(apt.ftparchive, af.command, repo.rel.pseudo.path, " > ", repo.rel.path, "/", af.file, " && \\\n",
+  "cat ", repo.rel.path, "/", af.file, " | gzip -9 > ", repo.rel.path, "/", af.file, ".gz && \\\n",
+  "cat ", repo.rel.path, "/", af.file, " | bzip2 -9 > ", repo.rel.path, "/", af.file, ".bz2")
+  system(dpkg.scan.call, intern=TRUE)
+  if(isTRUE(binary)){
+    for (this.path in c(repo.arch.paths)){
+      repo.all.pckgs.files <- c("Packages", "Packages.gz", "Packages.bz2")
+      file.copy(file.path(repo.rel.path, repo.all.pckgs.files), file.path(this.path, repo.all.pckgs.files), overwrite=TRUE)
+    }
+  } else {}
+  setwd(prev.wd)
+} ## end function deb.gen.package.index()
+
+
 ## function deb.build.sources()
 # - compression: either "xz" or "gzip"
 deb.build.sources <- function(srcs.name, build, src.dir.name, version,
@@ -1107,13 +1141,16 @@ deb.build.sources <- function(srcs.name, build, src.dir.name, version,
     src.files.to.move <- list.files(pattern="*.dsc$|*.debian.tar.gz$|*.orig.tar.gz$|*.debian.tar.xz$|*.orig.tar.xz$")
     file.copy(src.files.to.move, file.path(repo.src.real.path, src.files.to.move), overwrite=TRUE)
     message(paste0(action, ": copied *.dsc, *.orig.tar.[gz|xz] and *.debian.tar.[gz|xz] files to debian source repository."))
-    # update sources information; paths must be relative to the debian repo root
-    setwd(file.path(repo))
-    dpkg.scans.call <- paste0(apt.ftparchive, " sources ", repo.src.real.rel.path, " > ", repo.src.pseudo.rel.path, "/Sources && \\\n",
-    "cat ", repo.src.pseudo.rel.path, "/Sources | gzip -9 > ", repo.src.pseudo.rel.path, "/Sources.gz && \\\n",
-    "cat ", repo.src.pseudo.rel.path, "/Sources | bzip2 -9 > ", repo.src.pseudo.rel.path, "/Sources.bz2")
-    system(dpkg.scans.call, intern=TRUE)
-    setwd(prev.wd)
+    # update sources information
+    deb.gen.package.index(
+      repo=repo, binary=FALSE, distribution=distribution, component=component, apt.ftparchive=apt.ftparchive
+    )
+#     setwd(file.path(repo))
+#     dpkg.scans.call <- paste0(apt.ftparchive, " sources ", repo.src.real.rel.path, " > ", repo.src.pseudo.rel.path, "/Sources && \\\n",
+#     "cat ", repo.src.pseudo.rel.path, "/Sources | gzip -9 > ", repo.src.pseudo.rel.path, "/Sources.gz && \\\n",
+#     "cat ", repo.src.pseudo.rel.path, "/Sources | bzip2 -9 > ", repo.src.pseudo.rel.path, "/Sources.bz2")
+#     system(dpkg.scans.call, intern=TRUE)
+#     setwd(prev.wd)
 } ## end function deb.build.sources()
 
 
@@ -1154,17 +1191,21 @@ deb.build.binary <- function(deb.name, build, src.dir.name, options, version, re
   bin.files.to.move <- list.files(pattern="*.changes$|*.deb$")
   file.copy(bin.files.to.move, file.path(repo.bin.path, bin.files.to.move))
   message(paste0(action, ": copied *.changes and *.deb files to debian binary repository."))
-  # update package information; paths must be relative to the debian repo root
-  setwd(file.path(repo))
-  dpkg.scanp.call <- paste0(apt.ftparchive, " packages ", repo.bin.rel.path, " > ", repo.bin.rel.path, "/Packages && \\\n",
-  "cat ", repo.bin.rel.path, "/Packages | gzip -9 > ", repo.bin.rel.path, "/Packages.gz && \\\n",
-  "cat ", repo.bin.rel.path, "/Packages | bzip2 -9 > ", repo.bin.rel.path, "/Packages.bz2")
-  system(dpkg.scanp.call, intern=TRUE)
-  for (this.path in c(repo.arch.paths)){
-    repo.all.pckgs.files <- c("Packages", "Packages.gz", "Packages.bz2")
-    file.copy(file.path(repo.bin.rel.path, repo.all.pckgs.files), file.path(this.path, repo.all.pckgs.files), overwrite=TRUE)
-  }
-  setwd(prev.wd)
+  # update package information
+  deb.gen.package.index(
+    repo=repo, binary=TRUE, distribution=distribution, component=component, arch=arch,
+    repo.all.arch=repo.all.arch, apt.ftparchive=apt.ftparchive
+  )
+#   setwd(file.path(repo))
+#   dpkg.scanp.call <- paste0(apt.ftparchive, " packages ", repo.bin.rel.path, " > ", repo.bin.rel.path, "/Packages && \\\n",
+#   "cat ", repo.bin.rel.path, "/Packages | gzip -9 > ", repo.bin.rel.path, "/Packages.gz && \\\n",
+#   "cat ", repo.bin.rel.path, "/Packages | bzip2 -9 > ", repo.bin.rel.path, "/Packages.bz2")
+#   system(dpkg.scanp.call, intern=TRUE)
+#   for (this.path in c(repo.arch.paths)){
+#     repo.all.pckgs.files <- c("Packages", "Packages.gz", "Packages.bz2")
+#     file.copy(file.path(repo.bin.rel.path, repo.all.pckgs.files), file.path(this.path, repo.all.pckgs.files), overwrite=TRUE)
+#   }
+#   setwd(prev.wd)
 } ## end function deb.build.binary()
 
 
@@ -1277,7 +1318,7 @@ deb.keyring.in.repo <- function(repo.root, gpg.key=NULL, keyring.options=NULL,
 
 ## function deb.update.release()
 deb.update.release <- function(repo.root, repo=file.path(repo.root, "deb"), gpg.key=NULL,
-  distribution="unstable", component="main", arch=c("i386", "amd64", "source"), overwrite=FALSE,
+  distribution="unstable", component="main", arch=c("i386", "amd64", "source"),
   apt.ftparchive=Sys.which("apt-ftparchive"), gpg=Sys.which("gpg"), keyring=NULL, action="deb"){
   repo.release.path <- file.path(repo, "dists", distribution)
   prev.wd <- getwd()
@@ -1456,13 +1497,13 @@ deb.search.repo <- function(pckg=NULL, repo, distribution="unstable", component=
 # on debian binary and source packages. since this is like a repo-in-a-repo, the functionality
 # is outsourced to a function of its own.
 deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, keep.revisions=2, package=NULL,
-  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE, justDelete=FALSE){
+  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE, justDelete=FALSE, graceful=FALSE){
   # a specialty is that we need to take care of revisions: there might be several revisions,
   # but only *one* source.orig tarball!
   # also, we must check *everything* below the "dists" directory
-  
-  # remove "file://" from path
-  repo.root <- gsub("^file:(/)+", "/", repo.root)
+
+  # append "deb" directory to archive path
+  to.dir <- file.path(to.dir, "deb")
   
   # plan: run deb.list.packages.dirs() to discover dirs containig "Packages*" or "Sources*" files
   packageDirsBin <- deb.list.packages.dirs(repo=repo.root, binary=TRUE)
@@ -1530,30 +1571,46 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
       }
       presentFullVersions <- unique(presentPackages[,"FullVersion"])
       moveVersions <- presentFullVersions[!presentFullVersions %in% keepFullVersions]
-      ## TODO: moveSourceOrig <- <keep correct sources>
+      moveSourceOrig <- presentVersions[!presentVersions %in% keepVersions]
       debNamesAll <- archiveSubset(presentPackages, var="FullVersion", values=moveVersions)
+      debNamesSrcAll <- archiveSubset(presentPackages, var="Version", values=moveSourceOrig)
       if(length(moveVersions) > 0){
         if("Files.orig.name" %in% names(thisPackages)){
-          mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir), versions=moveVersions,
-            type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete, deb.names=debNamesAll[["Files.dsc.name"]])
-          mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir), versions=moveVersions,
-            type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete, deb.names=debNamesAll[["Files.debian.name"]])
-          message("archive: archiving Debian source files NOT IMPLEMENTED YET")
+          if(length(debNamesAll[["Files.dsc.name"]]) > 0){
+            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+              deb.names=debNamesAll[["Files.dsc.name"]], graceful=graceful
+            )
+          } else {}
+          if(length(debNamesAll[["Files.debian.name"]]) > 0){
+            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+              deb.names=debNamesAll[["Files.debian.name"]], graceful=graceful
+            )
+          } else {}
+          if(length(unique(debNamesSrcAll[["Files.orig.name"]])) > 0){
+            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+              deb.names=unique(debNamesSrcAll[["Files.orig.name"]]), graceful=graceful
+            )
+          } else {}
         } else {
-          mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir), versions=moveVersions,
-            type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete, deb.names=debNamesAll[["Filename"]])
+          if(length(debNamesAll[["Filename"]]) > 0){
+            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+              deb.names=debNamesAll[["Filename"]], graceful=graceful
+            )
+          } else {}
           for(thisChanges in names(debNamesAll)[grepl("^changes", names(debNamesAll))]){
-            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir), versions=moveVersions,
-              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete, deb.names=debNamesAll[[thisChanges]])
+            # some packages don't provide all changes files, so we'll exclude the NAs right away
+            deb.names <- debNamesAll[[thisChanges]][!is.na(debNamesAll[[thisChanges]])]
+            if(length(deb.names) > 0){
+              mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+                type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+                deb.names=deb.names, graceful=graceful
+              )
+            } else {}
           }
-        }
-        ## TODO:
-        # update PACKAGES
-        if(isTRUE(reallyDoIt)){
-          # deb.update.release(......)
-          message("archive: updated Debian Packages file (NOT IMPLEMENTED YET)")
-        } else {
-          message("archive: updated Debian Packages file (NOT RUN!)")
         }
       } else {}
     }
