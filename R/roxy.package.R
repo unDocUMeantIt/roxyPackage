@@ -732,6 +732,10 @@ roxy.package <- function(
     } else {
       tar.extraFlags <- ""
     }
+    if(isTRUE(unix.OS)){
+      # make more portable archives, should work with GNU and BSD tar
+      tar.extraFlags <- paste0(tar.extraFlags, " --format=ustar")
+    } else {}
     # failsafe exclusion of backup files
     # --exclude=*\\~ caused trouble for path names with tilde
     tilde.allFiles <- list.files(file.path(R.libs,pck.package))
@@ -744,9 +748,13 @@ roxy.package <- function(
     ## TODO: find a solution without sedwd()
     jmp.back <- getwd()
     setwd(R.libs)
-    tar(macosx.package, files=pck.package,
-      tar=Sys.which("tar"),
-      compression="gzip", extra_flags=paste("-h ", tar.extraFlags))
+    # it seems that tar() in R 3.3 produces archives that contain files twice and
+    # cannot be unpacked with OS X's bsdtar, so we'll try this manually
+    #     tar(macosx.package, files=pck.package,
+    #       tar=Sys.which("tar"),
+    #       compression="gzip", extra_flags=paste("-h ", tar.extraFlags))
+    mac.tar.call <- paste0(Sys.which("tar"), " -czhf ", macosx.package, " ", tar.extraFlags, " ", pck.package)
+    system(mac.tar.call, ignore.stdout=TRUE, ignore.stderr=TRUE, intern=FALSE)
     message(paste0("repo: created ", pckg.name.mac, " (mac OS X)"))
     setwd(jmp.back)
     tools::write_PACKAGES(dir=repo.macosx.R, type="mac.binary", verbose=TRUE, latestOnly=FALSE)

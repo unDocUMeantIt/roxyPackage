@@ -363,7 +363,6 @@ debianizeKeyring <- function(
       distribution=distribution,
       component=component,
       arch=c("i386", "amd64", "source"),
-      overwrite="gpg.key" %in% overwrite,
       apt.ftparchive=buildTools[["apt-ftparchive"]],
       gpg=buildTools[["gpg"]],
       action="deb-key"

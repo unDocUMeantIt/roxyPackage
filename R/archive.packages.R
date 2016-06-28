@@ -152,32 +152,38 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
     if(identical(this.type, "deb") & "deb" %in% type){
       # remove "file://" from path
       deb.repo <- gsub("^file:(/)+", "/", clean.repo.root)
-      # archiving Debian packages is done by a specialised internal function,
-      # see roxyPackage-internal_debianize.R
-      deb.archive.packages(repo.root=file.path(deb.repo, "deb"), to.dir=to.dir,
-        keep.versions=keep, keep.revisions=keep.revisions, package=package,
-        archive.root=clean.archive.root, overwrite=overwrite, reallyDoIt=reallyDoIt
-      )
-      # update Packages, Sources & Release files
-      if(isTRUE(reallyDoIt)){
-        # update package information
-        deb.gen.package.index(
-          repo=file.path(deb.repo, "deb"), binary=TRUE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
+      if(dir.exists(file.path(deb.repo, "deb"))){
+        # archiving Debian packages is done by a specialised internal function,
+        # see roxyPackage-internal_debianize.R
+        didArchiveSomething <- deb.archive.packages(repo.root=file.path(deb.repo, "deb"), to.dir=to.dir,
+          keep.versions=keep, keep.revisions=keep.revisions, package=package,
+          archive.root=clean.archive.root, overwrite=overwrite, reallyDoIt=reallyDoIt
         )
-        # update sources information
-        deb.gen.package.index(
-          repo=file.path(deb.repo, "deb"), binary=FALSE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
-        )
-        deb.update.release(
-          repo.root=deb.repo,
-          gpg.key=deb.options[["gpg.key"]],
-          keyring=deb.options[["keyring"]],
-          distribution=deb.options[["distribution"]],
-          component=deb.options[["component"]]
-        )
-        message("archive: updated Debian Packages file")
+        # update Packages, Sources & Release files
+        if(isTRUE(didArchiveSomething)){
+          if(isTRUE(reallyDoIt)){
+            # update package information
+            deb.gen.package.index(
+              repo=file.path(deb.repo, "deb"), binary=TRUE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
+            )
+            # update sources information
+            deb.gen.package.index(
+              repo=file.path(deb.repo, "deb"), binary=FALSE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
+            )
+            deb.update.release(
+              repo.root=deb.repo,
+              gpg.key=deb.options[["gpg.key"]],
+              keyring=deb.options[["keyring"]],
+              distribution=deb.options[["distribution"]],
+              component=deb.options[["component"]]
+            )
+            message("archive: updated Debian Packages file")
+          } else {
+            message("archive: updated Debian Packages file (NOT RUN!)")
+          }
+        } else {}
       } else {
-        message("archive: updated Debian Packages file (NOT RUN!)")
+        message("archive: no Debian repository found, skipping.")
       }
     } else {
       # iterate through in.repo$this.type$Package

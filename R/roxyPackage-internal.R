@@ -534,6 +534,10 @@ normalizePathByOS <- function(path, is.unix=isUNIX(), mustWork=FALSE, filePrefix
   # this may give bogus results on windows, so we'll encapsulate
   # it in shortPathName(), which is not available on all OSs
   if(isTRUE(is.unix)){
+    # if some function already added file:///, let's strip it off
+    if(grepl("^file:(/)+", path)){
+      path <- gsub("^file:(/)+", "/", path)
+    } else {}
     result <- normalizePath(path, mustWork=mustWork)
     slashes <- "//"
   } else {

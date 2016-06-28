@@ -14,17 +14,23 @@ fixed:
     archive.packages()
   - using tools::package_dependencies() instead of
     tools::package.dependencies() if R >= 3.3
+  - the tar() function of R produced broken archives with files added
+    multiple times
 changed:
   - the code for checks was moved to the end of roxy.package()
   - removed deb.gen.changelog.old(), it was unused since 0.04-2
   - debianize() now generates machine-readable copyright files
   - when debianizeKeyring() is called from debinaize() or roxy.rackage(),
     it is now able to fetch the repo URL
+  - removed overwrite argument from internal function deb.update.release()
+    because it actually didn't have any effect anyway
   - code cleaning (loops)
 added:
   - new action "binonly" to enable binary-only rebuilds
   - HTML page now lists all found binary packages for a package if it is
-    available for more than one R version in the repository 
+    available for more than one R version in the repository
+  - archive.packages() can noa also archive Debian repositories; it gained new
+    arguments keep.revisions and deb.options for fine-tuning
 
 changes in version 0.04-4 (2016-02-04)
 fixed:

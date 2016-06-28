@@ -1145,12 +1145,7 @@ deb.build.sources <- function(srcs.name, build, src.dir.name, version,
     deb.gen.package.index(
       repo=repo, binary=FALSE, distribution=distribution, component=component, apt.ftparchive=apt.ftparchive
     )
-#     setwd(file.path(repo))
-#     dpkg.scans.call <- paste0(apt.ftparchive, " sources ", repo.src.real.rel.path, " > ", repo.src.pseudo.rel.path, "/Sources && \\\n",
-#     "cat ", repo.src.pseudo.rel.path, "/Sources | gzip -9 > ", repo.src.pseudo.rel.path, "/Sources.gz && \\\n",
-#     "cat ", repo.src.pseudo.rel.path, "/Sources | bzip2 -9 > ", repo.src.pseudo.rel.path, "/Sources.bz2")
-#     system(dpkg.scans.call, intern=TRUE)
-#     setwd(prev.wd)
+    setwd(prev.wd)
 } ## end function deb.build.sources()
 
 
@@ -1196,16 +1191,7 @@ deb.build.binary <- function(deb.name, build, src.dir.name, options, version, re
     repo=repo, binary=TRUE, distribution=distribution, component=component, arch=arch,
     repo.all.arch=repo.all.arch, apt.ftparchive=apt.ftparchive
   )
-#   setwd(file.path(repo))
-#   dpkg.scanp.call <- paste0(apt.ftparchive, " packages ", repo.bin.rel.path, " > ", repo.bin.rel.path, "/Packages && \\\n",
-#   "cat ", repo.bin.rel.path, "/Packages | gzip -9 > ", repo.bin.rel.path, "/Packages.gz && \\\n",
-#   "cat ", repo.bin.rel.path, "/Packages | bzip2 -9 > ", repo.bin.rel.path, "/Packages.bz2")
-#   system(dpkg.scanp.call, intern=TRUE)
-#   for (this.path in c(repo.arch.paths)){
-#     repo.all.pckgs.files <- c("Packages", "Packages.gz", "Packages.bz2")
-#     file.copy(file.path(repo.bin.rel.path, repo.all.pckgs.files), file.path(this.path, repo.all.pckgs.files), overwrite=TRUE)
-#   }
-#   setwd(prev.wd)
+  setwd(prev.wd)
 } ## end function deb.build.binary()
 
 
@@ -1496,8 +1482,10 @@ deb.search.repo <- function(pckg=NULL, repo, distribution="unstable", component=
 # behaves similar to archive.packages() -- and is indeed called by it --, but specialises
 # on debian binary and source packages. since this is like a repo-in-a-repo, the functionality
 # is outsourced to a function of its own.
+# return value is logical to indicate if any packages were moved/deleted
 deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, keep.revisions=2, package=NULL,
   archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE, justDelete=FALSE, graceful=FALSE){
+  didArchiveSomething <- FALSE
   # a specialty is that we need to take care of revisions: there might be several revisions,
   # but only *one* source.orig tarball!
   # also, we must check *everything* below the "dists" directory
@@ -1581,18 +1569,21 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
               type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
               deb.names=debNamesAll[["Files.dsc.name"]], graceful=graceful
             )
+            didArchiveSomething <- TRUE
           } else {}
           if(length(debNamesAll[["Files.debian.name"]]) > 0){
             mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
               type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
               deb.names=debNamesAll[["Files.debian.name"]], graceful=graceful
             )
+            didArchiveSomething <- TRUE
           } else {}
           if(length(unique(debNamesSrcAll[["Files.orig.name"]])) > 0){
             mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
               type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
               deb.names=unique(debNamesSrcAll[["Files.orig.name"]]), graceful=graceful
             )
+            didArchiveSomething <- TRUE
           } else {}
         } else {
           if(length(debNamesAll[["Filename"]]) > 0){
@@ -1600,6 +1591,7 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
               type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
               deb.names=debNamesAll[["Filename"]], graceful=graceful
             )
+            didArchiveSomething <- TRUE
           } else {}
           for(thisChanges in names(debNamesAll)[grepl("^changes", names(debNamesAll))]){
             # some packages don't provide all changes files, so we'll exclude the NAs right away
@@ -1609,10 +1601,12 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
                 type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
                 deb.names=deb.names, graceful=graceful
               )
+              didArchiveSomething <- TRUE
             } else {}
           }
         }
       } else {}
     }
   }
+  return(didArchiveSomething)
 } ## end function deb.archive.packages()
