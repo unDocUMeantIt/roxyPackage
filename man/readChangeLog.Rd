@@ -19,11 +19,9 @@ initChangeLog(entry = list(changed = c("initial release"), fixed =
 \arguments{
 \item{file}{Character string, path to the ChangeLog file to read.}
 
-\item{head}{Character string,
-      the headline text of the ChangeLog file (without the package name).}
+\item{head}{Character string, the headline text of the ChangeLog file (without the package name).}
 
-\item{change}{Character string,
-      the text introducing each ChnageLog entry for a package version.}
+\item{change}{Character string, the text introducing each ChnageLog entry for a package version.}
 
 \item{item}{Character string, the text marking each entry item.}
 
@@ -48,26 +46,22 @@ An object of class \code{ChangeLog}.
 These functions ans methods can be used to manage ChangeLog files.
 }
 \details{
-The ChangeLog files used for R packages are usually required to have a standard format,
-      if they are supposed to be parsed
+The ChangeLog files used for R packages are usually required to have a standard format, if they are supposed to be parsed
 by functions like \code{tools::news2Rd}:
 \enumerate{
   \item entries are named "Changes in version <version number>" (and optionally a YYYY-MM-DD date string afterwards).
      The date string is mandatory if you want to use the ChageLog functions in roxyPackage. The version number can be given in
      both <major>.<minor>-<revision> or <major>.<minor>.<revision> format.
-  \item they have single changes properly itemized,
-      by indentation and then either \code{"o"}, \code{"-"} or \code{"*"} followed
+  \item they have single changes properly itemized, by indentation and then either \code{"o"}, \code{"-"} or \code{"*"} followed
     by space
   \item optionally have categories as subsections, like "Fixed", "Changed" or "Added"
 }
 
 \code{readChangeLog} tries to read a given ChangeLog file and parse its content to generate a special ChangeLog object.
 
-\code{writeChangeLog} takes such a ChangeLog object to write it back to a file. If \code{file=NULL},
-      the log will be returned to stdout.
+\code{writeChangeLog} takes such a ChangeLog object to write it back to a file. If \code{file=NULL}, the log will be returned to stdout.
 
-\code{initChangeLog} generates a ChangeLog object from scratch, e.g.,
-      to get started with a new package.
+\code{initChangeLog} generates a ChangeLog object from scratch, e.g., to get started with a new package.
 }
 \examples{
 \dontrun{
@@ -75,7 +69,6 @@ changelog <- readChangeLog("/home/user/myRsources/myRpackage/ChangeLog")
 }
 }
 \seealso{
-\code{\link[roxyPackage:getChangeLogEntry]{getChangeLogEntry}},
-      \code{\link[roxyPackage:updateChangeLog]{updateChangeLog}}
+\code{\link[roxyPackage:getChangeLogEntry]{getChangeLogEntry}}, \code{\link[roxyPackage:updateChangeLog]{updateChangeLog}}
 }
 

@@ -16,75 +16,53 @@ debianize(pck.source.dir, repo.root, build.dir = tempdir(), revision = 1,
   replace.dots = FALSE)
 }
 \arguments{
-\item{pck.source.dir}{Character string,
-      path pointing to the root directory of your package sources, to a local R package source tarball, or
-a full URL to such a package tarball. Tarballs will be downloaded to a temporary directory,
-      if needed, extracted, and then debianized.}
+\item{pck.source.dir}{Character string, path pointing to the root directory of your package sources, to a local R package source tarball, or
+a full URL to such a package tarball. Tarballs will be downloaded to a temporary directory, if needed, extracted, and then debianized.}
 
-\item{repo.root}{Character string,
-      valid path to a directory where to build/update a local package repository.}
+\item{repo.root}{Character string, valid path to a directory where to build/update a local package repository.}
 
-\item{build.dir}{Character string,
-      valid path to a directory where to build the package. If this directory is not empty, a temporary
+\item{build.dir}{Character string, valid path to a directory where to build the package. If this directory is not empty, a temporary
 directory will be created inside automatically.}
 
 \item{revision}{Numeric or a character string, the Debian package revision information.}
 
-\item{repo.name}{Character string,
-      the name for your debian package repository. This can be used to generate an OpenPGP debian package from the
-given \code{gpg.key},
-      unless you change the default behaviour with the parameter \code{deb.keyring.options}}
+\item{repo.name}{Character string, the name for your debian package repository. This can be used to generate an OpenPGP debian package from the
+given \code{gpg.key}, unless you change the default behaviour with the parameter \code{deb.keyring.options}}
 
-\item{origin}{Character string, should be either "noncran" or "other-<yourname>",
-      used for the package name. This indicates that your package is
+\item{origin}{Character string, should be either "noncran" or "other-<yourname>", used for the package name. This indicates that your package is
 not an official CRAN or BioC package.}
 
-\item{distribution}{Character string,
-      the Debain (based) distribution your package is intended for.}
+\item{distribution}{Character string, the Debain (based) distribution your package is intended for.}
 
 \item{component}{Character string, the Debain component of the distribution.}
 
-\item{urgency}{Character string,
-      urgency information for this release (refer to [1] if you want to change this).}
+\item{urgency}{Character string, urgency information for this release (refer to [1] if you want to change this).}
 
-\item{changelog}{Character vector,
-      log entries for the \code{./debian/changelog} file if it is going to be changed.}
+\item{changelog}{Character vector, log entries for the \code{./debian/changelog} file if it is going to be changed.}
 
-\item{deb.description}{A named list or data.frame with further information,
-      especially for the \code{./debian/control} file. This is similar to
-the \code{pck.description} parameter of \code{\link[roxyPackage:roxy.package]{roxy.package}},
-      only with different variables.
-Note that if certain key values are missing,
-      \code{debianize} will automatically use some defaults:
+\item{deb.description}{A named list or data.frame with further information, especially for the \code{./debian/control} file. This is similar to
+the \code{pck.description} parameter of \code{\link[roxyPackage:roxy.package]{roxy.package}}, only with different variables.
+Note that if certain key values are missing, \code{debianize} will automatically use some defaults:
 \describe{
-  \item{Build.Depends.Indep}{\code{"debhelper (>> 7.0.0), r-base-dev (>= <R.vers>),
-      cdbs"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format;
-    if \code{arch} is not set to \code{"all"},
-      the field \code{Build.Depends} is used instead}
-  \item{Depends}{\code{"r-base-core (>= <R vers>)"},
-      plus Depends/Imports in \code{DESCRIPTION} in debianized format}
+  \item{Build.Depends.Indep}{\code{"debhelper (>> 7.0.0), r-base-dev (>= <R.vers>), cdbs"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format;
+    if \code{arch} is not set to \code{"all"}, the field \code{Build.Depends} is used instead}
+  \item{Depends}{\code{"r-base-core (>= <R vers>)"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format}
   \item{Suggests}{Suggests in \code{DESCRIPTION} in debianized format}
-  \item{Maintainer}{generated from \code{\link[base:Sys.info]{Sys.info}} (\code{user <login@nodename>}),
-      with a warning.}
+  \item{Maintainer}{generated from \code{\link[base:Sys.info]{Sys.info}} (\code{user <login@nodename>}), with a warning.}
   \item{Section}{\code{"gnu-r"}}
   \item{Priority}{\code{"optional"}}
   \item{Homepage}{URL in \code{DESCRIPTION}}
 }
 Refer to [1] for further available fields in the \code{./debian/control} file. In case you would like to add to the fields definig relations to other packages
-like \code{Build.Depends} or \code{Depends} rather than replacing them,
-      provide a named character vector with a value called "append". For example:
+like \code{Build.Depends} or \code{Depends} rather than replacing them, provide a named character vector with a value called "append". For example:
 \code{Depends=c(append="libmysql++3")}.}
 
 \item{depends.origin}{A character string to set the default origin for packages which are a dependency of this one. In case all dependencies can be
-met by Debian packages from CRAN releases,
-      you can leave this to the default setting. If you need more control, see \code{depends.origin.alt}.}
+met by Debian packages from CRAN releases, you can leave this to the default setting. If you need more control, see \code{depends.origin.alt}.}
 
-\item{depends.origin.alt}{A named list of alternative origins for packages which are a dependency of this one. By default,
-      \code{depends.origin} is used,
-but if you know that certain dependencies are of different origin (e.g.,
-      your own repository), you can set this here. Each list element must be named after
-the R package you want to set an origin for,
-      and must be a character vector or single string, like \code{list(foo="other-janedoe")}. If more than one origin
+\item{depends.origin.alt}{A named list of alternative origins for packages which are a dependency of this one. By default, \code{depends.origin} is used,
+but if you know that certain dependencies are of different origin (e.g., your own repository), you can set this here. Each list element must be named after
+the R package you want to set an origin for, and must be a character vector or single string, like \code{list(foo="other-janedoe")}. If more than one origin
 is given, they will be set as alternatives (using the pipe \code{"|"} as "or").}
 
 \item{actions}{Character vector, naming the actions to perform:
@@ -96,8 +74,7 @@ is given, they will be set as alternatives (using the pipe \code{"|"} as "or").}
 
 \item{overwrite}{Character vector, naming the files which should be updated:
 \describe{
-  \item{"changelog"}{Update \code{./debian/changelog},
-      but only if no entry for this package version and revision is there yet}
+  \item{"changelog"}{Update \code{./debian/changelog}, but only if no entry for this package version and revision is there yet}
   \item{"compat"}{Re-write \code{./debian/compat}}
   \item{"control"}{Re-write \code{./debian/control}}
   \item{"copyright"}{Re-write \code{./debian/copyright}}
@@ -105,8 +82,7 @@ is given, they will be set as alternatives (using the pipe \code{"|"} as "or").}
   \item{"gpg.key"}{Re-write the keyring package in the repository (by default present packages are left unchanged)}
 }}
 
-\item{bin.opts}{Character string,
-      options to pass through to \code{dpkg-buildpackage} for the \code{"bin"} action.}
+\item{bin.opts}{Character string, options to pass through to \code{dpkg-buildpackage} for the \code{"bin"} action.}
 
 \item{arch}{Character string, architecture the package is build for.}
 
@@ -114,65 +90,48 @@ is given, they will be set as alternatives (using the pipe \code{"|"} as "or").}
 
 \item{epoch}{Integer value, the Debian package epoch information.}
 
-\item{gpg.key}{Character string,
-      the GnuPG key ID for the key that should be used for signing the Release file (secure apt).
+\item{gpg.key}{Character string, the GnuPG key ID for the key that should be used for signing the Release file (secure apt).
 This key must be available in your keyring (or in the one specified by \code{keyring}). Skipped if \code{NULL}.}
 
 \item{keyring}{Character string, path to an additional keyring file to use.}
 
-\item{gpg.version}{Integer number,
-      specifiying the GnuPG major version number. By default \code{gpg2} is assumed.}
+\item{gpg.version}{Integer number, specifiying the GnuPG major version number. By default \code{gpg2} is assumed.}
 
-\item{deb.keyring.options}{Named list,
-      extra options to pass through to \code{\link[roxyPackage:debianizeKeyring]{debianizeKeyring}}.
-By default, the value for \code{maintainer} will be taken from \code{deb.description},
-      and the values for \code{gpg.key},
-\code{repo.name}, \code{repo.root}, \code{build.dir}, \code{distribution},
-      \code{component}, \code{urgency}, \code{keyring}, and \code{gpg.version}
+\item{deb.keyring.options}{Named list, extra options to pass through to \code{\link[roxyPackage:debianizeKeyring]{debianizeKeyring}}.
+By default, the value for \code{maintainer} will be taken from \code{deb.description}, and the values for \code{gpg.key},
+\code{repo.name}, \code{repo.root}, \code{build.dir}, \code{distribution}, \code{component}, \code{urgency}, \code{keyring}, and \code{gpg.version}
 are taken from the settings given with the \code{debianize} function call.}
 
-\item{compression}{Character string,
-      compression format for Debian source packages. Currently \code{"xz"} and \code{"gzip"}
+\item{compression}{Character string, compression format for Debian source packages. Currently \code{"xz"} and \code{"gzip"}
 are supported.}
 
-\item{keep.build}{Logical. If \code{build.dir} is not \code{pck.source.dir},
-      work is done in generated folder with a random name.
+\item{keep.build}{Logical. If \code{build.dir} is not \code{pck.source.dir}, work is done in generated folder with a random name.
 Usually it is removed afterwards, unless you set this option to \code{TRUE}.}
 
 \item{replace.dots}{Logical. The proposed Debian R Policy actually asks to replace all dots in package names by hyphens. However,
 this is implemented differently in \code{r-cran.mk} and will lead to unbuildable packages. So the default here is to ignore the policy draft and keep dots
-in package names,
-      as is true for a lot of CRAN packages as well (code is law). In case you run into problems here
-(symptoms include a failing .deb build because the directory \code{build/<package name>} doesn't exist),
-      try turning this switch. If \code{TRUE}
+in package names, as is true for a lot of CRAN packages as well (code is law). In case you run into problems here
+(symptoms include a failing .deb build because the directory \code{build/<package name>} doesn't exist), try turning this switch. If \code{TRUE}
 dots will be replaced by hyphens in both source and binary package names. Note that building a package by calling this function should always
 work, because it will automatically create a symlink in the build directory if needed.}
 }
 \description{
-This function attempts to 'debianize' your R source package. This means,
-      it will add a \code{debian} directory
-to sources' root directory, and populate it with needed files for Debian package building,
-      as outlined in the Debian R Policy
+This function attempts to 'debianize' your R source package. This means, it will add a \code{debian} directory
+to sources' root directory, and populate it with needed files for Debian package building, as outlined in the Debian R Policy
 by Eddelbuettel & Bates (2003) and the Debian Policy Manual[1], version 3.9.3.1.
 }
 \details{
-The file \code{./debian/source/format} will also be created only once. The files \code{./debian/control},
-      \code{./debian/copyright} and
+The file \code{./debian/source/format} will also be created only once. The files \code{./debian/control}, \code{./debian/copyright} and
 \code{./debian/rules} will be generated from the information found in the \code{DESCRIPTION} file of the R package.
-Once created,
-      these files won't be touched again if they are not defined in the \code{overwrite} parameter. This enables you to save
+Once created, these files won't be touched again if they are not defined in the \code{overwrite} parameter. This enables you to save
 files from being re-written, e.g. if you altered them manually.
 
-The \code{./debian/changelog} is special here,
-      as \code{overwrite} doesn't mean the whole file will be overwritten, but rather that the
-function checks if the changelog already contains an entry for this particular package version and revision,
-      and only if this is not the
-case will add one at the beginning of the file,
-      including the log entries defined by the \code{changelog} parameter (each string will
+The \code{./debian/changelog} is special here, as \code{overwrite} doesn't mean the whole file will be overwritten, but rather that the
+function checks if the changelog already contains an entry for this particular package version and revision, and only if this is not the
+case will add one at the beginning of the file, including the log entries defined by the \code{changelog} parameter (each string will
 become one log entry).
 
-The function will try to detect the license you specified in the \code{DESCRIPTION} file,
-      and if it is one of the following licenses,
+The function will try to detect the license you specified in the \code{DESCRIPTION} file, and if it is one of the following licenses,
 generate some useful info on how to get the full license on a Debian system:
 \itemize{
    \item{Apache License}
@@ -187,50 +146,34 @@ Please note that the package will always be built against the R version installe
 Also, this function responds to \code{\link[roxyPackage:sandbox]{sandbox}}.
 }
 \section{Building the actual package}{
- If you're running the R session on a Debian based system,
-      the function can build the debian package,
-but it would likely fail when it comes to signing the .changes/.dsc files,
-      because \code{gpg} gets invoked without \code{"--no-tty"}.
-You'd have to sign those files later, e.g. with \code{debsign},
-      if you really need this. However, secure-apt can still be ensured, if you provide
-a valid GnuPG key ID from your keyring,
-      which will then be used to sign the generated \code{Release} file. If not present yet, a copy of
-the public key will automatically be saved to the repository,
-      in a file named \code{<key ID>.asc}.
+ If you're running the R session on a Debian based system, the function can build the debian package,
+but it would likely fail when it comes to signing the .changes/.dsc files, because \code{gpg} gets invoked without \code{"--no-tty"}.
+You'd have to sign those files later, e.g. with \code{debsign}, if you really need this. However, secure-apt can still be ensured, if you provide
+a valid GnuPG key ID from your keyring, which will then be used to sign the generated \code{Release} file. If not present yet, a copy of
+the public key will automatically be saved to the repository, in a file named \code{<key ID>.asc}.
 
-Package building is done in a temporal directory,
-      and the source files a copied there first. Set \code{build.dir=pck.source.dir} if
+Package building is done in a temporal directory, and the source files a copied there first. Set \code{build.dir=pck.source.dir} if
 you want to build in-place instead.
 }
 
 \section{Package dependencies}{
  This function will make no attempts to guess what package dependencies must be fulfilled.
-That is, if the defaults don't fit (see below),
-      then you must define these dependencies yourself via the \code{deb.description}
-parameter (setting appropriate values for fields like \code{Build.Depends},
-      \code{Build.Depends.Indep} and \code{Depends}). In case your R package
-depends on other R packages,
-      you will have to ensure that these are also available as Debian packages (and define them
-as dependencies),
-      so the package management can take care of resolving these dependencies transparently. Otherwise users might
-have a hard time figuring out how to get your package to work,
-      if the building process doesn't fail in the first place.
+That is, if the defaults don't fit (see below), then you must define these dependencies yourself via the \code{deb.description}
+parameter (setting appropriate values for fields like \code{Build.Depends}, \code{Build.Depends.Indep} and \code{Depends}). In case your R package
+depends on other R packages, you will have to ensure that these are also available as Debian packages (and define them
+as dependencies), so the package management can take care of resolving these dependencies transparently. Otherwise users might
+have a hard time figuring out how to get your package to work, if the building process doesn't fail in the first place.
 
-That said,
-      you should always try to debianize the package without manual dependencies set first. After that, look at the generated \code{control}
+That said, you should always try to debianize the package without manual dependencies set first. After that, look at the generated \code{control}
 file and see if there are problems at all. Usually the default method is supposed to be quite clever when it comes to detect dependencies from the
-actual package \code{DESCRIPTION} file (it will automatically translate those into proper Debain package names,
-      where tuning is possible via the
+actual package \code{DESCRIPTION} file (it will automatically translate those into proper Debain package names, where tuning is possible via the
 \code{depends.origin} and \code{depends.origin.alt} parameters).
 }
 
 \section{Repository access}{
- After you debianized your package and built some Debian packages,
-      \code{debianize} will prepare a Debain package repository
-in the specified directory (can be the same as used with \code{roxy.package}). You can now access it locally on your machine,
-      or upload the whole thing
-to a web server etc. Basically,
-      it should work if you add these lines to your repository configuration:
+ After you debianized your package and built some Debian packages, \code{debianize} will prepare a Debain package repository
+in the specified directory (can be the same as used with \code{roxy.package}). You can now access it locally on your machine, or upload the whole thing
+to a web server etc. Basically, it should work if you add these lines to your repository configuration:
 
 \code{deb http://<URL you uploaded to>/deb <distribution> <component>}
 
@@ -238,10 +181,8 @@ to a web server etc. Basically,
 }
 
 \section{Debianizing arbitrary packages}{
- With a little luck,
-      this function can almot automatically debianize any R package sources. You can even provide
-the \code{pck.source.dir} parameter with a URL to package sources (e.g.,
-      a source package from CRAN), and \code{debianize} will do its best to end up
+ With a little luck, this function can almot automatically debianize any R package sources. You can even provide
+the \code{pck.source.dir} parameter with a URL to package sources (e.g., a source package from CRAN), and \code{debianize} will do its best to end up
 with an installable debian package in the specified repository root.
 }
 \examples{
