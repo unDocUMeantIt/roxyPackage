@@ -45,7 +45,7 @@
 #'    are only printed.
 #' @param graceful Logical, if \code{TRUE} the process will not freak out because of missing files. Use this
 #'    for instance if you deleted files from the repo but did not update the package indices.
-#' @deb.options A list of options that must be properly set if you want to archive Debian packages. After packages were
+#' @param deb.options A list of options that must be properly set if you want to archive Debian packages. After packages were
 #'    removed from the repo, all Packages, Sources and Release files must be re-written and signed, and this is the
 #'    minimum information required: \code{distribution}, \code{component}, \code{gpg.key}, \code{keyring}.
 #'    See \code{\link[roxyPackage:debianize]{debianize}} for details.
@@ -182,9 +182,7 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
             message("archive: updated Debian Packages file (NOT RUN!)")
           }
         } else {}
-      } else {
-        message("archive: no Debian repository found, skipping.")
-      }
+      } else {}
     } else {
       # iterate through in.repo$this.type$Package
       checkThisRepo <- in.repo[[this.type]]
