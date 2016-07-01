@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2016 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -645,41 +645,19 @@ deb.gen.control <- function(srcs.name, deb.name, description, R.dscrptn, deb.dir
   return(TRUE)
 } ## end function deb.gen.control()
 
-
-## function deb.gen.copyright.old()
-# deb.maintainer: "name <mail@address.org>"
-deb.gen.copyright.old <- function(R.dscrptn, deb.name, description, year, deb.dir,
-  overwrite=TRUE, repo.name=NULL, isRpackage=TRUE, action=ifelse(isRpackage, "deb", "deb-key")){
-  file <- file.path(deb.dir, "copyright")
-  if(is.null(R.dscrptn[["Authors@R"]])){
-    maintainer <- as.character(R.dscrptn[["Maintainer"]])
-    author <- as.character(R.dscrptn[["Author"]])
-    author.nomail <- gsub("[[:space:]]*<[^>]*>", "", author)
+# this is being re-used also for the README.md file
+copyright.text <- function(license, package, year, author, deb=TRUE){
+  if(isTRUE(deb)){
+    # different formatting needed
+    id <- "  "    # indentation
+    el <- "  .\n" # empty lines
   } else {
-    pck.persons <- as.character(R.dscrptn[["Authors@R"]])
-    maintainer <- paste(
-      format(get.by.role(eval(parse(text=pck.persons)), "cre"),
-        include=c("given", "family", "email"), braces=list(email=c("<", ">"))),
-      collapse=", "
-    )
-    author <- paste(
-      format(get.by.role(eval(parse(text=pck.persons)), "aut"),
-        include=c("given", "family", "email"), braces=list(email=c("<", ">"))),
-      collapse=", "
-    )
-    author.nomail <- paste(
-      format(get.by.role(eval(parse(text=pck.persons)), "aut"),
-        include=c("given", "family")),
-      collapse=", "
-    )
+    id <- ""
+    el <- "\n"
   }
-  license <- as.character(R.dscrptn[["License"]])
-  R.name <- as.character(R.dscrptn[["Package"]])
-
-  if(!file_test("-f", file) | isTRUE(overwrite)){
-    if(checkLicence(license)){
-      licenseInfo <- checkLicence(license, deb=TRUE, logical=FALSE)
-      includeLicense <- paste0(R.name, " Copyright (C) ", year, " ", author.nomail, ", released under the\n",
+  if(checkLicence(license)){
+    licenseInfo <- checkLicence(license, deb=TRUE, logical=FALSE)
+    licenseText <- paste0(id , package, " Copyright (C) ", year, " ", author, ", released under the\n", id,
       licenseInfo[["name"]],
       if(!is.na(licenseInfo[["version"]])){
         paste0(" version ", licenseInfo[["version"]])
@@ -687,58 +665,35 @@ deb.gen.copyright.old <- function(R.dscrptn, deb.name, description, year, deb.di
       if(grepl(">", license)){
         paste0(" or (at your option) any later version")
       } else {},
-      ".\n\n",
-      "This software is distributed in the hope that it will be useful, but\n",
-      "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
-      "or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
-      "You should have received a copy of the license with your Debian system,\n",
-      "in the file /usr/share/common-licenses/", licenseInfo[["file"]], ", or with the\n",
-      "source package as the file COPYING or LICENSE.\n")
-    } else {
-      includeLicense <- paste0(R.name, " Copyright (C) ", year, " ", author.nomail, ", released under the\n",
-      "terms of the ", license, " license.\n\n",
-      "This software is distributed in the hope that it will be useful, but\n",
-      "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
-      "or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
-      "You should have received a copy of the license with the\n",
-      "source package as the file COPYING or LICENSE.\n")
-    }
-    if(isTRUE(isRpackage)){
-      txt.copyright <- paste0(
-        if(identical(author, maintainer)){
-          paste0("The R library ", R.name, " was originally written and is maintained by ", author, ".\n\n")
-        } else {
-          paste0("The R library ", R.name, " was originally written by ", author, "\n",
-          "and is maintained by ", maintainer, ".\n\n")
-        },
-        "This Debian package was put together by ", description[["Maintainer"]], ".\n\n",
-        if("Homepage" %in% names(description)){
-          paste0("The sources were downloaded from ", description[["Homepage"]], ".\n\n")
-        } else {},
-        "The package was renamed from its upstream name '", R.name, "' to\n",
-        "'", deb.name, "' in harmony with the R packaging policy to indicate\n",
-        "that the package is external to the CRAN or BioC repositories.\n\n",
-        includeLicense)
-    } else {
-      txt.copyright <- paste0(
-          paste0("This is the OpenPGP keyring for packages hosted at the\n", repo.name, " repository"),
-        if("Homepage" %in% names(description)){
-          paste0(": ", description[["Homepage"]], "\n\n")
-        } else {
-          paste0(".\n\n")
-        },
-        "This Debian package was put together by ", description[["Maintainer"]], ".\n\n",
-        "The keys in the keyrings don't fall under any copyright. Everything\n",
-        "else in the package is licensed as follows:\n\n",
-        includeLicense)
-    }
-
-    # write the copyright file
-    cat(txt.copyright, file=file)
-    message(paste0(action, ": debian/copyright updated."))
-  } else {}
-  return(TRUE)
-} ## end function deb.gen.copyright.old()
+      ".\n", el,
+       id, "This software is distributed in the hope that it will be useful, but\n",
+       id, "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
+       id, "or FITNESS FOR A PARTICULAR PURPOSE.\n", el,
+      if(isTRUE(deb)){
+        paste0(
+           id, "You should have received a copy of the license with your Debian system,\n",
+           id, "in the file /usr/share/common-licenses/", licenseInfo[["file"]], ", or with the\n",
+           id, "source package as the file COPYING or LICENSE.\n"
+        )
+      } else {
+        paste0(
+           id, "You should have received a copy of the license with the\n",
+           id, "source package as the file COPYING or LICENSE.\n"
+        )
+      }
+    )
+  } else {
+    licenseText <- paste0( id, package, " Copyright (C) ", year, " ", author, ", released under the\n",
+       id, "terms of the ", license, " license.\n", el,
+       id, "This software is distributed in the hope that it will be useful, but\n",
+       id, "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
+       id, "or FITNESS FOR A PARTICULAR PURPOSE.\n", el,
+       id, "You should have received a copy of the license with the\n",
+       id, "source package as the file COPYING or LICENSE.\n"
+    )
+  }
+  return(licenseText)
+}
 
 ## function deb.gen.copyright()
 deb.gen.copyright <- function(R.dscrptn, deb.name, description, year, deb.dir,
@@ -771,32 +726,13 @@ deb.gen.copyright <- function(R.dscrptn, deb.name, description, year, deb.dir,
   R.name <- as.character(R.dscrptn[["Package"]])
 
   if(!file_test("-f", file) | isTRUE(overwrite)){
-    if(checkLicence(license)){
-      licenseInfo <- checkLicence(license, deb=TRUE, logical=FALSE)
-      includeLicense <- paste0("  ", R.name, " Copyright (C) ", year, " ", author.nomail, ", released under the\n  ",
-      licenseInfo[["name"]],
-      if(!is.na(licenseInfo[["version"]])){
-        paste0(" version ", licenseInfo[["version"]])
-      } else {},
-      if(grepl(">", license)){
-        paste0(" or (at your option) any later version")
-      } else {},
-      ".\n  .\n",
-      "  This software is distributed in the hope that it will be useful, but\n",
-      "  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
-      "  or FITNESS FOR A PARTICULAR PURPOSE.\n  .\n",
-      "  You should have received a copy of the license with your Debian system,\n",
-      "  in the file /usr/share/common-licenses/", licenseInfo[["file"]], ", or with the\n",
-      "  source package as the file COPYING or LICENSE.\n")
-    } else {
-      includeLicense <- paste0("  ", R.name, " Copyright (C) ", year, " ", author.nomail, ", released under the\n",
-      "  terms of the ", license, " license.\n  .\n",
-      "  This software is distributed in the hope that it will be useful, but\n",
-      "  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
-      "  or FITNESS FOR A PARTICULAR PURPOSE.\n  .\n",
-      "  You should have received a copy of the license with the\n",
-      "  source package as the file COPYING or LICENSE.\n")
-    }
+    includeLicense <- copyright.text(
+      license=license,
+      package=R.name,
+      year=year,
+      author=author.nomail,
+      deb=TRUE
+    )
     if(isTRUE(isRpackage)){
       txt.copyright <- paste0(
         "Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n",

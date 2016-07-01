@@ -24,8 +24,11 @@ changed:
     it is now able to fetch the repo URL
   - removed overwrite argument from internal function deb.update.release()
     because it actually didn't have any effect anyway
+  - revert back to adding standard LICENSE files instead of LICENSE.txt, as
+    none of them are accepted on CRAN anyway
   - code cleaning (loops)
 added:
+  - new action "readme" to generate an initial README.md file
   - new action "binonly" to enable binary-only rebuilds
   - HTML page now lists all found binary packages for a package if it is
     available for more than one R version in the repository

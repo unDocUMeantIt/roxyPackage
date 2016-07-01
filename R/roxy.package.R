@@ -67,7 +67,7 @@
 #' @section CRAN compliance: The CRAN policies can sometimes be very strict. This package should allow you to produce packages which are suitable
 #' for release on CRAN. But some steps have to be taken care of by yourself. For instance, CRAN does currently not allow copies of common licenses
 #' in a source package, nor a \code{debian} folder. Therefore, if your package is supposed to be released on CRAN, you should include
-#' \code{Rbuildignore=c("debian", "LICENSE.txt")} to the function call.
+#' \code{Rbuildignore=c("debian", "LICENSE")} to the function call.
 #'
 #' @note The binary packaging is done simply by zipping (Windows) or targzipping (Mac OS X) the built and installed package. This should
 #' do the trick as long as your package is written in pure R code. It will most likely not produce usable packages if it contains
@@ -85,7 +85,8 @@
 #'    \describe{
 #'      \item{"roxy"}{Roxygenize the docs}
 #'      \item{"cite"}{Update CITATION file}
-#'      \item{"license"}{Update LICENSE.txt file; it's not called LICENSE to prevent an automatic installation}
+#'      \item{"license"}{Update LICENSE file}
+#'      \item{"readme"}{Generate initial README.md file}
 #'      \item{"check"}{Do a full package check, calling \code{R CMD check}}
 #'      \item{"package"}{Build & install the package, update source repository, calling \code{R CMD build} and \code{R CMD INSTALL}}
 #'      \item{"binonly"}{Like \code{"package"}, but doesn't copy the source package to the repository, to enable binary-only rebuilds}
@@ -120,6 +121,14 @@
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
 #'    will be used.
+#' @param readme.options A named list with parameters that add optional extra information to an initial README.md file, namely instructions to install the package
+#'    directly from a GitHub repository, and a Flattr button. Ignore this if you don't use either. Theoretically, you can overwrite all values of the internal
+#'    function \code{readme_text} (e.g., try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
+#'    \describe{
+#'      \item{\code{githubUser}}{Your GitHub user name, can be used both to contruct the GitHub repo URL as well as the Flattr URL}
+#'      \item{\code{flattrUser}}{Your Flattr user name}
+#'    }
+#'    All other missing values are then guessed from the other package information. It is then assumed that the GitHub repo has the same name as the package.
 #' @param ChangeLog A named list of character vectors with log entry items. The element names will be used as section names in the ChangeLog entry,
 #'    and each character string in a vector will be pasted as a log item. The news you provide here will be appended to probably present news, while
 #'    trying to prevent duplicate entries to appear. If you need more control, don't use the \code{"log"} action, but have a look at
@@ -197,6 +206,7 @@ roxy.package <- function(
     Rd2pdf="--pdf --no-preview"),
   URL=NULL,
   deb.options=NULL,
+  readme.options=NULL,
   ChangeLog=list(changed=c("initial release"), fixed=c("missing ChangeLog")),
   Rbuildignore=NULL,
   Rinstignore=NULL,
@@ -238,7 +248,7 @@ roxy.package <- function(
       if(this.R > 1){
         # well, the same is true for some other actions
         # we'll only perform them during the *first* run
-        this.actions <- actions[!actions %in% c("roxy", "cite", "license", "doc", "cl2news", "news2rss", "cleanRd")]
+        this.actions <- actions[!actions %in% c("roxy", "cite", "license", "doc", "cl2news", "news2rss", "cleanRd", "readme")]
         # we also don't need to repeat handling of .Rbuildignore and .Rinstignore
         Rbuildignore <- Rinstignore <- NULL
       } else {}
@@ -258,6 +268,7 @@ roxy.package <- function(
         Rcmd.options=Rcmd.options,
         URL=URL,
         deb.options=this.deb.options,
+        readme.options=readme.options,
         ChangeLog=ChangeLog,
         Rbuildignore=Rbuildignore,
         Rinstignore=Rinstignore,
@@ -379,8 +390,9 @@ roxy.package <- function(
   pckg.NEWS.html <- file.path(repo.pckg.info, "NEWS.html")
   RSS.file.name <- "RSS.xml"
   pckg.NEWS.rss <- file.path(repo.pckg.info, RSS.file.name)
-  pckg.license.file <- file.path(pck.source.dir, "LICENSE.txt")
-  pckg.license.file.old <- file.path(pck.source.dir, "LICENSE")
+  pckg.license.file <- file.path(pck.source.dir, "LICENSE")
+  pckg.license.file.old <- file.path(pck.source.dir, "LICENSE.txt")
+  pckg.readme.file <- file.path(pck.source.dir, "README.md")
   pckg.pdf.doc <- paste0(pck.package, ".pdf")
   
   # take care of .Rbuildignore and .Rinstignore
@@ -461,13 +473,46 @@ roxy.package <- function(
     if(checkLicence(pckg.license)){
       copyLicence(pckg.license, pckg.license.file, overwrite=TRUE)
       if(file.exists(pckg.license.file.old)){
-        warning("license: you have both LICENSE and LICENSE.txt in your project! if LICENSE is one of the standard licenses, please rename it to prevent its intallation.", call.=FALSE)
+        warning("license: you have both LICENSE and LICENSE.txt in your project! if LICENSE.txt is one of the standard licenses, please rename it to prevent its intallation.", call.=FALSE)
       } else {}
     } else {
       stop(simpleError(paste0("license: unrecognized license (", pckg.license, "), please provide your own LICENSE file! ")))
     }
   } else {}
 
+  if("readme" %in% actions){
+    if(file.exists(pckg.readme.file)){
+      warning("readme: README.md exists, please remove it if you want it re-written!", call.=FALSE)
+    } else {
+      readme.defaults <- mergeOptions(
+        someFunction=readme_text,
+        customOptions=readme.options,
+        newDefaults=list(
+          package=pck.package,
+          description=pck.description[["Description"]],
+          url=pck.description[["URL"]],
+          license=pck.description[["License"]],
+          author=paste0(
+            gsub(
+              "[[:space:]]*<[^>]*>",
+              "",
+              get.authors(description=pck.description, maintainer=FALSE, contributor=FALSE, copyright=FALSE)[["aut"]]
+            ),
+            collapse=", "
+          ),
+          githubRepo=pck.package,
+          fl_title=pck.package
+        )
+      )
+      formals(readme_text) <- readme.defaults
+      cat(
+        readme_text(),
+        file=pckg.readme.file
+      )
+      message(paste0("readme: generated initial ", pckg.readme.file, "."))
+    }
+  } else {}
+  
   if("roxy" %in% actions){
     add.options <- list(...)
     if(any(c("local.roxy.dir", "roxy.unlink.target") %in% names(add.options))){
