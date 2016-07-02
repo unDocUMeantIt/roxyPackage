@@ -27,6 +27,7 @@ changed:
   - revert back to adding standard LICENSE files instead of LICENSE.txt, as
     none of them are accepted on CRAN anyway
   - code cleaning (loops)
+  - removed the internal package description (obsolete)
 added:
   - new action "readme" to generate an initial README.md file
   - new action "binonly" to enable binary-only rebuilds
@@ -34,6 +35,8 @@ added:
     available for more than one R version in the repository
   - archive.packages() can noa also archive Debian repositories; it gained new
     arguments keep.revisions and deb.options for fine-tuning
+  - if readme.options contains a Flattr user and URL is set, a Flattr button
+    will also be added to the repository HTML page
 
 changes in version 0.04-4 (2016-02-04)
 fixed:

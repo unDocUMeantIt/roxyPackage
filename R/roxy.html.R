@@ -194,7 +194,8 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
 # for global repository index outside pckg dir, set index=TRUE and redirect="pckg/"
 #' @import XiMpLe
 roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
-  url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, url.deb.repo=NULL, main.path.mac=NULL, title=NULL, cite="", news="", changelog="", redirect="", rss.file=NULL) {
+  url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, url.deb.repo=NULL, main.path.mac=NULL, title=NULL,
+  cite="", news="", changelog="", redirect="", rss.file=NULL, flattrUser=NULL, URL=NULL) {
 
   rss.header <- rss.feed <- NULL
 
@@ -238,6 +239,15 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         attrs=list(href=rss.file))
     } else {}
 
+    # check if we need to prepare for flattr button
+    if(!is.null(flattrUser)){
+      if(is.null(URL)){
+        message("html: you need to specify 'URL' to generate a Flattr button!")
+      } else {
+        flattrImage <- "../flattr-badge-large.png"
+      }
+    } else {}
+
     pckg.title <- rx.clean(pckg[,"Title"])
     pckg.authors <- get.authors(pckg, maintainer=TRUE)
     pckg.author <- rx.clean(pckg.authors[["aut"]])
@@ -247,8 +257,23 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     html.body <- XMLNode("body",
       XMLNode("h2", paste0(pckg.name, ": ", pckg.title)),
       XMLNode("p", rx.clean(pckg[,"Description"])),
+      if(all(!is.null(flattrUser), !is.null(URL))){
+        XMLNode("p",
+          readme_flattr(
+            user_id=flattrUser,
+            url=paste0(URL,"/pckg/", pckg.name, "/index.html"),
+            title=pckg.name,
+            language="en_GB",
+            tags="stats,R",
+            category="software",
+            buttonText="Flattr this R package",
+            img=flattrImage,
+            md=FALSE
+          )
+        )
+      },
       XMLNode("table",
-         rx.tr("Version:", pckg[,"Version"]),
+        rx.tr("Version:", pckg[,"Version"]),
         rx.html.switch(desc=pckg, field="Depends"),
         rx.html.switch(desc=pckg, field="Suggests"),
         rx.html.switch(desc=pckg, field="Enhances"),
@@ -258,10 +283,11 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         rx.tr("Maintainer:", pckg.maintainer),
         rx.tr("License:", pckg[,"License"]),
         rx.html.switch(desc=pckg, field="URL"),
-         if(file_test("-f", cite)){
-          rx.tr("Citation:", XMLNode("a",
-            paste0(pckg.name, " citation info"),
-            attrs=list(href="citation.html")))},
+          if(file_test("-f", cite)){
+            rx.tr("Citation:", XMLNode("a",
+              paste0(pckg.name, " citation info"),
+              attrs=list(href="citation.html")))
+          },
         attrs=list(summary=paste0("Package ", pckg.name, " summary."))),
       XMLNode("h4", "Downloads:"),
       XMLNode("table",
@@ -312,7 +338,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
           rx.tr("Reference manual:", XMLNode("a",
             url.doc,
             attrs=list(href=url.doc)))},
-         if(!is.null(url.vgn)){
+        if(!is.null(url.vgn)){
           rx.tr("Vignettes:", XMLNode("",
             .children=as.list(sapply(url.vgn, function(this.vgn){
               XMLNode("", .children=list(
@@ -320,8 +346,8 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
                 XMLNode("br"))
               )
             }))))},
-         # add NEWS or ChangeLog
-         if(file_test("-f", news)){
+        # add NEWS or ChangeLog
+        if(file_test("-f", news)){
           rx.tr("News/ChangeLog:", XMLNode("", .children=list(
               XMLNode("a", "NEWS", attrs=list(href=gsub("(.*)(NEWS)(.*)", "\\2\\3", news, perl=TRUE))),
               rss.feed)))

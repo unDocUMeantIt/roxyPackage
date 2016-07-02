@@ -73,7 +73,8 @@ Will be passed on as given here. To deactivate, options must explicitly be se to
 
 \item{URL}{A character string defining the URL to the root of the repository (i.e., which holds the directories \code{src}
 etc.). This is not the path to the local file system, but should be the URL to the repository as it is available
-via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"} and \code{"deb"}.}
+via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"}, \code{"deb"}, and possibly \code{"html"} --
+if \code{flattrUser} is also set in \code{readme.options}, a Flattr button will be added to the HTML page, using this value.}
 
 \item{deb.options}{A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
@@ -84,7 +85,7 @@ directly from a GitHub repository, and a Flattr button. Ignore this if you don't
 function \code{readme_text} (e.g., try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
 \describe{
   \item{\code{githubUser}}{Your GitHub user name, can be used both to contruct the GitHub repo URL as well as the Flattr URL}
-  \item{\code{flattrUser}}{Your Flattr user name}
+  \item{\code{flattrUser}}{Your Flattr user name, also used by the \code{"html"} action in combination with \code{URL}}
 }
 All other missing values are then guessed from the other package information. It is then assumed that the GitHub repo has the same name as the package.}
 

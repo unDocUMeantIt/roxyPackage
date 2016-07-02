@@ -18,6 +18,7 @@
 # this file contains helper functions to write an initial REAMDE.md file
 
 # creates code for a flattr button
+#  - md: if TRUE returns markdown, if FALSE returns as XiMpLe X(HT)ML node
 readme_flattr <- function(
     user_id,
     url,
@@ -26,10 +27,11 @@ readme_flattr <- function(
     tags="github",
     category="software",
     buttonText="Flattr this git repo",
-    img="https://api.flattr.com/button/flattr-badge-large.png"
+    img="https://api.flattr.com/button/flattr-badge-large.png",
+    md=TRUE
   ){
-    result <- paste0(
-      "[![", buttonText, "](", img, ")](https://flattr.com/submit/auto?",
+    flattrURL <- paste0(
+      "https://flattr.com/submit/auto?",
       "user_id=", user_id,
       "&url=", url,
       "&title=", title,
@@ -41,9 +43,18 @@ readme_flattr <- function(
       } else {},
       if(!identical(category, "")){
         paste0("&category=", category)
-      } else {},
-      ")"
+      } else {}
     )
+    if(isTRUE(md)){
+      result <- paste0(
+        "[![", buttonText, "](", img, ")](",flattrURL,")"
+      )
+    } else {
+      result <- XMLNode("a",
+        XMLNode("img", attrs=list(src=img, alt=buttonText, style="max-width:100%;")),
+        attrs=list(href=flattrURL, target="_blank")
+      )
+    }
     return(result)
 }
 

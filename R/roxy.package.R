@@ -117,7 +117,8 @@
 #'    Will be passed on as given here. To deactivate, options must explicitly be se to \code{""}, missing options will be used with the default values.
 #' @param URL A character string defining the URL to the root of the repository (i.e., which holds the directories \code{src}
 #'    etc.). This is not the path to the local file system, but should be the URL to the repository as it is available
-#'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"} and \code{"deb"}.
+#'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"}, \code{"deb"}, and possibly \code{"html"} --
+#'    if \code{flattrUser} is also set in \code{readme.options}, a Flattr button will be added to the HTML page, using this value.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
 #'    will be used.
@@ -126,7 +127,7 @@
 #'    function \code{readme_text} (e.g., try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
 #'    \describe{
 #'      \item{\code{githubUser}}{Your GitHub user name, can be used both to contruct the GitHub repo URL as well as the Flattr URL}
-#'      \item{\code{flattrUser}}{Your Flattr user name}
+#'      \item{\code{flattrUser}}{Your Flattr user name, also used by the \code{"html"} action in combination with \code{URL}}
 #'    }
 #'    All other missing values are then guessed from the other package information. It is then assumed that the GitHub repo has the same name as the package.
 #' @param ChangeLog A named list of character vectors with log entry items. The element names will be used as section names in the ChangeLog entry,
@@ -831,6 +832,15 @@ roxy.package <- function(
       stopifnot(file.copy(RSS.local.image, RSS.image))
       message(paste0("html: copied RSS image to ", RSS.image))
     } else {}
+    if(all(!is.null(readme.options[["flattrUser"]]), !is.null(URL))){
+      # copy flattr image, if not present
+      flattr.image <- file.path(repo.pckg.info.main, "flattr-badge-large.png")
+      if(!file_test("-f", flattr.image)){
+        flattr.local.image <- file.path(roxyPackage.lib.dir(), "images", "flattr-badge-large.png")
+        stopifnot(file.copy(flattr.local.image, flattr.image))
+        message(paste0("html: copied Flattr button image to ", flattr.image))
+      } else {}
+    } else {}
     # check for binaries to link
     url.src <- url.win <- url.mac <- url.deb <- url.doc <- url.vgn <- deb.repo <- NULL
     if(file_test("-f", repo.src.gz)){
@@ -903,7 +913,9 @@ roxy.package <- function(
       url.src=url.src, url.win=url.win, url.mac=url.mac, url.doc=url.doc, url.vgn=url.vgn,
       url.deb.repo=url.deb.repo, main.path.mac=OSX.repo[["main"]],
       title=html.title, cite=pckg.cite.file.html, news=url.NEWS,
-      changelog=pckg.changelog, rss.file=RSS.file.name)
+      changelog=pckg.changelog, rss.file=RSS.file.name,
+      flattrUser=readme.options[["flattrUser"]], URL=URL
+    )
     target.file.pckg <- file.path(repo.pckg.info, "index.html")
     cat(package.html, file=target.file.pckg)
     message(paste0("html: updated ", target.file.pckg))
