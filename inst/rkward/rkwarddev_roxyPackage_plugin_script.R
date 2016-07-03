@@ -528,13 +528,15 @@ JS.preprocess <- rk.paste.JS(
     sandboxRLibs,
     sandboxRepo,
     sandboxArchive,
-    sandboxDir
+    sandboxDir,
+    guess.getter=guess.getter
   ),
   # make sure the variable is available with correct names
   rk.JS.vars(
     frameRhomes,
     frameSandbox,
-    modifiers="checked"
+    modifiers="checked",
+    guess.getter=guess.getter
   ),
   rk.JS.vars(envRhomesVarslot, join="\\\",\\n\\t\\\""),
   echo("\npackageVersion <- \"", pckgVersion, "\"\n"),
