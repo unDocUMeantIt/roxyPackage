@@ -1041,7 +1041,7 @@ deb.gen.package.index <- function(repo, binary=TRUE, distribution="unstable", co
 ## function deb.build.sources()
 # - compression: either "xz" or "gzip"
 deb.build.sources <- function(srcs.name, build, src.dir.name, version,
-  repo, distribution="unstable", component="main", compression="xz",
+  repo, distribution="unstable", component="main", compression="xz", keep.existing.orig=FALSE,
   tar=Sys.which("tar"), dpkg.source=Sys.which("dpkg-source"), apt.ftparchive=Sys.which("apt-ftparchive"),
   action="deb"){
 
@@ -1071,12 +1071,28 @@ deb.build.sources <- function(srcs.name, build, src.dir.name, version,
     } else {
       orig.file.name <- paste0(srcs.name, "_", version, ".orig.tar.gz")
     }
-    tar(orig.file.name, files=src.dir.name, tar=tar,
-      compression=compression, extra_flags=paste0("-h --exclude=", src.dir.name, "/debian --exclude=*\\~ --exclude-vcs"))
-    system(paste0(dpkg.source, " -Z", compression, " -b ", src.dir.name))
-    src.files.to.move <- list.files(pattern="*.dsc$|*.debian.tar.gz$|*.orig.tar.gz$|*.debian.tar.xz$|*.orig.tar.xz$")
-    file.copy(src.files.to.move, file.path(repo.src.real.path, src.files.to.move), overwrite=TRUE)
-    message(paste0(action, ": copied *.dsc, *.orig.tar.[gz|xz] and *.debian.tar.[gz|xz] files to debian source repository."))
+    if(isTRUE(keep.existing.orig) & file.exists(file.path(repo.src.real.path, orig.file.name))){
+      message(paste0(action, ": keeping existing *.orig.tar.[gz|xz] file."))
+      # copy existing file over for dpkg-source
+      file.copy(file.path(repo.src.real.path, orig.file.name), ".", overwrite=TRUE)
+      system(paste0(dpkg.source, " -Z", compression, " -b ", src.dir.name))
+      src.files.to.move <- list.files(pattern="*.dsc$|*.debian.tar.gz$|*.debian.tar.xz$")
+      file.copy(src.files.to.move, file.path(repo.src.real.path, src.files.to.move), overwrite=TRUE)
+      message(paste0(action, ": copied *.dsc and *.debian.tar.[gz|xz] files to debian source repository."))
+    } else {
+      # --exclude-vcs doesn't seem to work :-/
+      tar.extraFlags <- excludeVCSDirs(
+        src=file.path(build, src.dir.name),
+        exclude.dirs=c(".svn", "CVS", ".git", "_darcs", ".hg"),
+        action="deb", target="*.orig.tar.[gz|xz]"
+      )
+      tar(orig.file.name, files=src.dir.name, tar=tar,
+        compression=compression, extra_flags=paste0("-h --exclude=", src.dir.name, "/debian --exclude=*\\~ ", tar.extraFlags))
+      system(paste0(dpkg.source, " -Z", compression, " -b ", src.dir.name))
+      src.files.to.move <- list.files(pattern="*.dsc$|*.debian.tar.gz$|*.orig.tar.gz$|*.debian.tar.xz$|*.orig.tar.xz$")
+      file.copy(src.files.to.move, file.path(repo.src.real.path, src.files.to.move), overwrite=TRUE)
+      message(paste0(action, ": copied *.dsc, *.orig.tar.[gz|xz] and *.debian.tar.[gz|xz] files to debian source repository."))
+    }
     # update sources information
     deb.gen.package.index(
       repo=repo, binary=FALSE, distribution=distribution, component=component, apt.ftparchive=apt.ftparchive

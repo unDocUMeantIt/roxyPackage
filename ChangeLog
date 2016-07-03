@@ -37,6 +37,8 @@ added:
     arguments keep.revisions and deb.options for fine-tuning
   - if readme.options contains a Flattr user and URL is set, a Flattr button
     will also be added to the repository HTML page
+  - debianize() has a new option keep.existing.orig to prevent binary-only rebuilds
+    from overwriting existing *.orig.[gz|xz] archives
 
 changes in version 0.04-4 (2016-02-04)
 fixed:

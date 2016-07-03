@@ -657,3 +657,22 @@ archiveSubset <- function(data, var, values){
   }
   return(result)
 } ## end function archiveSubset()
+
+## function excludeVCSDirs()
+# since not all tar implementations (especially the BSD default on Mac OS X) support --exclude-vcs,
+# we'll exclude these manually
+# - src: path to the directory to archive
+excludeVCSDirs <- function(src, exclude.dirs=c(".svn", "CVS", ".git", "_darcs", ".hg"), action="repo", target="mac binary"){
+  VCS.allDirs <- list.dirs(src)
+  VCS.excludeDirs <- VCS.allDirs[grepl(paste(paste0(".*", exclude.dirs, "$"), collapse="|"), VCS.allDirs)]
+  # clean up the paths
+  path.to.dir <- dirname(src)
+  VCS.excludeDirs <- gsub("^/", "", gsub(path.to.dir, "", VCS.excludeDirs))
+  if(length(VCS.excludeDirs) > 0){
+    tar.extraFlags <- paste(paste0(" --exclude='", VCS.excludeDirs, "'"), collapse="")
+    message(paste0(action, ": excluded these directories from ", target, ":\n  ", paste(VCS.excludeDirs, collapse="\n  ")))
+  } else {
+    tar.extraFlags <- ""
+  }
+  return(tar.extraFlags)
+} ## end function excludeVCSDirs()

@@ -145,6 +145,8 @@
 #'    are supported.
 #' @param keep.build Logical. If \code{build.dir} is not \code{pck.source.dir}, work is done in generated folder with a random name.
 #'    Usually it is removed afterwards, unless you set this option to \code{TRUE}.
+#' @param keep.existing.orig Logical, if \code{TRUE} and there is already a \code{*.orig.tar.[gz|xz]} archive in the repository matching this version,
+#'    it will not be replaced with a re-packaged one but remains as is. This is useful for binary-only rebuilds.
 #' @param replace.dots Logical. The proposed Debian R Policy actually asks to replace all dots in package names by hyphens. However,
 #'    this is implemented differently in \code{r-cran.mk} and will lead to unbuildable packages. So the default here is to ignore the policy draft and keep dots
 #'    in package names, as is true for a lot of CRAN packages as well (code is law). In case you run into problems here
@@ -207,6 +209,7 @@ debianize <- function(
   deb.keyring.options=NULL,
   compression="xz",
   keep.build=FALSE,
+  keep.existing.orig=FALSE,
   replace.dots=FALSE){
 
   # anything to do at all?
@@ -377,6 +380,7 @@ debianize <- function(
       distribution=distribution,
       component=component,
       compression=compression,
+      keep.existing.orig=keep.existing.orig,
       tar=buildTools[["tar"]],
       dpkg.source=buildTools[["dpkg-source"]],
       apt.ftparchive=buildTools[["apt-ftparchive"]]

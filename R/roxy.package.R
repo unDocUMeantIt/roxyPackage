@@ -407,7 +407,8 @@ roxy.package <- function(
     newDefaults=list(
       pck.source.dir=pck.source.dir,
       repo.root=repo.root,
-      deb.keyring.options=list(URL=URL)
+      deb.keyring.options=list(URL=URL),
+      keep.existing.orig="binonly" %in% actions
     )
   )
   # try to set pckg.name.deb and deb.repo.path
@@ -767,17 +768,22 @@ roxy.package <- function(
       stop(simpleError("repo: you *must* provide a character string for \"main\" via OSX.repo (mac)!"))
     }
     removeIfExists(filePath=macosx.package)
-    # since not all tar implementations (especially the BSD default on Mac OS X) support --exclude-vcs,
-    # we'll exclude these manually
-    VCS.directories <- c(".svn", "CVS", ".git", "_darcs", ".hg")
-    VCS.allDirs <- list.dirs(file.path(R.libs,pck.package))
-    VCS.excludeDirs <- VCS.allDirs[grepl(paste(paste0(".*", VCS.directories, "$"), collapse="|"), VCS.allDirs)]
-    if(length(VCS.excludeDirs) > 0){
-      tar.extraFlags <- paste(paste0(" --exclude='", VCS.excludeDirs, "'"), collapse="")
-      message(paste("repo: excluded these directories from the mac binary:\n  ", VCS.excludeDirs, collapse="\n  "))
-    } else {
-      tar.extraFlags <- ""
-    }
+#     # since not all tar implementations (especially the BSD default on Mac OS X) support --exclude-vcs,
+#     # we'll exclude these manually
+#     VCS.directories <- c(".svn", "CVS", ".git", "_darcs", ".hg")
+#     VCS.allDirs <- list.dirs(file.path(R.libs,pck.package))
+#     VCS.excludeDirs <- VCS.allDirs[grepl(paste(paste0(".*", VCS.directories, "$"), collapse="|"), VCS.allDirs)]
+#     if(length(VCS.excludeDirs) > 0){
+#       tar.extraFlags <- paste(paste0(" --exclude='", VCS.excludeDirs, "'"), collapse="")
+#       message(paste("repo: excluded these directories from the mac binary:\n  ", VCS.excludeDirs, collapse="\n  "))
+#     } else {
+#       tar.extraFlags <- ""
+#     }
+    tar.extraFlags <- excludeVCSDirs(
+      src=file.path(R.libs,pck.package),
+      exclude.dirs=c(".svn", "CVS", ".git", "_darcs", ".hg"),
+      action="repo", target="mac binary"
+    )
     if(isTRUE(unix.OS)){
       # make more portable archives, should work with GNU and BSD tar
       tar.extraFlags <- paste0(tar.extraFlags, " --format=ustar")
