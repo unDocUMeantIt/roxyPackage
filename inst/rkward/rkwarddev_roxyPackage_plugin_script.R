@@ -659,7 +659,7 @@ JS.preprocess <- rk.paste.JS(
     } else {},
     echo("\tstringsAsFactors=FALSE\n)\n\n"),
     ## multiple R homes
-    if(frameRhomesChecked && envRhomesVarslot != ""){
+    if(frameRhomes && envRhomesVarslot != ""){
       echo(
         "R.homes <- c(\n\t\"", envRhomesVarslot, "\"\n)\n",
         "all.homes <- c(R.homes, R.home())\n",
