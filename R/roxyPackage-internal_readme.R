@@ -129,7 +129,7 @@ readme_text <- function(
     result <- paste0(
       md_h(package),
       includeFlattr,
-      description,
+      trim(description),
       if(!is.null(url)){
         paste0(
           "\n\nMore information on ", package,
