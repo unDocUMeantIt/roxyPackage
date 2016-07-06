@@ -129,7 +129,7 @@ readme_text <- function(
     result <- paste0(
       md_h(package),
       includeFlattr,
-      trim(description),
+      autoLineBreak(text=description, lineEnd=90, breakBy="\n"),
       if(!is.null(url)){
         paste0(
           "\n\nMore information on ", package,
