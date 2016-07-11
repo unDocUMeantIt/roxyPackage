@@ -39,7 +39,7 @@ citationText <- function(pck.dscr, pck.version, pck.date){
     all.authors <- get.by.role(R.auth.prsn)
     bibtex.authors <- paste(format(all.authors, include=c("given","family")), collapse = " and ")
     num.authors <- length(all.authors)
-    for(this.author in 1:num.authors){
+    for(this.author in seq_along(all.authors)){
       R.auth.famil <- format(all.authors[[this.author]], include=c("family"))
       R.auth.given <- abbreviate(format(all.authors[[this.author]], include=c("given")), minlength=1, strict=TRUE, dot=TRUE)
       R.auth.full <- paste(R.auth.famil, R.auth.given, sep=", ")

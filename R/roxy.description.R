@@ -84,7 +84,7 @@ roxy.description <- function(val, description, version=NULL, date=NULL, R.vers=N
       "\n#' Type: \\tab ",pck.type,"\\cr",
       paste(desc.parts, collapse=""),
       "\n#' }\n#'",
-      "\n#' ",gsub("\n#' #'\n#'","\n#'\n#'",gsub("\n[[:space:]]*", "\n#' ", description[["Description"]])),"\n#'",
+      "\n#' ",gsub("\n#' #'\n#'","\n#'\n#'", autoLineBreak(text=description[["Description"]], lineEnd=90, breakBy="\n#' ")),"\n#'",
       "\n#' @aliases ",description[["Package"]],"-package",
       "\n#' @name ",description[["Package"]],"-package",
       "\n#' @docType package",

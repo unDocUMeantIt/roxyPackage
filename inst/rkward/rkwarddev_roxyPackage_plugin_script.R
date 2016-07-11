@@ -512,7 +512,6 @@ rxp.dialog <- rk.XML.dialog(
   label="Create R package"
 )
 
-
 #############
 ## JavaScript
 JS.preprocess <- rk.paste.JS(
@@ -525,13 +524,19 @@ JS.preprocess <- rk.paste.JS(
     pckgLicense,
     envPckgRoot,
     envRepoRoot,
-    frameSandbox,
     sandboxSource,
     sandboxRLibs,
     sandboxRepo,
     sandboxArchive,
+    sandboxDir,
+    guess.getter=guess.getter
+  ),
+  # make sure the variable is available with correct names
+  rk.JS.vars(
     frameRhomes,
-    sandboxDir
+    frameSandbox,
+    modifiers="checked",
+    guess.getter=guess.getter
   ),
   rk.JS.vars(envRhomesVarslot, join="\\\",\\n\\t\\\""),
   echo("\npackageVersion <- \"", pckgVersion, "\"\n"),

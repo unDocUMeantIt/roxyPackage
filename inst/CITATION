@@ -2,12 +2,12 @@ bibentry("Manual",
     title="roxyPackage: Utilities to Automate Package Builds",
     author="m.eik michalke",
     year="2016",
-    note="(Version 0.04-4)",
+    note="(Version 0.05-1)",
     url="http://reaktanz.de/?c=hacking&s=roxyPackage",
 
     textVersion =
     paste("michalke, m. (2016). ",
-        "roxyPackage: Utilities to Automate Package Builds (Version 0.04-4). ",
+        "roxyPackage: Utilities to Automate Package Builds (Version 0.05-1). ",
         "Available from http://reaktanz.de/?c=hacking&s=roxyPackage",
         sep=""),
 

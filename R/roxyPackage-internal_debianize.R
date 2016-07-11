@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2016 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -335,7 +335,7 @@ dl.missing.dep.src <- function(deps, destdir=file.path(tempdir(),"roxyPackge","d
       this.debDeps <- debianizeDepends(thisDepends, R=NULL, collapse=NULL, drop.version=TRUE, origin=origin, origin.alt=origin.alt)
       if(length(this.debDeps) > 0 && nchar(this.debDeps) > 0){
         # run check.installed.deps()
-        for (this.debDeps.num in 1:length(this.debDeps)){
+        for (this.debDeps.num in seq_along(this.debDeps)){
           this.debDeps.R <- names(this.debDeps)[this.debDeps.num]
           this.debDeps.deb <- this.debDeps[this.debDeps.num]
           if(isTRUE(all)){
@@ -645,11 +645,60 @@ deb.gen.control <- function(srcs.name, deb.name, description, R.dscrptn, deb.dir
   return(TRUE)
 } ## end function deb.gen.control()
 
+# this is being re-used also for the README.md file
+copyright.text <- function(license, package, year, author, deb=TRUE){
+  if(isTRUE(deb)){
+    # different formatting needed
+    id <- "  "    # indentation
+    el <- "  .\n" # empty lines
+  } else {
+    id <- ""
+    el <- "\n"
+  }
+  if(checkLicence(license)){
+    licenseInfo <- checkLicence(license, deb=TRUE, logical=FALSE)
+    licenseText <- paste0(id , package, " Copyright (C) ", year, " ", author, ", released under the\n", id,
+      licenseInfo[["name"]],
+      if(!is.na(licenseInfo[["version"]])){
+        paste0(" version ", licenseInfo[["version"]])
+      } else {},
+      if(grepl(">", license)){
+        paste0(" or (at your option) any later version")
+      } else {},
+      ".\n", el,
+       id, "This software is distributed in the hope that it will be useful, but\n",
+       id, "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
+       id, "or FITNESS FOR A PARTICULAR PURPOSE.\n", el,
+      if(isTRUE(deb)){
+        paste0(
+           id, "You should have received a copy of the license with your Debian system,\n",
+           id, "in the file /usr/share/common-licenses/", licenseInfo[["file"]], ", or with the\n",
+           id, "source package as the file COPYING or LICENSE.\n"
+        )
+      } else {
+        paste0(
+           id, "You should have received a copy of the license with the\n",
+           id, "source package as the file COPYING or LICENSE.\n"
+        )
+      }
+    )
+  } else {
+    licenseText <- paste0( id, package, " Copyright (C) ", year, " ", author, ", released under the\n",
+       id, "terms of the ", license, " license.\n", el,
+       id, "This software is distributed in the hope that it will be useful, but\n",
+       id, "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
+       id, "or FITNESS FOR A PARTICULAR PURPOSE.\n", el,
+       id, "You should have received a copy of the license with the\n",
+       id, "source package as the file COPYING or LICENSE.\n"
+    )
+  }
+  return(licenseText)
+}
 
 ## function deb.gen.copyright()
-# deb.maintainer: "name <mail@address.org>"
 deb.gen.copyright <- function(R.dscrptn, deb.name, description, year, deb.dir,
-  overwrite=TRUE, repo.name=NULL, isRpackage=TRUE, action=ifelse(isRpackage, "deb", "deb-key")){
+  overwrite=TRUE, repo.name=NULL, isRpackage=TRUE, action=ifelse(isRpackage, "deb", "deb-key"),
+  URL=NULL){
   file <- file.path(deb.dir, "copyright")
   if(is.null(R.dscrptn[["Authors@R"]])){
     maintainer <- as.character(R.dscrptn[["Maintainer"]])
@@ -677,60 +726,67 @@ deb.gen.copyright <- function(R.dscrptn, deb.name, description, year, deb.dir,
   R.name <- as.character(R.dscrptn[["Package"]])
 
   if(!file_test("-f", file) | isTRUE(overwrite)){
-    if(checkLicence(license)){
-      licenseInfo <- checkLicence(license, deb=TRUE, logical=FALSE)
-      includeLicense <- paste0(R.name, " Copyright (C) ", year, " ", author.nomail, ", released under the\n",
-      licenseInfo[["name"]],
-      if(!is.na(licenseInfo[["version"]])){
-        paste0(" version ", licenseInfo[["version"]])
-      } else {},
-      if(grepl(">", license)){
-        paste0(" or (at your option) any later version")
-      } else {},
-      ".\n\n",
-      "This software is distributed in the hope that it will be useful, but\n",
-      "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
-      "or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
-      "You should have received a copy of the license with your Debian system,\n",
-      "in the file /usr/share/common-licenses/", licenseInfo[["file"]], ", or with the\n",
-      "source package as the file COPYING or LICENSE.\n")
-    } else {
-      includeLicense <- paste0(R.name, " Copyright (C) ", year, " ", author.nomail, ", released under the\n",
-      "terms of the ", license, " license.\n\n",
-      "This software is distributed in the hope that it will be useful, but\n",
-      "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n",
-      "or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
-      "You should have received a copy of the license with the\n",
-      "source package as the file COPYING or LICENSE.\n")
-    }
+    includeLicense <- copyright.text(
+      license=license,
+      package=R.name,
+      year=year,
+      author=author.nomail,
+      deb=TRUE
+    )
     if(isTRUE(isRpackage)){
       txt.copyright <- paste0(
-        if(identical(author, maintainer)){
-          paste0("The R library ", R.name, " was originally written and is maintained by ", author, ".\n\n")
-        } else {
-          paste0("The R library ", R.name, " was originally written by ", author, "\n",
-          "and is maintained by ", maintainer, ".\n\n")
-        },
-        "This Debian package was put together by ", description[["Maintainer"]], ".\n\n",
+        "Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n",
+        "Upstream-Name: ", R.name, "\n",
+        "Upstream-Contact: ", maintainer, "\n",
         if("Homepage" %in% names(description)){
-          paste0("The sources were downloaded from ", description[["Homepage"]], ".\n\n")
+          paste0("Source: ", description[["Homepage"]], "\n")
         } else {},
-        "The package was renamed from its upstream name '", R.name, "' to\n",
-        "'", deb.name, "' in harmony with the R packaging policy to indicate\n",
-        "that the package is external to the CRAN or BioC repositories.\n\n",
-        includeLicense)
+        "Comment:\n",
+        if(identical(author, maintainer)){
+          paste0("  The R library ", R.name, " was originally written and is maintained by ", author, ".\n  .\n")
+        } else {
+          paste0("  The R library ", R.name, " was originally written by ", author, "\n",
+          "  and is maintained by ", maintainer, ".\n  .\n")
+        },
+        "  This Debian package was put together by ", maintainer, ",\n",
+        "  using the GNU R package roxyPackage.\n  .\n",
+        "  The package was renamed from its upstream name '" ,R.name, "' to\n",
+        "  '" , deb.name, "' in harmony with the R packaging policy to indicate\n",
+        "  that the package is external to the CRAN or BioC repositories.\n  .\n",
+        "  The copyright information given here was offered by the GNU R package\n",
+        "  DESCRIPTION. The DESCRIPTION file for the original GNU R package can be\n",
+        "  found in /usr/lib/R/site-library/", R.name, "/DESCRIPTION.\n\n",
+        "Files: *\n",
+        "Copyright: ", year, " ", author.nomail, "\n",
+        "License: ", license, "\n",
+        includeLicense
+      )
     } else {
       txt.copyright <- paste0(
-          paste0("This is the OpenPGP keyring for packages hosted at the\n", repo.name, " repository"),
-        if("Homepage" %in% names(description)){
-          paste0(": ", description[["Homepage"]], "\n\n")
+        "Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n",
+        "Upstream-Name: ", R.name, "\n",
+        "Upstream-Contact: ", maintainer, "\n",
+        if(!is.null(URL)){
+          paste0("Source: ", URL, "\n")
+        } else {},
+        "Comment:\n",
+        "  This is the OpenPGP keyring for packages hosted at the\n  ", repo.name, " repository",
+        if(is.null(URL)){
+          paste0(".\n  .\n")
         } else {
-          paste0(".\n\n")
+          paste0(": ", URL, "\n  .\n")
         },
-        "This Debian package was put together by ", description[["Maintainer"]], ".\n\n",
-        "The keys in the keyrings don't fall under any copyright. Everything\n",
-        "else in the package is licensed as follows:\n\n",
-        includeLicense)
+        "  This Debian package was put together by ", description[["Maintainer"]], ".\n  .\n",
+        "  The keys in the keyring don't fall under any copyright. Everything\n",
+        "  else in the package is licensed as follows.\n\n",
+        "Files: *\n",
+        "Copyright: ", year, " ", author.nomail, "\n",
+        "License: ", license, "\n",
+        includeLicense,
+        "\nFiles: keyrings/*.gpg\n",
+        "Copyright: public-domain\n",
+        "License: public-domain\n"
+      )
     }
 
     # write the copyright file
@@ -749,7 +805,7 @@ deb.gen.rules <- function(deb.name, maintainer, year, origin, deb.dir, overwrite
     if(isTRUE(isRpackage)){
       txt.rules <- paste0(
         "#!/usr/bin/make -f\n",
-        "#\t\t\t\t\t\t\t\t-*- makefile -*-\n",
+        "# -*- makefile -*-\n",
         "# debian/rules file for the Debian/GNU Linux ", deb.name," package\n",
         "# Copyright ", year, " by ", maintainer, "\n\n",
         "debRreposname := ", origin, "\n\n",
@@ -758,7 +814,7 @@ deb.gen.rules <- function(deb.name, maintainer, year, origin, deb.dir, overwrite
     } else {
       txt.rules <- paste0(
         "#!/usr/bin/make -f\n",
-        "#\t\t\t\t\t\t\t\t-*- makefile -*-\n",
+        "# -*- makefile -*-\n",
         "# debian/rules file for the Debian/GNU Linux ", deb.name," package\n",
         "# Copyright ", year, " by ", maintainer, "\n\n",
         "%:\n",
@@ -780,38 +836,6 @@ deb.gen.rules <- function(deb.name, maintainer, year, origin, deb.dir, overwrite
 } ## end function deb.gen.rules()
 
 
-## function deb.gen.changelog.old()
-##TODO: just kept for comparison until the new function is considered stable
-deb.gen.changelog.old <- function(srcs.name, version, maintainer, logs, date=dateRFC2822(), distribution, urgency, deb.dir,
-  overwrite=TRUE, action="deb"){
-  file <- file.path(deb.dir, "changelog")
-  if(!file_test("-f", file) | isTRUE(overwrite)){
-    txt.changelog <- paste0(
-      srcs.name, " (", version, ") ", distribution, "; urgency=", urgency,"\n\n  * ",
-      paste(logs, collapse="\n  * "),
-      "\n\n -- ", maintainer, "  ", date, "\n\n")
-
-    # check if we need to write to the changelog at all
-    if(file_test("-f", file)){
-      current.changelog <- readLines(file)
-      alreadyInLog <- any(grepl(paste0(srcs.name, " \\(", version, "\\)"), current.changelog))
-      if(isTRUE(alreadyInLog)){
-        message(paste0("there's already a changelog entry for ", srcs.name, " (", version, "), skipping!"))
-      } else {
-        txt.changelog <- paste0(txt.changelog, paste(current.changelog, collapse="\n"), "\n")
-        # write the changelog file
-        cat(txt.changelog, file=file)
-      }
-    } else {
-      # write the changelog file
-      cat(txt.changelog, file=file)
-    }
-    message(paste0(action, ": debian/changelog updated."))
-  } else {}
-  return(TRUE)
-} ## end function deb.gen.changelog.old()
-
-
 ## function deb.append.clog()
 # use this function to append changelog entries individually
 deb.append.clog <- function(logs, file, deb.env, dch=Sys.which("dch"), dpkg.parsechangelog=Sys.which("dpkg-parsechangelog")){
@@ -828,8 +852,8 @@ deb.append.clog <- function(logs, file, deb.env, dch=Sys.which("dch"), dpkg.pars
   return(invisible(TRUE))
 } ## end function deb.append.clog()
 
+
 ## function deb.gen.changelog()
-## this version is missing (i.e., works without) date=dateRFC2822()!
 # export DEBFULLNAME="<name>" ; export DEBEMAIL="name@example.com" ; dch --create --empty --changelog <file> --package <srcs.name> --newversion="0.0X-XX-X" --distribution <distribution> --urgency <urgency>
 # export DEBFULLNAME="<name>" ; export DEBEMAIL="name@example.com" ; dch --newversion="0.0X-XX-X" "<text>"
 # export DEBFULLNAME="<name>" ; export DEBEMAIL="name@example.com" ; dch --append "<text>"
@@ -980,10 +1004,44 @@ deb.prepare.buildDir <- function(source, build, tar=Sys.which("tar")){
 } ## function deb.prepare.buildDir()
 
 
+## function deb.gen.package.index()
+# updates Packages/Sources files after changes were done to a repository
+deb.gen.package.index <- function(repo, binary=TRUE, distribution="unstable", component="main", arch="all",
+  repo.all.arch=c("binary-i386","binary-amd64"), apt.ftparchive=Sys.which("apt-ftparchive")){
+  prev.wd <- getwd()
+  setwd(file.path(repo))
+  if(isTRUE(binary)){
+    af.command <- " packages "
+    af.file <- "Packages"
+    repo.rel.path <- repo.rel.pseudo.path <- file.path("dists", distribution, component, "all")
+    repo.arch.rel.paths <- file.path("dists", distribution, component, repo.all.arch)
+    repo.arch.paths <- file.path(repo, repo.arch.rel.paths)
+  } else {
+    af.command <- " sources "
+    af.file <- "Sources"
+    repo.rel.path <- file.path("dists", distribution, component, "source")
+    repo.rel.pseudo.path <- file.path("source", distribution)
+    repo.real.path <- file.path(repo, repo.rel.pseudo.path)
+  }
+  # update packages/sources information; paths must be relative to the debian repo root
+  dpkg.scan.call <- paste0(apt.ftparchive, af.command, repo.rel.pseudo.path, " > ", repo.rel.path, "/", af.file, " && \\\n",
+  "cat ", repo.rel.path, "/", af.file, " | gzip -9 > ", repo.rel.path, "/", af.file, ".gz && \\\n",
+  "cat ", repo.rel.path, "/", af.file, " | bzip2 -9 > ", repo.rel.path, "/", af.file, ".bz2")
+  system(dpkg.scan.call, intern=TRUE)
+  if(isTRUE(binary)){
+    for (this.path in c(repo.arch.paths)){
+      repo.all.pckgs.files <- c("Packages", "Packages.gz", "Packages.bz2")
+      file.copy(file.path(repo.rel.path, repo.all.pckgs.files), file.path(this.path, repo.all.pckgs.files), overwrite=TRUE)
+    }
+  } else {}
+  setwd(prev.wd)
+} ## end function deb.gen.package.index()
+
+
 ## function deb.build.sources()
 # - compression: either "xz" or "gzip"
 deb.build.sources <- function(srcs.name, build, src.dir.name, version,
-  repo, distribution="unstable", component="main", compression="xz",
+  repo, distribution="unstable", component="main", compression="xz", keep.existing.orig=FALSE,
   tar=Sys.which("tar"), dpkg.source=Sys.which("dpkg-source"), apt.ftparchive=Sys.which("apt-ftparchive"),
   action="deb"){
 
@@ -1013,18 +1071,32 @@ deb.build.sources <- function(srcs.name, build, src.dir.name, version,
     } else {
       orig.file.name <- paste0(srcs.name, "_", version, ".orig.tar.gz")
     }
-    tar(orig.file.name, files=src.dir.name, tar=tar,
-      compression=compression, extra_flags=paste0("-h --exclude=", src.dir.name, "/debian --exclude=*\\~ --exclude-vcs"))
-    system(paste0(dpkg.source, " -Z", compression, " -b ", src.dir.name))
-    src.files.to.move <- list.files(pattern="*.dsc$|*.debian.tar.gz$|*.orig.tar.gz$|*.debian.tar.xz$|*.orig.tar.xz$")
-    file.copy(src.files.to.move, file.path(repo.src.real.path, src.files.to.move), overwrite=TRUE)
-    message(paste0(action, ": copied *.dsc, *.orig.tar.[gz|xz] and *.debian.tar.[gz|xz] files to debian source repository."))
-    # update sources information; paths must be relative to the debian repo root
-    setwd(file.path(repo))
-    dpkg.scans.call <- paste0(apt.ftparchive, " sources ", repo.src.real.rel.path, " > ", repo.src.pseudo.rel.path, "/Sources && \\\n",
-    "cat ", repo.src.pseudo.rel.path, "/Sources | gzip -9 > ", repo.src.pseudo.rel.path, "/Sources.gz && \\\n",
-    "cat ", repo.src.pseudo.rel.path, "/Sources | bzip2 -9 > ", repo.src.pseudo.rel.path, "/Sources.bz2")
-    system(dpkg.scans.call, intern=TRUE)
+    if(isTRUE(keep.existing.orig) & file.exists(file.path(repo.src.real.path, orig.file.name))){
+      message(paste0(action, ": keeping existing *.orig.tar.[gz|xz] file."))
+      # copy existing file over for dpkg-source
+      file.copy(file.path(repo.src.real.path, orig.file.name), ".", overwrite=TRUE)
+      system(paste0(dpkg.source, " -Z", compression, " -b ", src.dir.name))
+      src.files.to.move <- list.files(pattern="*.dsc$|*.debian.tar.gz$|*.debian.tar.xz$")
+      file.copy(src.files.to.move, file.path(repo.src.real.path, src.files.to.move), overwrite=TRUE)
+      message(paste0(action, ": copied *.dsc and *.debian.tar.[gz|xz] files to debian source repository."))
+    } else {
+      # --exclude-vcs doesn't seem to work :-/
+      tar.extraFlags <- excludeVCSDirs(
+        src=file.path(build, src.dir.name),
+        exclude.dirs=c(".svn", "CVS", ".git", "_darcs", ".hg"),
+        action="deb", target="*.orig.tar.[gz|xz]"
+      )
+      tar(orig.file.name, files=src.dir.name, tar=tar,
+        compression=compression, extra_flags=paste0("-h --exclude=", src.dir.name, "/debian --exclude=*\\~ ", tar.extraFlags))
+      system(paste0(dpkg.source, " -Z", compression, " -b ", src.dir.name))
+      src.files.to.move <- list.files(pattern="*.dsc$|*.debian.tar.gz$|*.orig.tar.gz$|*.debian.tar.xz$|*.orig.tar.xz$")
+      file.copy(src.files.to.move, file.path(repo.src.real.path, src.files.to.move), overwrite=TRUE)
+      message(paste0(action, ": copied *.dsc, *.orig.tar.[gz|xz] and *.debian.tar.[gz|xz] files to debian source repository."))
+    }
+    # update sources information
+    deb.gen.package.index(
+      repo=repo, binary=FALSE, distribution=distribution, component=component, apt.ftparchive=apt.ftparchive
+    )
     setwd(prev.wd)
 } ## end function deb.build.sources()
 
@@ -1066,16 +1138,11 @@ deb.build.binary <- function(deb.name, build, src.dir.name, options, version, re
   bin.files.to.move <- list.files(pattern="*.changes$|*.deb$")
   file.copy(bin.files.to.move, file.path(repo.bin.path, bin.files.to.move))
   message(paste0(action, ": copied *.changes and *.deb files to debian binary repository."))
-  # update package information; paths must be relative to the debian repo root
-  setwd(file.path(repo))
-  dpkg.scanp.call <- paste0(apt.ftparchive, " packages ", repo.bin.rel.path, " > ", repo.bin.rel.path, "/Packages && \\\n",
-  "cat ", repo.bin.rel.path, "/Packages | gzip -9 > ", repo.bin.rel.path, "/Packages.gz && \\\n",
-  "cat ", repo.bin.rel.path, "/Packages | bzip2 -9 > ", repo.bin.rel.path, "/Packages.bz2")
-  system(dpkg.scanp.call, intern=TRUE)
-  for (this.path in c(repo.arch.paths)){
-    repo.all.pckgs.files <- c("Packages", "Packages.gz", "Packages.bz2")
-    file.copy(file.path(repo.bin.rel.path, repo.all.pckgs.files), file.path(this.path, repo.all.pckgs.files), overwrite=TRUE)
-  }
+  # update package information
+  deb.gen.package.index(
+    repo=repo, binary=TRUE, distribution=distribution, component=component, arch=arch,
+    repo.all.arch=repo.all.arch, apt.ftparchive=apt.ftparchive
+  )
   setwd(prev.wd)
 } ## end function deb.build.binary()
 
@@ -1189,7 +1256,7 @@ deb.keyring.in.repo <- function(repo.root, gpg.key=NULL, keyring.options=NULL,
 
 ## function deb.update.release()
 deb.update.release <- function(repo.root, repo=file.path(repo.root, "deb"), gpg.key=NULL,
-  distribution="unstable", component="main", arch=c("i386", "amd64", "source"), overwrite=FALSE,
+  distribution="unstable", component="main", arch=c("i386", "amd64", "source"),
   apt.ftparchive=Sys.which("apt-ftparchive"), gpg=Sys.which("gpg"), keyring=NULL, action="deb"){
   repo.release.path <- file.path(repo, "dists", distribution)
   prev.wd <- getwd()
@@ -1260,7 +1327,7 @@ deb.check.changes <- function(packages, repo.root, column="Filename"){
   packages <- as.data.frame(packages, stringsAsFactors=FALSE)
   allPackageFiles <- packages[[column]]
   nameStubs <- gsub("_[[:alnum:]]*.deb", "", allPackageFiles)
-  for (thisStubNum in 1:length(nameStubs)){
+  for (thisStubNum in seq_along(nameStubs)){
     thisStub <- nameStubs[thisStubNum]
     directory <- gsub("/[^/]*$", "", thisStub)
     fileRoot <- file.path(repo.root, directory)
@@ -1367,11 +1434,16 @@ deb.search.repo <- function(pckg=NULL, repo, distribution="unstable", component=
 # behaves similar to archive.packages() -- and is indeed called by it --, but specialises
 # on debian binary and source packages. since this is like a repo-in-a-repo, the functionality
 # is outsourced to a function of its own.
+# return value is logical to indicate if any packages were moved/deleted
 deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, keep.revisions=2, package=NULL,
-  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE){
+  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE, justDelete=FALSE, graceful=FALSE){
+  didArchiveSomething <- FALSE
   # a specialty is that we need to take care of revisions: there might be several revisions,
   # but only *one* source.orig tarball!
   # also, we must check *everything* below the "dists" directory
+
+  # append "deb" directory to archive path
+  to.dir <- file.path(to.dir, "deb")
   
   # plan: run deb.list.packages.dirs() to discover dirs containig "Packages*" or "Sources*" files
   packageDirsBin <- deb.list.packages.dirs(repo=repo.root, binary=TRUE)
@@ -1403,9 +1475,90 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
     }
   }
   packagesSrcAllDirs <- unique(packagesSrcAllDirs)
-  
-  # now iterate through found package names, check respective versions and move file, if neccessary
-  ## TODO: s.o.
 
-  return(list(packagesBinAllDirs, packagesSrcAllDirs))
+  for (thisPackages in list(packagesBinAllDirs, packagesSrcAllDirs)){
+    # split version and revision
+    thisPackages[["FullVersion"]] <- thisPackages[["Version"]]
+    thisPackages[["Version"]] <- gsub("-[[:digit:]]+$", "", thisPackages[["FullVersion"]])
+    thisPackages[["Revision"]] <- gsub("(^.*)-([[:digit:]]+)$", "\\2", thisPackages[["FullVersion"]], perl=TRUE)
+    
+    # now iterate through found package names, check respective versions and move files, if neccessary
+    for (this.package in unique(thisPackages[,"Package"])){
+      presentPackages <- archiveSubset(data=thisPackages, var="Package", values=this.package)
+
+      presentVersions <- unique(presentPackages[,"Version"])
+      presentVersions <- presentVersions[order(package_version(presentVersions), decreasing=TRUE)]
+      if(keep.versions > 0){
+        keepVersions <- presentVersions[1:keep.versions]
+        keepFullVersions <- c()
+        # check revisions
+        for (thisVersion in keepVersions){
+          presentPackageVersion <- archiveSubset(data=presentPackages, var="Version", values=thisVersion)
+          if(!is.null(keep.revisions) & keep.revisions > 0){
+            allRevisions <- presentPackageVersion[["Revision"]]
+            allRevisions <- allRevisions[order(allRevisions, decreasing=TRUE)]
+            keepFullVersions <- c(
+              keepFullVersions,
+              archiveSubset(data=presentPackageVersion, var="Revision", values=allRevisions[1:keep.revisions])[["FullVersion"]]
+            )
+          } else {
+            # keep all revisions of this version
+            keepFullVersions <- c(keepFullVersions, presentPackageVersion[["FullVersion"]])
+          }
+        }
+      } else {
+        keepFullVersions <- ""
+      }
+      presentFullVersions <- unique(presentPackages[,"FullVersion"])
+      moveVersions <- presentFullVersions[!presentFullVersions %in% keepFullVersions]
+      moveSourceOrig <- presentVersions[!presentVersions %in% keepVersions]
+      debNamesAll <- archiveSubset(presentPackages, var="FullVersion", values=moveVersions)
+      debNamesSrcAll <- archiveSubset(presentPackages, var="Version", values=moveSourceOrig)
+      if(length(moveVersions) > 0){
+        if("Files.orig.name" %in% names(thisPackages)){
+          if(length(debNamesAll[["Files.dsc.name"]]) > 0){
+            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+              deb.names=debNamesAll[["Files.dsc.name"]], graceful=graceful
+            )
+            didArchiveSomething <- TRUE
+          } else {}
+          if(length(debNamesAll[["Files.debian.name"]]) > 0){
+            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+              deb.names=debNamesAll[["Files.debian.name"]], graceful=graceful
+            )
+            didArchiveSomething <- TRUE
+          } else {}
+          if(length(unique(debNamesSrcAll[["Files.orig.name"]])) > 0){
+            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+              deb.names=unique(debNamesSrcAll[["Files.orig.name"]]), graceful=graceful
+            )
+            didArchiveSomething <- TRUE
+          } else {}
+        } else {
+          if(length(debNamesAll[["Filename"]]) > 0){
+            mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+              type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+              deb.names=debNamesAll[["Filename"]], graceful=graceful
+            )
+            didArchiveSomething <- TRUE
+          } else {}
+          for(thisChanges in names(debNamesAll)[grepl("^changes", names(debNamesAll))]){
+            # some packages don't provide all changes files, so we'll exclude the NAs right away
+            deb.names <- debNamesAll[[thisChanges]][!is.na(debNamesAll[[thisChanges]])]
+            if(length(deb.names) > 0){
+              mvToArchive(this.package, repo=repo.root, archive=file.path(archive.root, to.dir),
+                type="deb", overwrite=overwrite, reallyDoIt=reallyDoIt, justDelete=justDelete,
+                deb.names=deb.names, graceful=graceful
+              )
+              didArchiveSomething <- TRUE
+            } else {}
+          }
+        }
+      } else {}
+    }
+  }
+  return(didArchiveSomething)
 } ## end function deb.archive.packages()

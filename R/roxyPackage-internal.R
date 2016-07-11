@@ -15,33 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with roxyPackage.  If not, see <http://www.gnu.org/licenses/>.
 
-
-# internal package description
-pckg.dscrptn <- data.frame(
-    Package="roxyPackage",
-    Type="Package",
-    Title="Utilities to automate package builds",
-    Author="m.eik michalke",
-    AuthorsR="c(person(given=\"m.eik\", family=\"michalke\", email=\"meik.michalke@hhu.de\",
-      role=c(\"aut\", \"cre\")))",
-    Maintainer="m.eik michalke <meik.michalke@hhu.de>",
-    Depends="R (>= 2.9.0),methods,roxygen2,XiMpLe (>= 0.03-12)",
-    Suggests="testthat",
-    Imports="tools",
-    Description="The intention of this package is to make packaging R code as
-      easy as possible. roxyPackage uses tools from the roxygen2 package to generate documentation. It also automatically
-      generates and updates files like *-package.R, DESCRIPTION, CITATION, ChangeLog and NEWS.Rd. Building packages
-      supports source format, as well as several binary formats (MS Windows, Mac OS X, Debian GNU/Linux) if the
-      package contains pure R code only. The packages built are stored in a fully functional local R package repository
-      which can be synced to a web server to share them with others. This includes the generation of browsable HTML
-      pages similar to CRAN, with support for RSS feeds from the ChangeLog. Please read the vignette for a more detailed
-      explanation by example.",
-    License="GPL (>= 3)",
-    Encoding="UTF-8",
-    LazyLoad="yes",
-    URL="http://reaktanz.de/?c=hacking&s=roxyPackage",
-    stringsAsFactors=FALSE)
-
 # empty environment for experimental tweaks
 .roxyPackage.env <- new.env()
 
@@ -467,43 +440,57 @@ removeIfExists <- function(filePath){
 
 
 ## function mvToArchive()
-mvToArchive <- function(package, repo, archive, versions, type=NA, file=NA, overwrite=FALSE,
-  reallyDoIt=FALSE, justDelete=FALSE){
+# - deb.name: debian package names are fully available via deb.archive.packages(), so they
+#       have their own argument 
+mvToArchive <- function(package, repo, archive, versions=NA, type=NA, file=NA, overwrite=FALSE,
+  reallyDoIt=FALSE, justDelete=FALSE, deb.names=NULL, graceful=FALSE){
 
   repo <- gsub("^file:(/)+", "/", repo)
   archive <- gsub("^file:(/)+", "/", archive)
 
   if(isTRUE(reallyDoIt) && !isTRUE(justDelete)){
-    createMissingDir(dirPath=repo, action="archive")
     createMissingDir(dirPath=archive, action="archive")
+    if(!is.null(deb.names)){
+      deb.dirs <- file.path(archive, unique(dirname(deb.names)))
+      createMissingDir(dirPath=deb.dirs, action="archive")
+    } else {}
   } else {}
 
-  file.ending <- switch(type,
+  if(is.null(deb.names)){
+    file.ending <- switch(type,
       source=".tar.gz",
       win.binary=".zip",
       mac.binary=".tgz"
     )
-  pkg.names <- paste0(package, "_", versions, file.ending)
+    pkg.names <- paste0(package, "_", versions, file.ending)
+  } else {
+    pkg.names <- deb.names
+  }
   sapply(pkg.names, function(this.package){
-    pkg.from <- file.path(repo, this.package)
-    pkg.to <- file.path(archive, this.package)
-    if(!file.exists(pkg.from)){
-      stop(simpleError(paste0("file doesn't exist:\n  ", pkg.from)))
-    } else {}
-    # don't archive, just remove files
-    if(isTRUE(justDelete)){
-      if(isTRUE(reallyDoIt)){
-        message(paste0("archive: deleting file ", pkg.from))
-        removeIfExists(pkg.from)
+    pkg.from <- normalizePathByOS(file.path(repo, this.package))
+    pkg.to <- normalizePathByOS(file.path(archive, this.package))
+    if(file.exists(pkg.from)){
+      # don't archive, just remove files
+      if(isTRUE(justDelete)){
+        if(isTRUE(reallyDoIt)){
+          message(paste0("archive: deleting file ", pkg.from))
+          removeIfExists(pkg.from)
+        } else {
+          message(paste0("archive: deleting file ", pkg.from, " (NOT RUN!)"))
+        }
       } else {
-        message(paste0("archive: deleting file ", pkg.from, " (NOT RUN!)"))
+        if(isTRUE(reallyDoIt)){
+          message(paste0("archive: moving ", pkg.from, " to ", pkg.to))
+          file.mv(from=pkg.from, to=pkg.to, overwrite=overwrite)
+        } else {
+          message(paste0("archive: moving ", pkg.from, " to ", pkg.to, " (NOT RUN!)"))
+        }
       }
     } else {
-      if(isTRUE(reallyDoIt)){
-        message(paste0("archive: moving ", pkg.from, " to ", pkg.to))
-        file.mv(from=pkg.from, to=pkg.to, overwrite=overwrite)
+      if(isTRUE(graceful)){
+        warning(paste0("file doesn't exist, skipping:\n  ", pkg.from))
       } else {
-        message(paste0("archive: moving ", pkg.from, " to ", pkg.to, " (NOT RUN!)"))
+        stop(simpleError(paste0("file doesn't exist:\n  ", pkg.from)))
       }
     }
   })
@@ -520,6 +507,10 @@ normalizePathByOS <- function(path, is.unix=isUNIX(), mustWork=FALSE, filePrefix
   # this may give bogus results on windows, so we'll encapsulate
   # it in shortPathName(), which is not available on all OSs
   if(isTRUE(is.unix)){
+    # if some function already added file:///, let's strip it off
+    if(grepl("^file:(/)+", path)){
+      path <- gsub("^file:(/)+", "/", path)
+    } else {}
     result <- normalizePath(path, mustWork=mustWork)
     slashes <- "//"
   } else {
@@ -613,3 +604,75 @@ mergeOptions <- function(someFunction, customOptions=NULL, newDefaults=NULL){
   defaults[args.set[args.set %in% args.def]] <- customOptions[args.set[args.set %in% args.def]]
   return(defaults)
 }
+## end function mergeOptions()
+
+
+## function binPackageLinks()
+# takes a package name and repository root, and looks up all binary packages compiled against different R versions
+# returns a list with the results
+binPackageLinks <- function(package, version, repo.root, type="win"){
+  pckg.basename <- paste0(package, "_", version)
+  clean.repo.root <- gsub("/$", "", repo.root)
+  win.results <- mac.results <- list()
+
+  if("win" %in% type){
+    pckg.name.win <- paste0(pckg.basename, ".zip")
+    repo.win <- listRDirs(file.path(clean.repo.root,  "bin", "windows", "contrib"), full.path=TRUE)
+    for (this.repo in repo.win){
+      if(file.exists(file.path(this.repo, pckg.name.win))){
+        R.vers <- basename(this.repo)
+        win.results[[R.vers]] <- pckg.name.win
+      } else {}
+    }
+    
+  } else {}
+
+  if("mac" %in% type){
+    pckg.name.mac <- paste0(pckg.basename, ".tgz")
+    repo.mac <- listRDirs(file.path(clean.repo.root, "bin", "macosx", "contrib"), full.path=TRUE)
+    for (this.repo in repo.mac){
+      if(file.exists(file.path(this.repo, pckg.name.mac))){
+        R.vers <- basename(this.repo)
+        mac.results[[R.vers]] <- pckg.name.mac
+      } else {}
+    }
+  } else {}
+  
+  result <- list(
+    win=win.results,
+    mac=mac.results
+  )
+  return(result)
+}
+## end function binPackageLinks()
+
+
+## function archiveSubset()
+# called by the archive functions to get proper subsets of data
+archiveSubset <- function(data, var, values){
+  result <- data[data[,var] %in% values,]
+  # even if there's only one package, ensure it's still a matrix
+  if(!is.matrix(result) & !is.data.frame(result)){
+    result <- t(as.matrix(result))
+  }
+  return(result)
+} ## end function archiveSubset()
+
+## function excludeVCSDirs()
+# since not all tar implementations (especially the BSD default on Mac OS X) support --exclude-vcs,
+# we'll exclude these manually
+# - src: path to the directory to archive
+excludeVCSDirs <- function(src, exclude.dirs=c(".svn", "CVS", ".git", "_darcs", ".hg"), action="repo", target="mac binary"){
+  VCS.allDirs <- list.dirs(src)
+  VCS.excludeDirs <- VCS.allDirs[grepl(paste(paste0(".*", exclude.dirs, "$"), collapse="|"), VCS.allDirs)]
+  # clean up the paths
+  path.to.dir <- dirname(src)
+  VCS.excludeDirs <- gsub("^/", "", gsub(path.to.dir, "", VCS.excludeDirs))
+  if(length(VCS.excludeDirs) > 0){
+    tar.extraFlags <- paste(paste0(" --exclude='", VCS.excludeDirs, "'"), collapse="")
+    message(paste0(action, ": excluded these directories from ", target, ":\n  ", paste(VCS.excludeDirs, collapse="\n  ")))
+  } else {
+    tar.extraFlags <- ""
+  }
+  return(tar.extraFlags)
+} ## end function excludeVCSDirs()

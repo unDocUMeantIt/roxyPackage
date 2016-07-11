@@ -1,5 +1,7 @@
 # roxyPackage
 
+[![Flattr this git repo](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=m.eik&url=https://github.com/unDocUMeantIt/roxyPackage&title=roxyPackage&language=en_GB&tags=github&category=software)
+
 roxyPackage is a collection of tools to automate packaging of [R](https://r-project.org) code.
 
 The intention of this package is to make packaging R code as easy as possible. 'roxyPackage' uses

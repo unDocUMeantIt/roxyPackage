@@ -13,7 +13,7 @@ debianize(pck.source.dir, repo.root, build.dir = tempdir(), revision = 1,
   bin.opts = "-rfakeroot -b -uc", arch = "all", compat = 7,
   epoch = NULL, gpg.key = NULL, keyring = NULL, gpg.version = 2,
   deb.keyring.options = NULL, compression = "xz", keep.build = FALSE,
-  replace.dots = FALSE)
+  keep.existing.orig = FALSE, replace.dots = FALSE)
 }
 \arguments{
 \item{pck.source.dir}{Character string,
@@ -138,6 +138,10 @@ are supported.}
 \item{keep.build}{Logical. If \code{build.dir} is not \code{pck.source.dir},
       work is done in generated folder with a random name.
 Usually it is removed afterwards, unless you set this option to \code{TRUE}.}
+
+\item{keep.existing.orig}{Logical,
+      if \code{TRUE} and there is already a \code{*.orig.tar.[gz|xz]} archive in the repository matching this version,
+it will not be replaced with a re-packaged one but remains as is. This is useful for binary-only rebuilds.}
 
 \item{replace.dots}{Logical. The proposed Debian R Policy actually asks to replace all dots in package names by hyphens. However,
 this is implemented differently in \code{r-cran.mk} and will lead to unbuildable packages. So the default here is to ignore the policy draft and keep dots

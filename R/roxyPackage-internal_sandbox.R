@@ -30,7 +30,7 @@ check.sandbox <- function(){
 # this function returns the *names* of packages the given package depends on.
 # if recursive=TRUE, it will also check those packages' dependencies
 # recursively and return all names it finds down the way.
-pck.deps <- function(package, R.libs, description=NULL, recursive=TRUE,
+pck.deps <- function(package, R.libs, R.version, description=NULL, recursive=TRUE,
   depLevel=c("Depends", "Imports"), initSuggests=FALSE, known.deps=c()){
   # try to get a matrix with dependencies. first column should be the package names
   # if we hav a description, use that, otherwise try to read DESCRIPTION
@@ -46,19 +46,26 @@ pck.deps <- function(package, R.libs, description=NULL, recursive=TRUE,
   # in the default setting. but only try depLevel if it appears in DESCRIPTION,
   # because package.dependencies() will stop with an error otherwise...
   depLevel.tmp <- depLevel[depLevel %in% colnames(description)]
-  pck.deps.packages <- unique(unlist(sapply(depLevel.tmp, function(thisLevel){
-      pck.dep.tmp <- as.data.frame(
-        tools::package.dependencies(as.matrix(description), depLevel=thisLevel),
-        stringsAsFactors=FALSE)
-      return(pck.dep.tmp[,1])
-    })))
+  if(isTRUE(R_system_version(R.version) < "3.3")){
+    pck.deps.packages <- unique(unlist(sapply(depLevel.tmp, function(thisLevel){
+        pck.dep.tmp <- as.data.frame(
+          tools::package.dependencies(as.matrix(description), depLevel=thisLevel),
+          stringsAsFactors=FALSE)
+        return(pck.dep.tmp[,1])
+      })))
+  } else {
+    # package.dependencies() is deprecated in R >= 3.3
+    pck.deps.packages <- unique(
+      tools::package_dependencies(package, db=description, which=depLevel.tmp)[[1]]
+    )
+  }
   # clean packages from those who are not available in R.libs
   pck.deps.packages <- pck.deps.packages[file_test("-d", file.path(R.libs, pck.deps.packages))]
   if(isTRUE(recursive)){
     pck.deps.recursive <- unlist(sapply(pck.deps.packages, function(thisPck){
       # make sure we drop the initial "Suggests" here
       pck.deps(
-        package=thisPck, R.libs=R.libs, description=NULL, recursive=TRUE,
+        package=thisPck, R.libs=R.libs, R.version=R.version, description=NULL, recursive=TRUE,
         depLevel=initDepLevel, initSuggests=FALSE, known.deps=pck.deps.packages
       )
     }))
@@ -70,19 +77,31 @@ pck.deps <- function(package, R.libs, description=NULL, recursive=TRUE,
 
 ## function prep.sndbx.source.dir()
 # a helper function for the following prepare.sandbox() functions
+# - snd.pck.source.dir: the sandbox root directory for package sources, no package name
+# - pck.source.dir: the original source directory, including package name
+# - package: name of the package
 prep.sndbx.source.dir <- function(snd.pck.source.dir, pck.source.dir, package){
   if(!identical(snd.pck.source.dir, pck.source.dir) && !identical(snd.pck.source.dir, "")){
     createMissingDir(dirPath=snd.pck.source.dir, action="sandbox")
+    target.dir <- file.path(snd.pck.source.dir, package)
     # copy sources to sandbox, but only if not already present
-    if(!file_test("-d", file.path(snd.pck.source.dir, package))){
+    if(!file_test("-d", target.dir)){
       file.copy(
         from=pck.source.dir,
         to=snd.pck.source.dir,
         overwrite=TRUE,
         recursive=TRUE)
+      src.basename <- basename(pck.source.dir)
+      if(!identical(src.basename, package)){
+        # in case we're copying from a source path that does not end in the plain package name,
+        # e.g., a release branch with version information, the target directory must be changed
+        # into the package basename. otherwise, actions like binary builds will fail, because they
+        # are looking in the wrong places
+        file.rename(from=file.path(snd.pck.source.dir, src.basename), to=target.dir)
+      } else {}
       message(paste0("sandbox: copied '", package, "' sources to ", snd.pck.source.dir))
     } else {}
-    return(file.path(snd.pck.source.dir, package))
+    return(target.dir)
   } else {
     return(pck.source.dir)
   }
@@ -128,7 +147,7 @@ prepare.sandbox <- function(package, description, pck.source.dir, R.libs, R.vers
     snd.R.libs.Rver <- file.path(snd.R.libs, R.version)
     createMissingDir(dirPath=snd.R.libs.Rver, action="sandbox")
     # calculate package dependecies
-    pck.dep.packages <- pck.deps(package=package, R.libs=R.libs, description=description,
+    pck.dep.packages <- pck.deps(package=package, R.libs=R.libs, R.version=R.version, description=description,
       recursive=TRUE, depLevel=depLevel, initSuggests=initSuggests, known.deps=c())
     # we'll assume that the developer installed all needed dependencies here,
     # but we will not abort if packages are not found -- worst case is that

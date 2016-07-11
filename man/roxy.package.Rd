@@ -11,8 +11,8 @@ roxy.package(pck.source.dir, pck.version, pck.description, R.libs, repo.root,
   Rcmd.options = c(install = "--install-tests", build =
   "--no-manual --no-build-vignettes", check = "--as-cran", Rd2pdf =
   "--pdf --no-preview"), URL = NULL, deb.options = NULL,
-  ChangeLog = list(changed = c("initial release"), fixed =
-  c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
+  readme.options = NULL, ChangeLog = list(changed = c("initial release"),
+  fixed = c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
   OSX.repo = list(main = "contrib", symlinks = "mavericks"), ...)
 }
 \arguments{
@@ -38,10 +38,13 @@ include \code{"roxy"}, then this information is read from the present DESCRIPTIO
 \describe{
   \item{"roxy"}{Roxygenize the docs}
   \item{"cite"}{Update CITATION file}
-  \item{"license"}{Update LICENSE.txt file; it's not called LICENSE to prevent an automatic installation}
+  \item{"license"}{Update LICENSE file}
+  \item{"readme"}{Generate initial README.md file}
   \item{"check"}{Do a full package check, calling \code{R CMD check}}
   \item{"package"}{Build & install the package, update source repository,
       calling \code{R CMD build} and \code{R CMD INSTALL}}
+  \item{"binonly"}{Like \code{"package"},
+      but doesn't copy the source package to the repository, to enable binary-only rebuilds}
   \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
   \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
     \code{URL} accordingly.}
@@ -86,13 +89,30 @@ Will be passed on as given here. To deactivate,
       which holds the directories \code{src}
 etc.). This is not the path to the local file system,
       but should be the URL to the repository as it is available
-via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"} and \code{"deb"}.}
+via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"},
+      \code{"deb"}, and possibly \code{"html"} --
+if \code{flattrUser} is also set in \code{readme.options},
+      a Flattr button will be added to the HTML page, using this value.}
 
 \item{deb.options}{A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default,
       \code{pck.source.dir}
 and \code{repo.root} are set to the values given to the parameters above. As for the other options,
       if not set, the defaults of \code{debianize}
 will be used.}
+
+\item{readme.options}{A named list with parameters that add optional extra information to an initial README.md file,
+      namely instructions to install the package
+directly from a GitHub repository,
+      and a Flattr button. Ignore this if you don't use either. Theoretically, you can overwrite all values of the internal
+function \code{readme_text} (e.g.,
+      try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
+\describe{
+  \item{\code{githubUser}}{Your GitHub user name,
+      can be used both to contruct the GitHub repo URL as well as the Flattr URL}
+  \item{\code{flattrUser}}{Your Flattr user name,
+      also used by the \code{"html"} action in combination with \code{URL}}
+}
+All other missing values are then guessed from the other package information. It is then assumed that the GitHub repo has the same name as the package.}
 
 \item{ChangeLog}{A named list of character vectors with log entry items. The element names will be used as section names in the ChangeLog entry,
 and each character string in a vector will be pasted as a log item. The news you provide here will be appended to probably present news,
@@ -208,7 +228,7 @@ for release on CRAN. But some steps have to be taken care of by yourself. For in
       CRAN does currently not allow copies of common licenses
 in a source package, nor a \code{debian} folder. Therefore,
       if your package is supposed to be released on CRAN, you should include
-\code{Rbuildignore=c("debian", "LICENSE.txt")} to the function call.
+\code{Rbuildignore=c("debian", "LICENSE")} to the function call.
 }
 \examples{
 \dontrun{

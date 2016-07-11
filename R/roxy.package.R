@@ -67,7 +67,7 @@
 #' @section CRAN compliance: The CRAN policies can sometimes be very strict. This package should allow you to produce packages which are suitable
 #' for release on CRAN. But some steps have to be taken care of by yourself. For instance, CRAN does currently not allow copies of common licenses
 #' in a source package, nor a \code{debian} folder. Therefore, if your package is supposed to be released on CRAN, you should include
-#' \code{Rbuildignore=c("debian", "LICENSE.txt")} to the function call.
+#' \code{Rbuildignore=c("debian", "LICENSE")} to the function call.
 #'
 #' @note The binary packaging is done simply by zipping (Windows) or targzipping (Mac OS X) the built and installed package. This should
 #' do the trick as long as your package is written in pure R code. It will most likely not produce usable packages if it contains
@@ -85,9 +85,11 @@
 #'    \describe{
 #'      \item{"roxy"}{Roxygenize the docs}
 #'      \item{"cite"}{Update CITATION file}
-#'      \item{"license"}{Update LICENSE.txt file; it's not called LICENSE to prevent an automatic installation}
+#'      \item{"license"}{Update LICENSE file}
+#'      \item{"readme"}{Generate initial README.md file}
 #'      \item{"check"}{Do a full package check, calling \code{R CMD check}}
 #'      \item{"package"}{Build & install the package, update source repository, calling \code{R CMD build} and \code{R CMD INSTALL}}
+#'      \item{"binonly"}{Like \code{"package"}, but doesn't copy the source package to the repository, to enable binary-only rebuilds}
 #'      \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
 #'      \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
 #'        \code{URL} accordingly.}
@@ -115,10 +117,19 @@
 #'    Will be passed on as given here. To deactivate, options must explicitly be se to \code{""}, missing options will be used with the default values.
 #' @param URL A character string defining the URL to the root of the repository (i.e., which holds the directories \code{src}
 #'    etc.). This is not the path to the local file system, but should be the URL to the repository as it is available
-#'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"} and \code{"deb"}.
+#'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"}, \code{"deb"}, and possibly \code{"html"} --
+#'    if \code{flattrUser} is also set in \code{readme.options}, a Flattr button will be added to the HTML page, using this value.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
 #'    will be used.
+#' @param readme.options A named list with parameters that add optional extra information to an initial README.md file, namely instructions to install the package
+#'    directly from a GitHub repository, and a Flattr button. Ignore this if you don't use either. Theoretically, you can overwrite all values of the internal
+#'    function \code{readme_text} (e.g., try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
+#'    \describe{
+#'      \item{\code{githubUser}}{Your GitHub user name, can be used both to contruct the GitHub repo URL as well as the Flattr URL}
+#'      \item{\code{flattrUser}}{Your Flattr user name, also used by the \code{"html"} action in combination with \code{URL}}
+#'    }
+#'    All other missing values are then guessed from the other package information. It is then assumed that the GitHub repo has the same name as the package.
 #' @param ChangeLog A named list of character vectors with log entry items. The element names will be used as section names in the ChangeLog entry,
 #'    and each character string in a vector will be pasted as a log item. The news you provide here will be appended to probably present news, while
 #'    trying to prevent duplicate entries to appear. If you need more control, don't use the \code{"log"} action, but have a look at
@@ -196,6 +207,7 @@ roxy.package <- function(
     Rd2pdf="--pdf --no-preview"),
   URL=NULL,
   deb.options=NULL,
+  readme.options=NULL,
   ChangeLog=list(changed=c("initial release"), fixed=c("missing ChangeLog")),
   Rbuildignore=NULL,
   Rinstignore=NULL,
@@ -216,7 +228,7 @@ roxy.package <- function(
       stop(simpleError("If you specify more than one R.home, you must also define as many R.libs!"))
     } else {}
     # if so, iterate recursively through it and then end
-    for (this.R in 1:R.versions){
+    for (this.R in seq_along(R.homes)){
       this.home <- R.homes[this.R]
       this.libs <- R.libs[this.R]
       this.actions <- actions
@@ -237,7 +249,7 @@ roxy.package <- function(
       if(this.R > 1){
         # well, the same is true for some other actions
         # we'll only perform them during the *first* run
-        this.actions <- actions[!actions %in% c("roxy", "cite", "license", "doc", "cl2news", "news2rss", "cleanRd")]
+        this.actions <- actions[!actions %in% c("roxy", "cite", "license", "doc", "cl2news", "news2rss", "cleanRd", "readme")]
         # we also don't need to repeat handling of .Rbuildignore and .Rinstignore
         Rbuildignore <- Rinstignore <- NULL
       } else {}
@@ -257,6 +269,7 @@ roxy.package <- function(
         Rcmd.options=Rcmd.options,
         URL=URL,
         deb.options=this.deb.options,
+        readme.options=readme.options,
         ChangeLog=ChangeLog,
         Rbuildignore=Rbuildignore,
         Rinstignore=Rinstignore,
@@ -378,8 +391,9 @@ roxy.package <- function(
   pckg.NEWS.html <- file.path(repo.pckg.info, "NEWS.html")
   RSS.file.name <- "RSS.xml"
   pckg.NEWS.rss <- file.path(repo.pckg.info, RSS.file.name)
-  pckg.license.file <- file.path(pck.source.dir, "LICENSE.txt")
-  pckg.license.file.old <- file.path(pck.source.dir, "LICENSE")
+  pckg.license.file <- file.path(pck.source.dir, "LICENSE")
+  pckg.license.file.old <- file.path(pck.source.dir, "LICENSE.txt")
+  pckg.readme.file <- file.path(pck.source.dir, "README.md")
   pckg.pdf.doc <- paste0(pck.package, ".pdf")
   
   # take care of .Rbuildignore and .Rinstignore
@@ -392,13 +406,16 @@ roxy.package <- function(
     customOptions=deb.options,
     newDefaults=list(
       pck.source.dir=pck.source.dir,
-      repo.root=repo.root
+      repo.root=repo.root,
+      deb.keyring.options=list(URL=URL),
+      keep.existing.orig="binonly" %in% actions
     )
   )
   # try to set pckg.name.deb and deb.repo.path
   # this will only work if repo.root is unchanged, the rest is too messy now...
-  deb.repo.path.part <- paste0("deb/dists/", deb.defaults[["distribution"]], "/", deb.defaults[["component"]], "/", deb.defaults[["arch"]])
-  deb.repo.path <- paste0("../../", deb.repo.path.part)
+  # don't ry to replace this without checking the outcome in the HTML file!
+  deb.repo.path.part <- file.path("deb", "dists", deb.defaults[["distribution"]], deb.defaults[["component"]], deb.defaults[["arch"]])
+  deb.repo.path <- file.path("..", "..", deb.repo.path.part)
   # need to get repo.name to be able to call eval() on deb.defaults[["origin"]], because that pastes repo.name
   repo.name <- deb.defaults[["repo.name"]]
   deb.defaults[["origin"]] <- eval(deb.defaults[["origin"]])
@@ -458,13 +475,46 @@ roxy.package <- function(
     if(checkLicence(pckg.license)){
       copyLicence(pckg.license, pckg.license.file, overwrite=TRUE)
       if(file.exists(pckg.license.file.old)){
-        warning("license: you have both LICENSE and LICENSE.txt in your project! if LICENSE is one of the standard licenses, please rename it to prevent its intallation.", call.=FALSE)
+        warning("license: you have both LICENSE and LICENSE.txt in your project! if LICENSE.txt is one of the standard licenses, please rename it to prevent its intallation.", call.=FALSE)
       } else {}
     } else {
       stop(simpleError(paste0("license: unrecognized license (", pckg.license, "), please provide your own LICENSE file! ")))
     }
   } else {}
 
+  if("readme" %in% actions){
+    if(file.exists(pckg.readme.file)){
+      warning("readme: README.md exists, please remove it if you want it re-written!", call.=FALSE)
+    } else {
+      readme.defaults <- mergeOptions(
+        someFunction=readme_text,
+        customOptions=readme.options,
+        newDefaults=list(
+          package=pck.package,
+          description=pck.description[["Description"]],
+          url=pck.description[["URL"]],
+          license=pck.description[["License"]],
+          author=paste0(
+            gsub(
+              "[[:space:]]*<[^>]*>",
+              "",
+              get.authors(description=pck.description, maintainer=FALSE, contributor=FALSE, copyright=FALSE)[["aut"]]
+            ),
+            collapse=", "
+          ),
+          githubRepo=pck.package,
+          fl_title=pck.package
+        )
+      )
+      formals(readme_text) <- readme.defaults
+      cat(
+        readme_text(),
+        file=pckg.readme.file
+      )
+      message(paste0("readme: generated initial ", pckg.readme.file, "."))
+    }
+  } else {}
+  
   if("roxy" %in% actions){
     add.options <- list(...)
     if(any(c("local.roxy.dir", "roxy.unlink.target") %in% names(add.options))){
@@ -510,29 +560,6 @@ roxy.package <- function(
       cite.obj.html <- roxy.html.cite(cite.obj=eval(parse(text=cite.obj)), page.css="../web.css", package=pck.package)
       cat(cite.obj.html, file=pckg.cite.file.html)
       message(paste0("cite: updated ", pckg.cite.file.html, "."))
-    } else {}
-  } else {}
-
-  if("check" %in% actions){
-    # check for examples check file before
-    chk.ex.file <- file.path(pck.source.dir, paste0(pck.package, "-Ex.R"))
-    chk.ex.file.present <- ifelse(file_test("-f", chk.ex.file), TRUE, FALSE)
-    tryCatch(chk.out.dir <- tempdir(), error=function(e) stop(e))
-    message(paste0("check: calling R CMD check, this might take a while..."))
-    if(isTRUE(unix.OS)){
-      r.cmd.check.call <- paste0("R_LIBS_USER=", R.libs, " ; ",
-        R.bin, " CMD check --output=", chk.out.dir, " ", Rcmd.opt.check, pck.source.dir)
-      print(system(r.cmd.check.call, intern=TRUE))
-    } else {
-      r.cmd.check.call <- paste0("set R_LIBS_USER=", shQuote(R.libs, type="cmd"), " && ",
-        R.bin, " CMD check --output=", chk.out.dir, " ", Rcmd.opt.check, shQuote(pck.source.dir, type="cmd"))
-      print(shell(r.cmd.check.call, translate=TRUE, intern=TRUE))
-    }
-    on.exit(message(paste0("check: saved results to ", chk.out.dir, "/", pck.package, ".Rcheck")), add=TRUE)
-    # need to clean up?
-    if(!isTRUE(chk.ex.file.present) & file_test("-f", chk.ex.file)){
-      # there's an example file which wasn't here before
-      unlink(chk.ex.file)
     } else {}
   } else {}
 
@@ -627,12 +654,13 @@ roxy.package <- function(
     message("build: created PDF docs")
   } else {}
 
-  if("package" %in% actions){
+  if(any(c("package", "binonly") %in% actions)){
     ## fill source repo
     createMissingDir(dirPath=repo.src.contrib, action="repo")
     ## TODO: find a solution without sedwd()
     jmp.back <- getwd()
-    setwd(file.path(pck.source.dir, ".."))
+    pck.source.dir.parent <- dirname(file.path(pck.source.dir))
+    setwd(pck.source.dir.parent)
     if(isTRUE(unix.OS)){
       r.cmd.build.call <- paste0(R.bin, " CMD build ", Rcmd.opt.build, pck.source.dir)
       system(r.cmd.build.call, intern=TRUE)
@@ -640,9 +668,11 @@ roxy.package <- function(
       r.cmd.build.call <- paste0(R.bin, " CMD build ", Rcmd.opt.build, shQuote(pck.source.dir, type="cmd"))
       shell(r.cmd.build.call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
     }
-    file.mv(from=file.path(pck.source.dir,"..",pckg.name.src), to=repo.src.gz, overwrite=TRUE)
+    if(!"binonly" %in% actions){
+      file.mv(from=file.path(pck.source.dir.parent,pckg.name.src), to=repo.src.gz, overwrite=TRUE)
+      message(paste0("repo: copied ", pckg.name.src, " to src/contrib."))
+    } else {}
     setwd(jmp.back)
-    message(paste0("repo: copied ", pckg.name.src, " to src/contrib."))
     # install.packages() doesn't work if we want to build for/with other R installations than
     # the actual running one, so we'll use  R CMD INSTALL instead
     if(isTRUE(unix.OS)){
@@ -655,13 +685,16 @@ roxy.package <- function(
       shell(r.cmd.install.call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
     }
     message("build: built and installed package")
-    tools::write_PACKAGES(dir=repo.src.contrib, type="source", verbose=TRUE, latestOnly=FALSE)
-    message("repo: updated src/contrib/PACKAGES (source)")
 
-    ## update ChangeLog
-    if(file.exists(src.changelog)){
-      stopifnot(file.copy(src.changelog, pckg.changelog, overwrite=TRUE))
-      message("pckg: updated ChangeLog")
+    if(!"binonly" %in% actions){
+      tools::write_PACKAGES(dir=repo.src.contrib, type="source", verbose=TRUE, latestOnly=FALSE)
+      message("repo: updated src/contrib/PACKAGES (source)")
+
+      ## update ChangeLog
+      if(file.exists(src.changelog)){
+        stopifnot(file.copy(src.changelog, pckg.changelog, overwrite=TRUE))
+        message("pckg: updated ChangeLog")
+      } else {}
     } else {}
   } else {}
 
@@ -735,17 +768,26 @@ roxy.package <- function(
       stop(simpleError("repo: you *must* provide a character string for \"main\" via OSX.repo (mac)!"))
     }
     removeIfExists(filePath=macosx.package)
-    # since not all tar implementations (especially the BSD default on Mac OS X) support --exclude-vcs,
-    # we'll exclude these manually
-    VCS.directories <- c(".svn", "CVS", ".git", "_darcs", ".hg")
-    VCS.allDirs <- list.dirs(file.path(R.libs,pck.package))
-    VCS.excludeDirs <- VCS.allDirs[grepl(paste(paste0(".*", VCS.directories, "$"), collapse="|"), VCS.allDirs)]
-    if(length(VCS.excludeDirs) > 0){
-      tar.extraFlags <- paste(paste0(" --exclude='", VCS.excludeDirs, "'"), collapse="")
-      message(paste("repo: excluded these directories from the mac binary:\n  ", VCS.excludeDirs, collapse="\n  "))
-    } else {
-      tar.extraFlags <- ""
-    }
+#     # since not all tar implementations (especially the BSD default on Mac OS X) support --exclude-vcs,
+#     # we'll exclude these manually
+#     VCS.directories <- c(".svn", "CVS", ".git", "_darcs", ".hg")
+#     VCS.allDirs <- list.dirs(file.path(R.libs,pck.package))
+#     VCS.excludeDirs <- VCS.allDirs[grepl(paste(paste0(".*", VCS.directories, "$"), collapse="|"), VCS.allDirs)]
+#     if(length(VCS.excludeDirs) > 0){
+#       tar.extraFlags <- paste(paste0(" --exclude='", VCS.excludeDirs, "'"), collapse="")
+#       message(paste("repo: excluded these directories from the mac binary:\n  ", VCS.excludeDirs, collapse="\n  "))
+#     } else {
+#       tar.extraFlags <- ""
+#     }
+    tar.extraFlags <- excludeVCSDirs(
+      src=file.path(R.libs,pck.package),
+      exclude.dirs=c(".svn", "CVS", ".git", "_darcs", ".hg"),
+      action="repo", target="mac binary"
+    )
+    if(isTRUE(unix.OS)){
+      # make more portable archives, should work with GNU and BSD tar
+      tar.extraFlags <- paste0(tar.extraFlags, " --format=ustar")
+    } else {}
     # failsafe exclusion of backup files
     # --exclude=*\\~ caused trouble for path names with tilde
     tilde.allFiles <- list.files(file.path(R.libs,pck.package))
@@ -758,9 +800,13 @@ roxy.package <- function(
     ## TODO: find a solution without sedwd()
     jmp.back <- getwd()
     setwd(R.libs)
-    tar(macosx.package, files=pck.package,
-      tar=Sys.which("tar"),
-      compression="gzip", extra_flags=paste("-h ", tar.extraFlags))
+    # it seems that tar() in R 3.3 produces archives that contain files twice and
+    # cannot be unpacked with OS X's bsdtar, so we'll try this manually
+    #     tar(macosx.package, files=pck.package,
+    #       tar=Sys.which("tar"),
+    #       compression="gzip", extra_flags=paste("-h ", tar.extraFlags))
+    mac.tar.call <- paste0(Sys.which("tar"), " -czhf ", macosx.package, " ", tar.extraFlags, " ", pck.package)
+    system(mac.tar.call, ignore.stdout=TRUE, ignore.stderr=TRUE, intern=FALSE)
     message(paste0("repo: created ", pckg.name.mac, " (mac OS X)"))
     setwd(jmp.back)
     tools::write_PACKAGES(dir=repo.macosx.R, type="mac.binary", verbose=TRUE, latestOnly=FALSE)
@@ -792,16 +838,25 @@ roxy.package <- function(
       stopifnot(file.copy(RSS.local.image, RSS.image))
       message(paste0("html: copied RSS image to ", RSS.image))
     } else {}
+    if(all(!is.null(readme.options[["flattrUser"]]), !is.null(URL))){
+      # copy flattr image, if not present
+      flattr.image <- file.path(repo.pckg.info.main, "flattr-badge-large.png")
+      if(!file_test("-f", flattr.image)){
+        flattr.local.image <- file.path(roxyPackage.lib.dir(), "images", "flattr-badge-large.png")
+        stopifnot(file.copy(flattr.local.image, flattr.image))
+        message(paste0("html: copied Flattr button image to ", flattr.image))
+      } else {}
+    } else {}
     # check for binaries to link
     url.src <- url.win <- url.mac <- url.deb <- url.doc <- url.vgn <- deb.repo <- NULL
     if(file_test("-f", repo.src.gz)){
       url.src <- pckg.name.src
     } else {}
     if(file_test("-f", win.package)){
-      url.win <- pckg.name.win
+      url.win <- binPackageLinks(package=pck.package, version=pck.version, repo.root=repo.root, type="win")[["win"]]
     } else {}
     if(file_test("-f", macosx.package)){
-      url.mac <- pckg.name.mac
+      url.mac <- binPackageLinks(package=pck.package, version=pck.version, repo.root=repo.root, type="mac")[["mac"]]
     } else {}
     url.debRepo.info <- NULL
     if(file_test("-f", deb.package)){
@@ -864,7 +919,9 @@ roxy.package <- function(
       url.src=url.src, url.win=url.win, url.mac=url.mac, url.doc=url.doc, url.vgn=url.vgn,
       url.deb.repo=url.deb.repo, main.path.mac=OSX.repo[["main"]],
       title=html.title, cite=pckg.cite.file.html, news=url.NEWS,
-      changelog=pckg.changelog, rss.file=RSS.file.name)
+      changelog=pckg.changelog, rss.file=RSS.file.name,
+      flattrUser=readme.options[["flattrUser"]], URL=URL
+    )
     target.file.pckg <- file.path(repo.pckg.info, "index.html")
     cat(package.html, file=target.file.pckg)
     message(paste0("html: updated ", target.file.pckg))
@@ -885,6 +942,35 @@ roxy.package <- function(
     global.html <- roxy.html(all.descs, index=TRUE, css="web.css", title=html.index, redirect="pckg/")
     cat(global.html, file=target.file.glob)
     message(paste0("html: updated global index ", target.file.glob))
+  } else {}
+
+  if("check" %in% actions){
+    # check for examples check file before
+    chk.ex.file <- file.path(pck.source.dir, paste0(pck.package, "-Ex.R"))
+    chk.ex.file.present <- ifelse(file_test("-f", chk.ex.file), TRUE, FALSE)
+    tryCatch(chk.out.dir <- tempdir(), error=function(e) stop(e))
+    # checks should better be performed on built packages not source directories
+    if("package" %in% actions & file_test("-f", repo.src.gz)){
+      pck.check.target <- repo.src.gz
+    } else {
+      pck.check.target <- pck.source.dir
+    }
+    message(paste0("check: calling R CMD check, this might take a while..."))
+    if(isTRUE(unix.OS)){
+      r.cmd.check.call <- paste0("R_LIBS_USER=", R.libs, " ; ",
+        R.bin, " CMD check --output=", chk.out.dir, " ", Rcmd.opt.check, pck.check.target)
+      print(system(r.cmd.check.call, intern=TRUE))
+    } else {
+      r.cmd.check.call <- paste0("set R_LIBS_USER=", shQuote(R.libs, type="cmd"), " && ",
+        R.bin, " CMD check --output=", chk.out.dir, " ", Rcmd.opt.check, shQuote(pck.check.target, type="cmd"))
+      print(shell(r.cmd.check.call, translate=TRUE, intern=TRUE))
+    }
+    on.exit(message(paste0("check: saved results to ", chk.out.dir, "/", pck.package, ".Rcheck")), add=TRUE)
+    # need to clean up?
+    if(!isTRUE(chk.ex.file.present) & file_test("-f", chk.ex.file)){
+      # there's an example file which wasn't here before
+      unlink(chk.ex.file)
+    } else {}
   } else {}
 
   return(invisible(NULL))
