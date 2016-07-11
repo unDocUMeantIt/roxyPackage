@@ -1,5 +1,9 @@
 ChangeLog for package roxyPackage
 
+changes in version 0.05-2 (2016-07-12)
+unreleased:
+  - this release is under development
+
 changes in version 0.05-1 (2016-07-12)
 fixed:
   - R CMD check should be performed on built packages, not source
