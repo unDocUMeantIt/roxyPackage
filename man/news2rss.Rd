@@ -11,9 +11,11 @@ news2rss(news, rss = NULL, html = NULL, encoding = "UTF-8",
 \arguments{
 \item{news}{Character string, path to the R NEWS file to be converted.}
 
-\item{rss}{Character string, path to the RSS.xml file to be written. If \code{NULL}, results are written to stdout().}
+\item{rss}{Character string, path to the RSS.xml file to be written. If \code{NULL},
+      results are written to stdout().}
 
-\item{html}{Logical, whether \code{news} is in HTML or Rd format. If \code{NULL}, guess this from the file ending.}
+\item{html}{Logical, whether \code{news} is in HTML or Rd format. If \code{NULL},
+      guess this from the file ending.}
 
 \item{encoding}{Character string, how the feed is encoded.}
 
@@ -22,8 +24,10 @@ news2rss(news, rss = NULL, html = NULL, encoding = "UTF-8",
   \item{\code{title}:}{Title of the feed, probably the package name.}
   \item{\code{link}:}{URL to the package web page, e.g. its repository site.}
   \item{\code{description}:}{Descriptions of the feed, e.g. the package.}
-  \item{\code{language}:}{Optional, a valid RSS language code, see \code{http://www.rssboard.org/rss-language-codes}.}
-  \item{\code{atom}:}{Optional, full URL to the RSS feed on the web, used for \code{atom:link rel="self"}.}
+  \item{\code{language}:}{Optional, a valid RSS language code,
+      see \code{http://www.rssboard.org/rss-language-codes}.}
+  \item{\code{atom}:}{Optional, full URL to the RSS feed on the web,
+      used for \code{atom:link rel="self"}.}
 }}
 }
 \value{

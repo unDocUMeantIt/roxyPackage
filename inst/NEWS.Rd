@@ -1,12 +1,7 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
-\section{Changes in roxyPackage version 0.04-5 (2016-06-06)}{
-  \subsection{unreleased}{
-    \itemize{
-      \item this version is under development
-    }
-  }
+\section{Changes in roxyPackage version 0.05-1 (2016-07-12)}{
   \subsection{fixed}{
     \itemize{
       \item R CMD check should be performed on built packages, not source
@@ -19,20 +14,37 @@
         \code{archive.packages()}
       \item using \code{tools::package_dependencies()} instead of
         \code{tools::package.dependencies()} if R >= 3.3
+      \item the \code{tar()} function of R produced broken archives with files added
+        multiple times
     }
   }
   \subsection{changed}{
     \itemize{
       \item the code for checks was moved to the end of \code{roxy.package()}
-      \item rewrote the construction of deb.repo.path and deb.repo.path.part, two
-        path strings used internally in \code{roxy.package()}
+      \item removed \code{deb.gen.changelog.old()}, it was unused since 0.04-2
+      \item \code{debianize()} now generates machine-readable copyright files
+      \item when \code{debianizeKeyring()} is called from \code{debianize()} or \code{roxy.rackage()}, it
+        is now able to fetch the repo URL
+      \item removed overwrite argument from internal function \code{deb.update.release()}
+        because it actually didn't have any effect anyway
+      \item revert back to adding standard LICENSE files instead of LICENSE.txt, as
+        none of them are accepted on CRAN anyway
+      \item code cleaning (loops)
+      \item removed the internal package description (obsolete)
     }
   }
   \subsection{added}{
     \itemize{
+      \item new action \code{"readme"} to generate an initial README.md file
       \item new action \code{"binonly"} to enable binary-only rebuilds
       \item HTML page now lists all found binary packages for a package if it is
-        available for more than one R version in the repository 
+        available for more than one R version in the repository
+      \item \code{archive.packages()} can noa also archive Debian repositories; it gained
+        new arguments keep.revisions and deb.options for fine-tuning
+      \item if readme.options contains a Flattr user and URL is set, a Flattr button
+        will also be added to the repository HTML page
+      \item \code{debianize()} has a new option keep.existing.orig to prevent binary-only
+        rebuilds from overwriting existing *.orig.[gz|xz] archives
     }
   }
 }

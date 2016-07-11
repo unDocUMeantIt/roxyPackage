@@ -33,7 +33,8 @@ An object of class \code{ChangeLog}.
 This method can be used to update ChangeLog objects.
 }
 \details{
-\code{updateChangeLog} takes a ChangeLog object and a version number string, replaces the complete
+\code{updateChangeLog} takes a ChangeLog object and a version number string,
+      replaces the complete
 entry with the contents of \code{entry} and updates the time stamp to \code{date}.
 }
 \seealso{

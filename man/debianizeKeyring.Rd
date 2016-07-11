@@ -17,38 +17,50 @@ debianizeKeyring(gpg.key, repo.name, repo.root, maintainer,
   sign.key = gpg.key, compression = "xz", keep.build = FALSE)
 }
 \arguments{
-\item{gpg.key}{Character string, the OpenPGP key ID for the key that should be included in the package.
+\item{gpg.key}{Character string,
+      the OpenPGP key ID for the key that should be included in the package.
 This key must be available in your keyring (or in the one specified by \code{keyring}).}
 
-\item{repo.name}{Character string, name of the repository this keyring will be used for. Must not include spaces or special characters!}
+\item{repo.name}{Character string,
+      name of the repository this keyring will be used for. Must not include spaces or special characters!}
 
-\item{repo.root}{Character string, valid path to a directory where to build/update a local package repository.}
+\item{repo.root}{Character string,
+      valid path to a directory where to build/update a local package repository.}
 
-\item{maintainer}{Character string, name an mail address of the maintainer of the keyring package, in the format of
+\item{maintainer}{Character string,
+      name an mail address of the maintainer of the keyring package, in the format of
 \code{firstName lastName <your@mail.address>}.}
 
-\item{build.dir}{Character string, valid path to a directory where to build the package. If this directory is not empty, a temporary
+\item{build.dir}{Character string,
+      valid path to a directory where to build the package. If this directory is not empty, a temporary
 directory will be created inside automatically.}
 
-\item{keyname}{Character string, a name for keyring. Will be used for both the exported keyring file and debian package name.
+\item{keyname}{Character string,
+      a name for keyring. Will be used for both the exported keyring file and debian package name.
 Using something like \code{"myrepo-keyring"} is a good choice.}
 
-\item{pck.source.dir}{Character string, path pointing to the root directory of the keyring package sources. If this
+\item{pck.source.dir}{Character string,
+      path pointing to the root directory of the keyring package sources. If this
 directory does not exist yet, it will be created and filled with the necessary files.}
 
-\item{version}{Numeric or a character string, the main Debian package version indicator for the keyring package.}
+\item{version}{Numeric or a character string,
+      the main Debian package version indicator for the keyring package.}
 
 \item{revision}{Numeric or a character string, the Debian package revision information.}
 
-\item{distribution}{Character string, the Debain (based) distribution your package is intended for.}
+\item{distribution}{Character string,
+      the Debain (based) distribution your package is intended for.}
 
 \item{component}{Character string, the Debain component of the distribution.}
 
-\item{urgency}{Character string, urgency information for this release (refer to [1] if you want to change this).}
+\item{urgency}{Character string,
+      urgency information for this release (refer to [1] if you want to change this).}
 
-\item{URL}{Character string, should point to the repository this keyring package is built for.}
+\item{URL}{Character string,
+      should point to the repository this keyring package is built for.}
 
-\item{changelog}{Character vector, log entries for the \code{./debian/changelog} file if it is going to be changed.}
+\item{changelog}{Character vector,
+      log entries for the \code{./debian/changelog} file if it is going to be changed.}
 
 \item{description}{Character string, some description of the keyring package.}
 
@@ -60,7 +72,8 @@ directory does not exist yet, it will be created and filled with the necessary f
 
 \item{overwrite}{Character vector, naming the files which should be updated:
 \describe{
-  \item{"changelog"}{Update \code{./debian/changelog}, but only if no entry for this package version and revision is there yet}
+  \item{"changelog"}{Update \code{./debian/changelog},
+      but only if no entry for this package version and revision is there yet}
   \item{"compat"}{Re-write \code{./debian/compat}}
   \item{"control"}{Re-write \code{./debian/control}}
   \item{"copyright"}{Re-write \code{./debian/copyright}}
@@ -70,7 +83,8 @@ directory does not exist yet, it will be created and filled with the necessary f
   \item{"gpg.key"}{Re-write the exported key in \code{./keyrings/}}
 }}
 
-\item{bin.opts}{Character string, options to pass through to \code{dpkg-buildpackage} for the \code{"bin"} action.}
+\item{bin.opts}{Character string,
+      options to pass through to \code{dpkg-buildpackage} for the \code{"bin"} action.}
 
 \item{compat}{Integer value, specifying the \code{debhelper} compatibility level.}
 
@@ -78,21 +92,27 @@ directory does not exist yet, it will be created and filled with the necessary f
 
 \item{keyring}{Character string, path to an additional keyring file to use.}
 
-\item{gpg.version}{Integer number, specifiying the GnuPG major version number. By default \code{gpg2} is assumed.}
+\item{gpg.version}{Integer number,
+      specifiying the GnuPG major version number. By default \code{gpg2} is assumed.}
 
-\item{sign.key}{Character string, the OpenPGP key ID for the key that should be used for signing the Release file (secure apt).
+\item{sign.key}{Character string,
+      the OpenPGP key ID for the key that should be used for signing the Release file (secure apt).
 This key must be available in your keyring (or in the one specified by \code{keyring}). Skipped if \code{NULL}.}
 
-\item{compression}{Character string, compression format for Debian source packages. Currently \code{"xz"} and \code{"gzip"}
+\item{compression}{Character string,
+      compression format for Debian source packages. Currently \code{"xz"} and \code{"gzip"}
 are supported.}
 
-\item{keep.build}{Logical. If \code{build.dir} is not \code{pck.source.dir}, work is done in generated folder with a random name. Usually it
+\item{keep.build}{Logical. If \code{build.dir} is not \code{pck.source.dir},
+      work is done in generated folder with a random name. Usually it
 is removed afterwards, unless you set this option to \code{TRUE}.}
 }
 \description{
-Similar to \code{\link[roxyPackage:debianize]{debianize}}, this function generates a Debian package,
+Similar to \code{\link[roxyPackage:debianize]{debianize}},
+      this function generates a Debian package,
 but it specialises on packaging OpenPGP/GnuPG keyrings. The resulting package can be used to
-provide keys in a Debian package repository, hence enabling secure apt. They are probably easier to handle
+provide keys in a Debian package repository,
+      hence enabling secure apt. They are probably easier to handle
 for users.
 }
 \examples{

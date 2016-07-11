@@ -1,8 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.04-5 (2016-06-06)
-unreleased:
-  - this version is under development
+changes in version 0.05-1 (2016-07-12)
 fixed:
   - R CMD check should be performed on built packages, not source
     directories. this is now the case if you run the "check" action also with "package"
@@ -20,8 +18,8 @@ changed:
   - the code for checks was moved to the end of roxy.package()
   - removed deb.gen.changelog.old(), it was unused since 0.04-2
   - debianize() now generates machine-readable copyright files
-  - when debianizeKeyring() is called from debinaize() or roxy.rackage(),
-    it is now able to fetch the repo URL
+  - when debianizeKeyring() is called from debianize() or roxy.rackage(), it
+    is now able to fetch the repo URL
   - removed overwrite argument from internal function deb.update.release()
     because it actually didn't have any effect anyway
   - revert back to adding standard LICENSE files instead of LICENSE.txt, as
@@ -33,12 +31,12 @@ added:
   - new action "binonly" to enable binary-only rebuilds
   - HTML page now lists all found binary packages for a package if it is
     available for more than one R version in the repository
-  - archive.packages() can noa also archive Debian repositories; it gained new
-    arguments keep.revisions and deb.options for fine-tuning
+  - archive.packages() can noa also archive Debian repositories; it gained
+    new arguments keep.revisions and deb.options for fine-tuning
   - if readme.options contains a Flattr user and URL is set, a Flattr button
     will also be added to the repository HTML page
-  - debianize() has a new option keep.existing.orig to prevent binary-only rebuilds
-    from overwriting existing *.orig.[gz|xz] archives
+  - debianize() has a new option keep.existing.orig to prevent binary-only
+    rebuilds from overwriting existing *.orig.[gz|xz] archives
 
 changes in version 0.04-4 (2016-02-04)
 fixed:
