@@ -35,7 +35,7 @@ added:
   - new action "binonly" to enable binary-only rebuilds
   - HTML page now lists all found binary packages for a package if it is
     available for more than one R version in the repository
-  - archive.packages() can noa also archive Debian repositories; it gained
+  - archive.packages() can now also archive Debian repositories; it gained
     new arguments keep.revisions and deb.options for fine-tuning
   - if readme.options contains a Flattr user and URL is set, a Flattr button
     will also be added to the repository HTML page
