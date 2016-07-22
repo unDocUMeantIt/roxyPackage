@@ -5,6 +5,8 @@ unreleased:
   - this release is under development
 fixed:
   - replaced some tilde characters in the vignette by \textasciitilde
+changed:
+  - added "readme" action to vignette
 
 changes in version 0.05-1 (2016-07-12)
 fixed:

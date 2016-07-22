@@ -136,6 +136,7 @@ There are a number of additional actions, and most of them run out of the box wi
 	\item{\texttt{"cite":}}{ Use the data from \texttt{pck.description} to write a proper CITATION file.}
 	\item{\texttt{"license":}}{ Try to detect the software license of this package from the "License" info in \texttt{pck.description}, and add a copy as the LICENSE file; will let you know if it doesn't know the license you specified.}
 	\item{\texttt{"doc":}}{ Update pdf documentation, including vignettes if found in \texttt{inst/doc}.}
+  \item{\texttt{"readme":}}{ Generate initial \texttt{README.md} file (optionally including a Flattr button and GitHub URL).}
 	\item{\texttt{"log":}}{ Generate initial \texttt{ChangeLog} or update a present \texttt{ChangeLog} file.}
 	\item{\texttt{"cl2news":}}{ Look for a \texttt{ChangeLog} file in the package root directory, and translate it into an \texttt{inst/NEWS.Rd} file.}
 	\item{\texttt{"news2rss":}}{ Look for an \texttt{inst/NEWS.Rd} file and translate it into an RSS feed for the repository; you need to provide a value for the \texttt{URL} parameter for this to work, where the URL should point to the root location where your repository is available.}
