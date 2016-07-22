@@ -25,7 +25,7 @@ LazyLoad: yes
 URL: http://reaktanz.de/?c=hacking&s=roxyPackage
 Authors@R: c(person(given="m.eik", family="michalke", email="meik.michalke@hhu.de", role=c("aut", "cre")))
 Version: 0.05-2
-Date: 2016-07-12
+Date: 2016-07-22
 RoxygenNote: 5.0.1
 Collate:
     '00_classes_01_ChangeLog_internal.R'

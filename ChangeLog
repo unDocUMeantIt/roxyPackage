@@ -1,8 +1,10 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-2 (2016-07-12)
+changes in version 0.05-2 (2016-07-22)
 unreleased:
   - this release is under development
+fixed:
+  - replaced some tilde characters in the vignette by \textasciitilde
 
 changes in version 0.05-1 (2016-07-12)
 fixed:

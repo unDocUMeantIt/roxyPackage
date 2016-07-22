@@ -41,9 +41,9 @@ simpleExample <- function(){NULL}
 
 This must be done for every function, class etc. you would like to export. But that's about it -- we can now call \texttt{roxy.package()} to create a valid R package. Of course you have to tell the function some things:
 \begin{itemize}
-	\item{where is the source directory of the package (\texttt{"~/myRcode/examplePackage"})} 
-	\item{where is the R library the package can be installed to (e.\,g., \texttt{"~/R"})}
-	\item{in which directory should the repository be created (e.\,g., \texttt{"~/myRcode/repo"})}
+	\item{where is the source directory of the package (\texttt{"\textasciitilde/myRcode/examplePackage"})} 
+	\item{where is the R library the package can be installed to (e.\,g., \texttt{"\textasciitilde/R"})}
+	\item{in which directory should the repository be created (e.\,g., \texttt{"\textasciitilde/myRcode/repo"})}
 	\item{what is the package version number, description, author, its dependencies etc.}
 \end{itemize}
 
