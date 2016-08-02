@@ -73,8 +73,16 @@ rx.html.switch <- function(desc, field){
   if(field %in% dimnames(desc)[[2]]){
     switch(EXPR=field,
       Depends=rx.tr("Depends:", rx.clean(desc[,"Depends"])),
+      Imports=rx.tr("Imports:", rx.clean(desc[,"Imports"])),
       Suggests=rx.tr("Suggests:", rx.clean(desc[,"Suggests"])),
       Enhances=rx.tr("Enhances:", rx.clean(desc[,"Enhances"])),
+      BugReports=rx.tr("BugReports:", 
+        if(substr(desc[,"BugReports"], 1, 4) != 'http'){
+          rx.clean(desc[,"BugReports"], nomail=FALSE, textmail=TRUE)
+        } else {
+          XMLNode("a", gsub("&", "&amp;", desc[,"BugReports"]),
+          attrs=list(href=gsub("&", "&amp;", desc[,"BugReports"])))
+        }),
       URL=rx.tr("URL:", XMLNode("a",
         gsub("&", "&amp;", desc[,"URL"]),
         attrs=list(href=gsub("&", "&amp;", desc[,"URL"]))))
@@ -275,12 +283,14 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
       XMLNode("table",
         rx.tr("Version:", pckg[,"Version"]),
         rx.html.switch(desc=pckg, field="Depends"),
+        rx.html.switch(desc=pckg, field="Imports"),
         rx.html.switch(desc=pckg, field="Suggests"),
         rx.html.switch(desc=pckg, field="Enhances"),
 #        rx.tr("Published:", pckg[,"Date"]),
         rx.tr("Published:", as.character(as.Date(getDescField(pckg, field=c("Date","Packaged","Date/Publication"))))),
         rx.tr("Author:", pckg.author),
         rx.tr("Maintainer:", pckg.maintainer),
+        rx.html.switch(desc=pckg, field="BugReports"),
         rx.tr("License:", pckg[,"License"]),
         rx.html.switch(desc=pckg, field="URL"),
           if(file_test("-f", cite)){
