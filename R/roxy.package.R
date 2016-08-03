@@ -81,6 +81,7 @@
 #' @param repo.root Character string, valid path to a directory where to build/update a local package repository.
 #' @param pck.date Character string of the release date in YYYY-MM-DD format. Defaults to \code{Sys.Date()}. If actions don't
 #'    include \code{"roxy"}, then this information is read from the present DESCRIPTION file.
+#'    But \code{pck.date} will be used if \code{Date}, \code{Packaged} or \code{Date/Publication} are not in the DESCRIPTION file.
 #' @param actions Character vector, must contain at least one of the following values:
 #'    \describe{
 #'      \item{"roxy"}{Roxygenize the docs}
@@ -317,8 +318,12 @@ roxy.package <- function(
     # clean from newlines
     pck.dscrptn <- as.data.frame(t(sapply(pck.dscrptn, function(x) gsub("\n", " ", x))), stringsAsFactors=FALSE)
     pck.version <- getDescField(pck.dscrptn, field="Version")
-    # if "Date" is missing, try some fallbacks
-    pck.date <- as.character(as.Date(getDescField(pck.dscrptn, field=c("Date","Packaged","Date/Publication"))))
+    # if "Date" is missing in DESCRIPTION file, try some fallbacks
+    if(any(c("Date","Packaged","Date/Publication") %in% colnames(pck.dscrptn))){
+      pck.date <- as.character(as.Date(getDescField(pck.dscrptn, field=c("Date","Packaged","Date/Publication"))))
+    } else {
+      pck.dscrptn["Date"] <- pck.date
+    }
     pck.package <- getDescField(pck.dscrptn, field="Package")
     pck.title <- getDescField(pck.dscrptn, field="Title")
     rss.description <- getDescField(pck.dscrptn, field="Description")
