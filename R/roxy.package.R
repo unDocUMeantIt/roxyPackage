@@ -79,9 +79,9 @@
 #' @param pck.description Data frame holding the package description (see Examples section).
 #' @param R.libs Character string, valid path to the R library where the package should be installed to.
 #' @param repo.root Character string, valid path to a directory where to build/update a local package repository.
-#' @param pck.date Character string of the release date in YYYY-MM-DD format. Defaults to \code{Sys.Date()}. If actions don't
-#'    include \code{"roxy"}, then this information is read from the present DESCRIPTION file.
-#'    But \code{pck.date} will be used if \code{Date}, \code{Packaged} or \code{Date/Publication} are not in the DESCRIPTION file.
+#' @param pck.date Date class object or character string of the release date in YYYY-MM-DD format. Defaults to \code{Sys.Date()}.
+#'    If actions don't include \code{"roxy"} and neither \code{Date}, \code{Packaged}, nor \code{Date/Publication} are found
+#'    in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise, the information from the DESCRIPTION file is used.
 #' @param actions Character vector, must contain at least one of the following values:
 #'    \describe{
 #'      \item{"roxy"}{Roxygenize the docs}
@@ -322,6 +322,7 @@ roxy.package <- function(
     if(any(c("Date","Packaged","Date/Publication") %in% colnames(pck.dscrptn))){
       pck.date <- as.character(as.Date(getDescField(pck.dscrptn, field=c("Date","Packaged","Date/Publication"))))
     } else {
+      message("There was no 'Date', 'Packaged', or 'Date/Publication' in DESCRIPTION, using pck.date as fallback.")
       pck.dscrptn["Date"] <- pck.date
     }
     pck.package <- getDescField(pck.dscrptn, field="Package")

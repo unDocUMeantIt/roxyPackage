@@ -7,6 +7,11 @@ fixed:
   - replaced some tilde characters in the vignette by \textasciitilde
 changed:
   - added "readme" action to vignette
+added:
+  - HTML page now also lists Imports and BugReports, which can either be a URL
+    or mail address (contributed by robert nuske)
+  - if all of 'Date', 'Packaged', and 'Date/Publication' are missing in DESCRIPTION,
+    pck.date will now be used as well (contributed by robert nuske)
 
 changes in version 0.05-1 (2016-07-12)
 fixed:
