@@ -107,8 +107,8 @@
 #'    an existing file with the same name! Also note that if both a \code{NEWS/NEWS.Rd} and \code{ChangeLog} file are found, only
 #'    news files will be linked by the \code{"html"} action.
 #' @param cleanup Logical, if \code{TRUE} will remove backup files (matching \code{.*~$} or \code{.*backup$}) from the source directory.
-#' @param rm.vignette Logical, if \code{TRUE} and a vignette PDF was build during the \code{"doc"} action, it will not be kept
-#'    in the source package but just be moved to the \code{./pckg/$PACKAGENAME} directory of the repository.
+#' @param rm.vignette Logical, if \code{TRUE} and a vignette was build during the \code{"doc"} action and vignettes live in the directory \code{inst/doc},
+#'    it will not be kept in the source package but just be moved to the \code{./pckg/$PACKAGENAME} directory of the repository.
 #' @param R.homes Path to the R installation to use. Can be set manually to build packages for other R versions than the default one,
 #'    if you have installed them in parallel. Should probably be used together with \code{R.libs}.
 #' @param html.index A character string for the headline of the global index HTML file.
