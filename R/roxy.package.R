@@ -598,20 +598,7 @@ roxy.package <- function(
 
     if(!is.null(pckg.vignette.names)){
       pckg.vignette.namesPDF <- paste0(pckg.vignette.names, ".pdf")
-      # we probably need to clean up first, because buildVignettes() will
-      # do nothing if there's already a PDF vignette present folder
-      for (thisVignette in pckg.vignette.names){
-        local({
-          thisVignetteFiles <- list.files(pckg.vignette.dir, pattern=thisVignette)
-          thisVignettePDF <- paste0(thisVignette, ".pdf")
-          haveVignettePDF <- any(grepl(paste0(thisVignettePDF, "$"), thisVignetteFiles))
-          haveVignetteSrc <- any(grepl(paste0(thisVignette, "[.][rRsS](nw|tex)$"), thisVignetteFiles))
-          if(haveVignettePDF && haveVignetteSrc){
-            message(paste0("build: remove old PDF vignette (", thisVignettePDF, ")"))
-            stopifnot(file.remove(file.path(pckg.vignette.dir, thisVignettePDF)))
-          } else {}
-        })
-      }
+
       # create and move vignette
       tools::buildVignettes(dir=pck.source.dir)
       # check for possible vignette documents
