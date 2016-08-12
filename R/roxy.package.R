@@ -107,8 +107,8 @@
 #'    an existing file with the same name! Also note that if both a \code{NEWS/NEWS.Rd} and \code{ChangeLog} file are found, only
 #'    news files will be linked by the \code{"html"} action.
 #' @param cleanup Logical, if \code{TRUE} will remove backup files (matching \code{.*~$} or \code{.*backup$}) from the source directory.
-#' @param rm.vignette Logical, if \code{TRUE} and a vignette PDF was build during the \code{"doc"} action, it will not be kept
-#'    in the source package but just be moved to the \code{./pckg/$PACKAGENAME} directory of the repository.
+#' @param rm.vignette Logical, if \code{TRUE} and a vignette was build during the \code{"doc"} action and vignettes live in the directory \code{inst/doc},
+#'    they will not be kept in the source package but just be moved to the \code{./pckg/$PACKAGENAME} directory of the repository.
 #' @param R.homes Path to the R installation to use. Can be set manually to build packages for other R versions than the default one,
 #'    if you have installed them in parallel. Should probably be used together with \code{R.libs}.
 #' @param html.index A character string for the headline of the global index HTML file.
@@ -588,66 +588,59 @@ roxy.package <- function(
     }
   } else {}
 
-  ## update PDF docs
+  ## update docs (reference manual and vignettes)
   if("doc" %in% actions){
     # had to move this down here, because tools::pkgVignettes() and tools::buildVignettes()
     # don't work without an existing DESCRIPTION file since R 3.0.1... hooooray...
-    pckg.vignette.info <- tools::pkgVignettes(dir=pck.source.dir)
-    pckg.vignette.dir <- pckg.vignette.info$dir
-    pckg.vignette.names <- pckg.vignette.info$names
+    # makes sense because buildVignettes() needs to know the VignetteBuilder from DESCRIPTION
 
-    if(!is.null(pckg.vignette.names)){
-      pckg.vignette.namesPDF <- paste0(pckg.vignette.names, ".pdf")
-      # we probably need to clean up first, because buildVignettes() will
-      # do nothing if there's already a PDF vignette present folder
-      for (thisVignette in pckg.vignette.names){
-        local({
-          thisVignetteFiles <- list.files(pckg.vignette.dir, pattern=thisVignette)
-          thisVignettePDF <- paste0(thisVignette, ".pdf")
-          haveVignettePDF <- any(grepl(paste0(thisVignettePDF, "$"), thisVignetteFiles))
-          haveVignetteSrc <- any(grepl(paste0(thisVignette, "[.][rRsS](nw|tex)$"), thisVignetteFiles))
-          if(haveVignettePDF && haveVignetteSrc){
-            message(paste0("build: remove old PDF vignette (", thisVignettePDF, ")"))
-            stopifnot(file.remove(file.path(pckg.vignette.dir, thisVignettePDF)))
-          } else {}
-        })
-      }
-      # create and move vignette
-      tools::buildVignettes(dir=pck.source.dir)
-      # check for possible vignette documents
-      # becomes character(0) if none found
-      pdf.vignette.files <- list.files(pckg.vignette.dir,
-        pattern=paste0(paste0(pckg.vignette.names, ".pdf"), collapse="|"),
-        ignore.case=TRUE)
-      createMissingDir(file.path(R.libs, pck.package, "doc"), action="doc")
-      createMissingDir(file.path(pck.source.dir, "inst", "doc"), action="doc")
-      for(thisVignette in pdf.vignette.files){
-        local({
-          pdf.vignette.src <- file.path(pckg.vignette.dir, thisVignette)
-          pdf.vignette.dst <- file.path(R.libs, pck.package, "doc", thisVignette)
-          stopifnot(file.copy(pdf.vignette.src, pdf.vignette.dst, overwrite=TRUE))
-          # special case: dedicated vignettes directory, need to copy to inst/doc and
-          # remove vignette PDF from source dir
-          if(grepl("vignettes$", pckg.vignette.dir)){
-            pdf.vignette.src.files <- file.path(pckg.vignette.dir, list.files(pckg.vignette.dir))
-            pdf.vignette.doc.dir <- file.path(pck.source.dir, "inst", "doc")
-            stopifnot(file.copy(pdf.vignette.src.files, pdf.vignette.doc.dir, overwrite=TRUE))
-            stopifnot(file.remove(pdf.vignette.src))
-         } else {}
+    # any vignettes?
+    pckg.vigns <- tools::pkgVignettes(dir=pck.source.dir)
+    if(length(pckg.vigns$docs) > 0){
+      # build vignettes and move them (partly inspired by devtools::build_vignettes)
+      
+      # create vignettes and gather fresh information
+      tools::buildVignettes(dir=pck.source.dir, tangle=TRUE)
+      pckg.vigns <- tools::pkgVignettes(dir=pck.source.dir, output=TRUE, source=TRUE)
+      
+      # only do the moving if any vignettes were built
+      if(length(pckg.vigns$outputs > 0)){
+        message("build: vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
+        
+        # what to move and where to move it to
+        what.mv <- c(pckg.vigns$outputs, unlist(pckg.vigns$sources, use.names=FALSE))
+        what.cp <- pckg.vigns$docs
+        to.bin.doc <- file.path(R.libs, pck.package, "doc")
+        to.src.inst.doc <- file.path(pck.source.dir, "inst", "doc")
+        
+        # copy to bin-package
+        createMissingDir(to.bin.doc, action="doc")
+        stopifnot(file.copy(what.mv, to.bin.doc, overwrite=TRUE))
+        stopifnot(file.copy(what.cp, to.bin.doc, overwrite=TRUE))
+        
+        ## copy to repo/website
+        stopifnot(file.copy(pckg.vigns$outputs, repo.pckg.info, overwrite=TRUE))
+        message("repo: updated  vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
+        
+        # copy to src-package's inst/doc if not already there (this is the case if they live in directory vignettes)
+        if(!grepl("inst/doc$", pckg.vigns$dir)){
+          createMissingDir(to.src.inst.doc, action="doc")
+          stopifnot(file.copy(what.mv, to.src.inst.doc, overwrite=TRUE))
+          stopifnot(file.copy(what.cp, to.src.inst.doc, overwrite=TRUE))
+          stopifnot(file.remove(what.mv))
+        } else {
+          # mimicking previous implementation
           if(isTRUE(rm.vignette)){
-            stopifnot(file.remove(pdf.vignette.src))
-          } else {}
-          message(paste0("build: created PDF vignette (", thisVignette, ")"))
-          ## copy vignettes
-          pdf.vignette.repo <- file.path(repo.pckg.info, thisVignette)
-          if(file.exists(pdf.vignette.dst)){
-            stopifnot(file.copy(pdf.vignette.dst, pdf.vignette.repo, overwrite=TRUE))
-            message(paste0("repo: updated vignette (", thisVignette, ")"))
-          } else {}
-        })
+            stopifnot(file.remove(what.mv))
+          }
+        }
+        # Enhancement: handle vignettes/.install_extras (cf. devtools:::copy_vignettes)
+      } else {
+        warning("build: Couldn't build all vignettes")
       }
     } else {}
 
+    # do the reference manual
     pdf.docs <- file.path(repo.pckg.info, pckg.pdf.doc)
     removeIfExists(filePath=pdf.docs)
     if(isTRUE(unix.OS)){
@@ -895,14 +888,15 @@ roxy.package <- function(
       url.deb.repo <- "deb_repo.html"
     } else {}
     # check for docs to link
-    pdf.docs.repo.files <- list.files(repo.pckg.info, pattern="*.pdf", ignore.case=TRUE)
     pdf.docs <- file.path(repo.pckg.info, pckg.pdf.doc)
-    pdf.vignette.repo <- pdf.docs.repo.files[!pdf.docs.repo.files %in% pckg.pdf.doc]
+    # build vignettes seem to be pdf or html
+    vig.names <- basename(tools::file_path_sans_ext(tools::pkgVignettes(dir=pck.source.dir)$docs))
+    vignettes.in.repo <- list.files(repo.pckg.info, paste0("^(", paste(vig.names, collapse='|'), ")\\.(html|pdf)"))
     if(file_test("-f", pdf.docs)){
       url.doc <- pckg.pdf.doc
     } else {}
-    if(length(pdf.vignette.repo) > 0){
-      url.vgn <- pdf.vignette.repo
+    if(length(vignettes.in.repo) > 0){
+      url.vgn <- vignettes.in.repo
     } else {}
     # check for NEWS.Rd or NEWS file
     if(file_test("-f", pckg.NEWS.Rd)){
