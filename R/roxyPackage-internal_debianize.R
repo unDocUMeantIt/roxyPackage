@@ -841,7 +841,7 @@ deb.gen.rules <- function(deb.name, maintainer, year, origin, deb.dir, overwrite
 deb.append.clog <- function(logs, file, deb.env, dch=Sys.which("dch"), dpkg.parsechangelog=Sys.which("dpkg-parsechangelog")){
   for(thisLog in logs){
     # first check whether the entry already exists
-    current.clog <- system(paste0(dpkg.parsechangelog, " -l", file, " --count1 -SChanges"), intern=TRUE)
+    current.clog <- system(paste0(dpkg.parsechangelog, " -l", file, " --count 1 -SChanges"), intern=TRUE)
     items <- findItemsInChangeLog(current.clog, item="[[:space:]]*\\*")
     if(!thisLog %in% items){
       append.changelog <- paste0(dch, " --changelog=\"", file,
@@ -876,7 +876,7 @@ deb.gen.changelog <- function(srcs.name, version, maintainer, logs, distribution
     } else {}
     message(paste0(action, ": created initial debian/changelog."))
   } else if(isTRUE(overwrite)){
-    current.clog.version <- package_version(system(paste0(dpkg.parsechangelog, " -l", file, " --count1 -SVersion"), intern=TRUE))
+    current.clog.version <- package_version(system(paste0(dpkg.parsechangelog, " -l", file, " --count 1 -SVersion"), intern=TRUE))
     if(identical(current.clog.version, package_version(version))){
       deb.append.clog(logs=logs, file=file, deb.env=deb.env, dch=dch)
     } else {

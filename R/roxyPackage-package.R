@@ -4,7 +4,7 @@
 #' Package: \tab roxyPackage\cr
 #' Type: \tab Package\cr
 #' Version: \tab 0.05-2\cr
-#' Date: \tab 2016-07-22\cr
+#' Date: \tab 2016-08-14\cr
 #' Depends: \tab R (>= 2.9.0),methods,roxygen2,XiMpLe (>= 0.03-20)\cr
 #' Encoding: \tab UTF-8\cr
 #' License: \tab GPL (>= 3)\cr

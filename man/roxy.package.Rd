@@ -31,8 +31,11 @@ include \code{"roxy"}, then this information is read from the present DESCRIPTIO
 \item{repo.root}{Character string,
       valid path to a directory where to build/update a local package repository.}
 
-\item{pck.date}{Character string of the release date in YYYY-MM-DD format. Defaults to \code{Sys.Date()}. If actions don't
-include \code{"roxy"}, then this information is read from the present DESCRIPTION file.}
+\item{pck.date}{Date class object or character string of the release date in YYYY-MM-DD format. Defaults to \code{Sys.Date()}.
+If actions don't include \code{"roxy"} and neither \code{Date}, \code{Packaged},
+      nor \code{Date/Publication} are found
+in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
+      the information from the DESCRIPTION file is used.}
 
 \item{actions}{Character vector, must contain at least one of the following values:
 \describe{
@@ -69,8 +72,8 @@ news files will be linked by the \code{"html"} action.}
       if \code{TRUE} will remove backup files (matching \code{.*~$} or \code{.*backup$}) from the source directory.}
 
 \item{rm.vignette}{Logical,
-      if \code{TRUE} and a vignette PDF was build during the \code{"doc"} action, it will not be kept
-in the source package but just be moved to the \code{./pckg/$PACKAGENAME} directory of the repository.}
+      if \code{TRUE} and a vignette was build during the \code{"doc"} action and vignettes live in the directory \code{inst/doc},
+they will not be kept in the source package but just be moved to the \code{./pckg/$PACKAGENAME} directory of the repository.}
 
 \item{R.homes}{Path to the R installation to use. Can be set manually to build packages for other R versions than the default one,
 if you have installed them in parallel. Should probably be used together with \code{R.libs}.}
@@ -192,28 +195,26 @@ See \code{\link[roxyPackage:cl2news]{cl2news}} for details.
 
 \section{Build for several R versions}{
 
-The options \code{R.libs} and \code{R.homes} can actually take more than one string,
-      but a vector of strings. This can be used
+The options \code{R.libs} and \code{R.homes} can actually take more than one string, i.e.,
+      a vector of strings. This can be used
 to build packages for different R versions,
       provided you installed them on your system. If you're running GNU/Linux, an easy way
 of doing so is to fetch the R sources from CRAN,
       calling \code{"./configure"} with something like \code{"--prefix=$HOME/R/<R version>"},
 so that \code{"make install"} installs to that path. Let's assume you did that with R 3.2.2 and 3.1.3,
       you could then call \code{roxy.package}
-with options like \code{R.homes=c("home/user/R/R-3.1.3",
-      "home/user/R/R-3.2.2")} and \code{R.libs=c("home/user/R/R-3.1.3/lib64/R/library",}
-\code{"home/user/R/R-3.2.2/lib64/R/library")}. \code{roxy.package} will then call itself recursively for each given R installation.
+with options like \code{R.homes=c("home/user/R/R-3.2.2",
+      "home/user/R/R-3.1.3")} and \code{R.libs=c("home/user/R/R-3.2.2/lib64/R/library",}
+\code{"home/user/R/R-3.1.3/lib64/R/library")}. \code{roxy.package} will then call itself recursively for each given R installation.
 
 One thing you should be aware of is that \code{roxy.package} will not perform all actions each time. That is because some of them,
       namely
-\code{"roxy"}, \code{"cite"}, \code{"license"}, \code{"doc"},
-      \code{"cl2news"} and \code{"news2rss"}, should produce identical
-results anyway,
-      so they are only considered during the first run. You should always place the R version which should be linked to from the
-HTML index last in line,
-      because \code{"html"} will overwrite previous results. For a similar reason, the \code{"deb"} action will only actually
-build a binary package during the last run,
-      but debianizing it will be done during the first.
+\code{"roxy"}, \code{"cite"}, \code{"license"}, \code{"doc"}, \code{"cl2news"},
+      \code{"news2rss"}, \code{"cleanRd"}, and \code{"readme"},
+would overwrite previous results anyway,
+      so they are only considered during the first run. Therefore, you should always place the R version which
+should be used for these actions first in line. The \code{"html"} action will list all Windows and OS X binary packages. The \code{"deb"}
+action will only actually debianize and build a binary package during the first run, too.
 }
 
 \section{Windows}{

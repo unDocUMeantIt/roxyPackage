@@ -1,17 +1,23 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-2 (2016-07-22)
+changes in version 0.05-2 (2016-08-14)
 unreleased:
   - this release is under development
 fixed:
   - replaced some tilde characters in the vignette by \textasciitilde
+  - debinanizing failed with certain versions of dpkg-parsechangelog
+    expecting a space after "--count"
 changed:
   - added "readme" action to vignette
+  - changed the docs to suggest to give the most recent R version first in
+    line when building for multiple versions. the debianizing is now also done
+    during the first run
 added:
-  - HTML page now also lists Imports and BugReports, which can either be a URL
-    or mail address (contributed by robert nuske)
-  - if all of 'Date', 'Packaged', and 'Date/Publication' are missing in DESCRIPTION,
-    pck.date will now be used as well (contributed by robert nuske)
+  - HTML page now also lists Imports and BugReports, which can either be a
+    URL or mail address (contributed by robert nuske)
+  - if all of 'Date', 'Packaged', and 'Date/Publication' are missing in
+    DESCRIPTION, pck.date will now be used as well (contributed by robert nuske)
+  - support for vignette types other than PDF (contributed by robert nuske)
 
 changes in version 0.05-1 (2016-07-12)
 fixed:
