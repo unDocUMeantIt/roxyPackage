@@ -350,16 +350,12 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
             attrs=list(href=url.doc)))},
         if(!is.null(url.vgn)){
           if(is.null(title.vgn)){ title.vgn <- url.vgn }
-          rx.tr("Vignettes:", 
-                XMLNode("",
-                        .children=
-                          mapply(function(this.url, this.title){
-                            XMLNode("", .children=list(
-                              XMLNode("a", this.title, attrs=list(href=this.url)),
-                              XMLNode("br")))},
-                            url.vgn, title.vgn, SIMPLIFY=FALSE)
-                )
-          )
+          rx.tr("Vignettes:", XMLNode("", .children=mapply(function(this.url, this.title){
+            XMLNode("", .children=list(
+            XMLNode("a", this.title, attrs=list(href=this.url)),
+            XMLNode("br")))},
+            url.vgn, title.vgn, SIMPLIFY=FALSE)
+          ))
         },
         # add NEWS or ChangeLog
         if(file_test("-f", news)){
