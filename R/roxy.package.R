@@ -844,7 +844,7 @@ roxy.package <- function(
       } else {}
     } else {}
     # check for binaries to link
-    url.src <- url.win <- url.mac <- url.deb <- url.doc <- url.vgn <- deb.repo <- NULL
+    url.src <- url.win <- url.mac <- url.deb <- url.doc <- url.vgn <- title.vgn <- deb.repo <- NULL
     if(file_test("-f", repo.src.gz)){
       url.src <- pckg.name.src
     } else {}
@@ -886,14 +886,14 @@ roxy.package <- function(
     } else {}
     # check for docs to link
     pdf.docs <- file.path(repo.pckg.info, pckg.pdf.doc)
-    # build vignettes seem to be pdf or html
-    vig.names <- basename(tools::file_path_sans_ext(tools::pkgVignettes(dir=pck.source.dir)$docs))
-    vignettes.in.repo <- list.files(repo.pckg.info, paste0("^(", paste(vig.names, collapse='|'), ")\\.(html|pdf)"))
+    # gather information (title, file name) about built vignettes
+    vig.info <- tools::getVignetteInfo(package=pck.package)
     if(file_test("-f", pdf.docs)){
       url.doc <- pckg.pdf.doc
     } else {}
-    if(length(vignettes.in.repo) > 0){
-      url.vgn <- vignettes.in.repo
+    if(nrow(vig.info) > 0){
+      url.vgn <- vig.info[, 7]
+      title.vgn <- vig.info[, 5]
     } else {}
     # check for NEWS.Rd or NEWS file
     if(file_test("-f", pckg.NEWS.Rd)){
@@ -913,7 +913,7 @@ roxy.package <- function(
       RSS.file.name <- NULL
     } else {}
     package.html <- roxy.html(pckg.dscrptn, index=FALSE, css="web.css", R.version=R.Version.win,
-      url.src=url.src, url.win=url.win, url.mac=url.mac, url.doc=url.doc, url.vgn=url.vgn,
+      url.src=url.src, url.win=url.win, url.mac=url.mac, url.doc=url.doc, url.vgn=url.vgn, title.vgn=title.vgn,
       url.deb.repo=url.deb.repo, main.path.mac=OSX.repo[["main"]],
       title=html.title, cite=pckg.cite.file.html, news=url.NEWS,
       changelog=pckg.changelog, rss.file=RSS.file.name,

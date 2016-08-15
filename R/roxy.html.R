@@ -202,7 +202,7 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
 # for global repository index outside pckg dir, set index=TRUE and redirect="pckg/"
 #' @import XiMpLe
 roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
-  url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, url.deb.repo=NULL, main.path.mac=NULL, title=NULL,
+  url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, title.vgn=NULL, url.deb.repo=NULL, main.path.mac=NULL, title=NULL,
   cite="", news="", changelog="", redirect="", rss.file=NULL, flattrUser=NULL, URL=NULL) {
 
   rss.header <- rss.feed <- NULL
@@ -349,13 +349,18 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
             url.doc,
             attrs=list(href=url.doc)))},
         if(!is.null(url.vgn)){
-          rx.tr("Vignettes:", XMLNode("",
-            .children=as.list(sapply(url.vgn, function(this.vgn){
-              XMLNode("", .children=list(
-                XMLNode("a", this.vgn, attrs=list(href=this.vgn)),
-                XMLNode("br"))
-              )
-            }))))},
+          if(is.null(title.vgn)){ title.vgn <- url.vgn }
+          rx.tr("Vignettes:", 
+                XMLNode("",
+                        .children=
+                          mapply(function(this.url, this.title){
+                            XMLNode("", .children=list(
+                              XMLNode("a", this.title, attrs=list(href=this.url)),
+                              XMLNode("br")))},
+                            url.vgn, title.vgn, SIMPLIFY=FALSE)
+                )
+          )
+        },
         # add NEWS or ChangeLog
         if(file_test("-f", news)){
           rx.tr("News/ChangeLog:", XMLNode("", .children=list(
