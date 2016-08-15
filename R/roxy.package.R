@@ -892,8 +892,14 @@ roxy.package <- function(
       url.doc <- pckg.pdf.doc
     } else {}
     if(nrow(vig.info) > 0){
-      url.vgn <- vig.info[, 7]
-      title.vgn <- vig.info[, 5]
+      if(all( c('Title', 'PDF') %in% colnames(vig.info))){
+        url.vgn <- vig.info[, "PDF"]
+        title.vgn <- vig.info[, "Title"]
+      } else{
+        stop(simpleError(paste("doc: the output format of tools::getVignetteInfo()", 
+                               "is not compatible with this version of roxyPackage.",
+                               "Please consider filing a bug report!")))
+      }
     } else {}
     # check for NEWS.Rd or NEWS file
     if(file_test("-f", pckg.NEWS.Rd)){
