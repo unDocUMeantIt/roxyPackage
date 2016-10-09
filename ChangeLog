@@ -12,6 +12,7 @@ changed:
   - changed the docs to suggest to give the most recent R version first in
     line when building for multiple versions. the debianizing is now also done
     during the first run
+  - reaktanz.de supports HTTPS now, updated references
 added:
   - HTML page now also lists Imports and BugReports, which can either be a
     URL or mail address (contributed by robert nuske)

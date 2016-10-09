@@ -19,7 +19,7 @@ roxyPackage also includes a plugin for [RKWard](https://rkward.kde.org), a power
 IDE for R, providing graphical dialogs for its basic features. To make full use of this feature,
 please install [RKWard](https://rkward.kde.org) (plugins are detected automatically).
 
-More information on roxyPackage is available on the [project homepage](http://reaktanz.de/?c=hacking&s=roxyPackage).
+More information on roxyPackage is available on the [project homepage](https://reaktanz.de/?c=hacking&s=roxyPackage).
 
 ## Installation
 
@@ -28,14 +28,14 @@ More information on roxyPackage is available on the [project homepage](http://re
 Installation of tha latest stable release is fairly easy, it's available from the project's own repository:
 
 ```
-install.packages("roxyPackage", repo="http://R.reaktanz.de")
+install.packages("roxyPackage", repo="https://reaktanz.de/R")
 ```
 
 To automatically get updates, consider adding the repository to your R configuration. You might also
-want to subscribe to the package's [RSS feed](http://r.reaktanz.de/pckg/roxyPackage/RSS.xml) to get notified of new releases.
+want to subscribe to the package's [RSS feed](https://reaktanz.de/R/pckg/roxyPackage/RSS.xml) to get notified of new releases.
 
 If you're running a Debian based operating system, you might be interested in the
-[precompiled *.deb packages](http://r.reaktanz.de/pckg/roxyPackage/deb_repo.html).
+[precompiled *.deb packages](https://reaktanz.de/R/pckg/roxyPackage/deb_repo.html).
 
 ### Not on CRAN
 
