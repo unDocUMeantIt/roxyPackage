@@ -6,7 +6,7 @@ Build-Depends-Indep: debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs,
  r-cran-ximple (>= 0.03-20) | r-other-reaktanz-ximple (>= 0.03-20) |
  r-other-rkward-ximple (>= 0.03-20)
 Standards-Version: 3.9.3.1
-Homepage: http://reaktanz.de/?c=hacking&s=roxyPackage
+Homepage: https://reaktanz.de/?c=hacking&s=roxyPackage
 
 Package: r-other-reaktanz-roxypackage
 Architecture: all
@@ -39,6 +39,6 @@ Description: GNU R package: The intention of this package is to make
  others. This includes the generation of browsable HTML pages similar
  to CRAN, with support for RSS feeds from the ChangeLog. Please read
  the vignette for a more detailed explanation by example.
-Homepage: http://reaktanz.de/?c=hacking&s=roxyPackage
+Homepage: https://reaktanz.de/?c=hacking&s=roxyPackage
 Suggests:
 Conflicts: r-cran-roxypackage

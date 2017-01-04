@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-2 (2016-08-14)
+changes in version 0.05-2 (2017-01-04)
 unreleased:
   - this release is under development
 fixed:
@@ -12,6 +12,8 @@ changed:
   - changed the docs to suggest to give the most recent R version first in
     line when building for multiple versions. the debianizing is now also done
     during the first run
+  - internal funation GPGsign() now forces both cert-digest-algo and digest-algo to be
+    set to SHA256; for now, this is hard coded but could be made configurable if requested
   - reaktanz.de supports HTTPS now, updated references
 added:
   - HTML page now also lists Imports and BugReports, which can either be a

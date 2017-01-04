@@ -1184,7 +1184,7 @@ GPGwriteKey <- function(key, file, gpg=Sys.which("gpg"), overwrite=FALSE, keyrin
 
 
 ## function GPGsign()
-GPGsign <- function(key, fileToSign, signatureFile, gpg=Sys.which("gpg"), keyring=NULL){
+GPGsign <- function(key, fileToSign, signatureFile, gpg=Sys.which("gpg"), keyring=NULL, certDigestAlgo="SHA256", digestAlgo="SHA256"){
   if(!is.null(keyring)){
     add.options <- paste0(" --keyring ", keyring)
   } else {
@@ -1193,8 +1193,14 @@ GPGsign <- function(key, fileToSign, signatureFile, gpg=Sys.which("gpg"), keyrin
   # --no-tty --yes is mandatory, otherwise gpg will stop with an error
   # because it will try to get password information from /dev/tty and/or
   # ask if files should be re-signed
-  gpg.sign.call <- paste0(gpg, add.options, " --no-tty --yes --default-key ", key,
-    " -abs -o ", signatureFile, " ", fileToSign)
+  gpg.sign.call <- paste0(
+    gpg, add.options,
+    " --cert-digest-algo ", certDigestAlgo,
+    " --digest-algo ", digestAlgo,
+    " --no-tty --yes --default-key ", key,
+    " -abs -o ", signatureFile,
+    " ", fileToSign
+  )
   system(gpg.sign.call, intern=TRUE)
 } ## end function GPGsign()
 

@@ -4,12 +4,12 @@
 #' Package: \tab roxyPackage\cr
 #' Type: \tab Package\cr
 #' Version: \tab 0.05-2\cr
-#' Date: \tab 2016-08-14\cr
+#' Date: \tab 2017-01-04\cr
 #' Depends: \tab R (>= 2.9.0),methods,roxygen2,XiMpLe (>= 0.03-20)\cr
 #' Encoding: \tab UTF-8\cr
 #' License: \tab GPL (>= 3)\cr
 #' LazyLoad: \tab yes\cr
-#' URL: \tab http://reaktanz.de/?c=hacking&s=roxyPackage\cr
+#' URL: \tab https://reaktanz.de/?c=hacking&s=roxyPackage\cr
 #' }
 #'
 #' The intention of this package is to make packaging R code as easy as possible.
