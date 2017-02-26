@@ -1184,6 +1184,8 @@ GPGwriteKey <- function(key, file, gpg=Sys.which("gpg"), overwrite=FALSE, keyrin
 
 
 ## function GPGsign()
+# newer apt clients look for a clearsigned InRelease file instead of Release+Release.gpg
+# to get such a file, set 'signatureFile' to end with the file name "InRelease"
 GPGsign <- function(key, fileToSign, signatureFile, gpg=Sys.which("gpg"), keyring=NULL, certDigestAlgo="SHA256", digestAlgo="SHA256"){
   if(!is.null(keyring)){
     add.options <- paste0(" --keyring ", keyring)
@@ -1193,12 +1195,17 @@ GPGsign <- function(key, fileToSign, signatureFile, gpg=Sys.which("gpg"), keyrin
   # --no-tty --yes is mandatory, otherwise gpg will stop with an error
   # because it will try to get password information from /dev/tty and/or
   # ask if files should be re-signed
+  if(grepl("InRelease$", signatureFile)){
+    outOptions <- paste0(" --sign --armor --clearsign -o ", signatureFile)
+  } else {
+    outOptions <- paste0(" --sign --armor --detach-sign -o ", signatureFile)
+  }
   gpg.sign.call <- paste0(
     gpg, add.options,
     " --cert-digest-algo ", certDigestAlgo,
     " --digest-algo ", digestAlgo,
     " --no-tty --yes --default-key ", key,
-    " -abs -o ", signatureFile,
+    outOptions,
     " ", fileToSign
   )
   system(gpg.sign.call, intern=TRUE)
@@ -1281,7 +1288,16 @@ deb.update.release <- function(repo.root, repo=file.path(repo.root, "deb"), gpg.
       fileToSign=file.path(repo.release.path, "Release"),
       signatureFile=file.path(repo.release.path, "Release.gpg"),
       gpg=gpg,
-      keyring=keyring)
+      keyring=keyring
+    )
+    # also create an InRelease file for newer clients
+    GPGsign(
+      key=gpg.key,
+      fileToSign=file.path(repo.release.path, "Release"),
+      signatureFile=file.path(repo.release.path, "InRelease"),
+      gpg=gpg,
+      keyring=keyring
+    )
     message(paste0(action, ": signed Release file with key ", gpg.key, "."))
   } else {}
   setwd(prev.wd)
