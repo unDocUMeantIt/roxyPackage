@@ -49,6 +49,10 @@ any longer.
 To ask for help, report bugs, suggest feature improvements, or discuss the global
 development of the package, please use the issue tracker on GitHub.
 
+### Branches
+
+Please note that all development happens in the `develop` branch. Pull requests against the `master` branch will be rejected, as it is reserved for the current stable release.
+
 ## Licence
 
 Copyright 2012-2015 Meik Michalke <meik.michalke@hhu.de>
