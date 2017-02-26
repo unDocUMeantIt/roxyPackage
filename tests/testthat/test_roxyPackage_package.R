@@ -251,7 +251,7 @@ test_that("adding a license file", {
 	)
 
 	expect_that(
-		file_test("-f", file.path(testPckRoot, "LICENSE.txt")),
+		file_test("-f", file.path(testPckRoot, "LICENSE")),
 		is_true()
 	)
 
