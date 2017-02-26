@@ -20,4 +20,3 @@ Translate character string into HTML entities
 \examples{
 entities("foo_bar")
 }
-

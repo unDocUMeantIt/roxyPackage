@@ -24,10 +24,12 @@ those packages will be copied to \code{file.path(sandbox.dir, "R")}
 (at first use, not when setting this here!).}
 
 \item{repo.root}{Logical, whether to sandbox the repository. This repository will be
-set up in \code{file.path(sandbox.dir, "repo")} (at first use, not when setting this here!).}
+set up in \code{file.path(sandbox.dir, "repo")} (at first use,
+      not when setting this here!).}
 
 \item{archive}{Logical, whether to sandbox the repository archive. The archive will be
-set up in \code{file.path(sandbox.dir, "repo_archive")} (at first use, not when setting this here!).}
+set up in \code{file.path(sandbox.dir, "repo_archive")} (at first use,
+      not when setting this here!).}
 }
 \value{
 Settings are stored in an internal environment, so there is no actual return value.
@@ -54,4 +56,3 @@ sandbox(active=TRUE)
 \seealso{
 \code{\link[roxyPackage:sandbox.status]{sandbox.status}} to see the current settings.
 }
-

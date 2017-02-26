@@ -21,4 +21,3 @@ sandbox.status()
 \seealso{
 \code{\link[roxyPackage:sandbox]{sandbox}} to change these settings.
 }
-

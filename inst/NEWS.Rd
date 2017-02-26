@@ -1,6 +1,38 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
+\section{Changes in roxyPackage version 0.05-2 (2017-02-26)}{
+  \subsection{fixed}{
+    \itemize{
+      \item replaced some tilde characters in the vignette by \\textasciitilde
+      \item debinanizing failed with certain versions of dpkg-parsechangelog
+        expecting a space after "--count"
+    }
+  }
+  \subsection{changed}{
+    \itemize{
+      \item added \code{"readme"} action to vignette
+      \item changed the docs to suggest to give the most recent R version first in
+        line when building for multiple versions. the debianizing is now also done
+        during the first run
+      \item internal function \code{GPGsign()} now forces both cert-digest-algo and
+        digest-algo to be set to SHA256; for now, this is hard coded but could be made
+        configurable if requested
+      \item reaktanz.de supports HTTPS now, updated references
+    }
+  }
+  \subsection{added}{
+    \itemize{
+      \item internal function \code{GPGsign()} is now also capable of generating InRelease
+        files; they will automatically be added to debian repos from now on
+      \item HTML page now also lists Imports and BugReports, which can either be a
+        URL or mail address (contributed by robert nuske)
+      \item if all of 'Date', 'Packaged', and 'Date/Publication' are missing in
+        DESCRIPTION, pck.date will now be used as well (contributed by robert nuske)
+      \item support for vignette types other than PDF (contributed by robert nuske)
+    }
+  }
+}
 \section{Changes in roxyPackage version 0.05-1 (2016-07-12)}{
   \subsection{fixed}{
     \itemize{
@@ -39,7 +71,7 @@
       \item new action \code{"binonly"} to enable binary-only rebuilds
       \item HTML page now lists all found binary packages for a package if it is
         available for more than one R version in the repository
-      \item \code{archive.packages()} can noa also archive Debian repositories; it gained
+      \item \code{archive.packages()} can now also archive Debian repositories; it gained
         new arguments keep.revisions and deb.options for fine-tuning
       \item if readme.options contains a Flattr user and URL is set, a Flattr button
         will also be added to the repository HTML page

@@ -1,8 +1,6 @@
 ChangeLog for package roxyPackage
 
 changes in version 0.05-2 (2017-02-26)
-unreleased:
-  - this release is under development
 fixed:
   - replaced some tilde characters in the vignette by \textasciitilde
   - debinanizing failed with certain versions of dpkg-parsechangelog
@@ -12,12 +10,13 @@ changed:
   - changed the docs to suggest to give the most recent R version first in
     line when building for multiple versions. the debianizing is now also done
     during the first run
-  - internal function GPGsign() now forces both cert-digest-algo and digest-algo to be
-    set to SHA256; for now, this is hard coded but could be made configurable if requested
+  - internal function GPGsign() now forces both cert-digest-algo and
+    digest-algo to be set to SHA256; for now, this is hard coded but could be made
+    configurable if requested
   - reaktanz.de supports HTTPS now, updated references
 added:
-  - internal function GPGsign() is now also capable of generating InRelease files; they
-    will automatically be added to debian repos from now on
+  - internal function GPGsign() is now also capable of generating InRelease
+    files; they will automatically be added to debian repos from now on
   - HTML page now also lists Imports and BugReports, which can either be a
     URL or mail address (contributed by robert nuske)
   - if all of 'Date', 'Packaged', and 'Date/Publication' are missing in

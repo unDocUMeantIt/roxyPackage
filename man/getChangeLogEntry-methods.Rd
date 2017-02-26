@@ -3,9 +3,9 @@
 \docType{methods}
 \name{getChangeLogEntry}
 \alias{getChangeLogEntry}
+\alias{getChangeLogEntry,ChangeLog-method}
 \alias{getChangeLogEntry,-methods}
 \alias{getChangeLogEntry,ChangeLog,ANY,ANY,ANY,ANY-method}
-\alias{getChangeLogEntry,ChangeLog-method}
 \title{Read/write ChangeLog objects}
 \usage{
 getChangeLogEntry(log, ...)
@@ -38,4 +38,3 @@ CL.entry <- getChangeLogEntry(changelog, version="0.02-22")
 \code{\link[roxyPackage:readChangeLog]{readChangeLog}},
   \code{\link[roxyPackage:updateChangeLog]{updateChangeLog}}
 }
-

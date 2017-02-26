@@ -2,43 +2,28 @@ Source: r-other-reaktanz-roxypackage
 Section: gnu-r
 Priority: optional
 Maintainer: m.eik michalke <meik.michalke@hhu.de>
-Build-Depends-Indep: debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs,
- r-cran-ximple (>= 0.03-20) | r-other-reaktanz-ximple (>= 0.03-20) |
- r-other-rkward-ximple (>= 0.03-20)
+Build-Depends-Indep: debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs, r-cran-ximple (>= 0.03-20) | r-other-reaktanz-ximple (>=
+ 0.03-20) | r-other-rkward-ximple (>= 0.03-20)
 Standards-Version: 3.9.3.1
 Homepage: https://reaktanz.de/?c=hacking&s=roxyPackage
 
 Package: r-other-reaktanz-roxypackage
 Architecture: all
 Section: gnu-r
-Depends: r-base (>= 3.0.0), r-cran-roxygen2 |
- r-other-reaktanz-roxygen2, r-cran-ximple (>= 0.03-20) |
- r-other-reaktanz-ximple (>= 0.03-20) | r-other-rkward-ximple (>=
- 0.03-20), r-base (>= 3.0.0), r-cran-roxygen2 |
- r-other-reaktanz-roxygen2, r-cran-ximple (>= 0.03-20) |
- r-other-reaktanz-ximple (>= 0.03-20) | r-other-rkward-ximple (>=
- 0.03-20), r-base (>= 3.0.0), r-cran-roxygen2 |
- r-other-reaktanz-roxygen2, r-cran-ximple (>= 0.03-20) |
- r-other-reaktanz-ximple (>= 0.03-20) | r-other-rkward-ximple (>=
- 0.03-20), r-base (>= 3.0.0), r-cran-roxygen2 |
- r-other-reaktanz-roxygen2, r-cran-ximple (>= 0.03-20) |
- r-other-reaktanz-ximple (>= 0.03-20) | r-other-rkward-ximple (>=
- 0.03-20), r-base (>= 3.0.0), r-cran-roxygen2 |
- r-other-reaktanz-roxygen2, r-cran-ximple (>= 0.03-20) |
- r-other-reaktanz-ximple (>= 0.03-20) | r-other-rkward-ximple (>=
- 0.03-20)
-Description: GNU R package: The intention of this package is to make
- packaging R code as easy as possible. 'roxyPackage' uses tools from
- the 'roxygen2' package to generate documentation. It also
- automatically generates and updates files like *-package.R,
- DESCRIPTION, CITATION, ChangeLog and NEWS.Rd. Building packages
- supports source format, as well as several binary formats (MS Windows,
- Mac OS X, Debian GNU/Linux) if the package contains pure R code only.
- The packages built are stored in a fully functional local R package
- repository which can be synced to a web server to share them with
- others. This includes the generation of browsable HTML pages similar
- to CRAN, with support for RSS feeds from the ChangeLog. Please read
- the vignette for a more detailed explanation by example.
+Depends: r-base (>= 3.0.0), r-cran-roxygen2 | r-other-reaktanz-roxygen2, r-cran-ximple (>= 0.03-20) | r-other-reaktanz-ximple (>=
+ 0.03-20) | r-other-rkward-ximple (>= 0.03-20), r-base (>= 3.0.0), r-cran-roxygen2 | r-other-reaktanz-roxygen2, r-cran-ximple (>=
+ 0.03-20) | r-other-reaktanz-ximple (>= 0.03-20) | r-other-rkward-ximple (>= 0.03-20), r-base (>= 3.0.0), r-cran-roxygen2 |
+ r-other-reaktanz-roxygen2, r-cran-ximple (>= 0.03-20) | r-other-reaktanz-ximple (>= 0.03-20) | r-other-rkward-ximple (>= 0.03-20),
+ r-base (>= 3.0.0), r-cran-roxygen2 | r-other-reaktanz-roxygen2, r-cran-ximple (>= 0.03-20) | r-other-reaktanz-ximple (>= 0.03-20) |
+ r-other-rkward-ximple (>= 0.03-20), r-base (>= 3.0.0), r-cran-roxygen2 | r-other-reaktanz-roxygen2, r-cran-ximple (>= 0.03-20) |
+ r-other-reaktanz-ximple (>= 0.03-20) | r-other-rkward-ximple (>= 0.03-20)
+Description: GNU R package: The intention of this package is to make packaging R code as easy as possible. 'roxyPackage' uses tools
+ from the 'roxygen2' package to generate documentation. It also automatically generates and updates files like *-package.R,
+ DESCRIPTION, CITATION, ChangeLog and NEWS.Rd. Building packages supports source format, as well as several binary formats (MS
+ Windows, Mac OS X, Debian GNU/Linux) if the package contains pure R code only. The packages built are stored in a fully functional
+ local R package repository which can be synced to a web server to share them with others. This includes the generation of browsable
+ HTML pages similar to CRAN, with support for RSS feeds from the ChangeLog. Please read the vignette for a more detailed explanation
+ by example.
 Homepage: https://reaktanz.de/?c=hacking&s=roxyPackage
 Suggests:
 Conflicts: r-cran-roxypackage

@@ -44,6 +44,7 @@
 #'    \code{\link[roxyPackage:readChangeLog]{readChangeLog}},
 #'    \code{\link[roxyPackage:updateChangeLog]{updateChangeLog}},
 #'    \code{\link[roxyPackage:writeChangeLog]{writeChangeLog}}
+#' @import utils
 #' @export
 #' @examples
 #' \dontrun{

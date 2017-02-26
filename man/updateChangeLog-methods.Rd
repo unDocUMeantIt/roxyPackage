@@ -3,9 +3,9 @@
 \docType{methods}
 \name{updateChangeLog}
 \alias{updateChangeLog}
+\alias{updateChangeLog,ChangeLog-method}
 \alias{updateChangeLog,-methods}
 \alias{updateChangeLog,ChangeLog,ANY,ANY,ANY,ANY-method}
-\alias{updateChangeLog,ChangeLog-method}
 \title{Update ChangeLog objects}
 \usage{
 updateChangeLog(log, entry, version, date = Sys.Date(), append = TRUE)
@@ -33,10 +33,10 @@ An object of class \code{ChangeLog}.
 This method can be used to update ChangeLog objects.
 }
 \details{
-\code{updateChangeLog} takes a ChangeLog object and a version number string, replaces the complete
+\code{updateChangeLog} takes a ChangeLog object and a version number string,
+      replaces the complete
 entry with the contents of \code{entry} and updates the time stamp to \code{date}.
 }
 \seealso{
 \code{\link[roxyPackage:readChangeLog]{readChangeLog}}
 }
-

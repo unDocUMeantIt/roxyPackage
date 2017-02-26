@@ -11,41 +11,53 @@ archive.packages(repo.root, to.dir = "Archive", keep = 1,
   = "main", gpg.key = NULL, keyring = NULL))
 }
 \arguments{
-\item{repo.root}{Path to the repository root, i.e., the directory which contains the \code{src}
+\item{repo.root}{Path to the repository root, i.e.,
+      the directory which contains the \code{src}
 and \code{bin} directories. Usually this path should start with "\code{file:///}".}
 
 \item{to.dir}{Character string, name of the folder to move the old packages to.}
 
 \item{keep}{An integer value defining the maximum nuber of versions to keep. Setting this to 0 will
-completely remove all packages from the repository, which is probably only useful in combination
+completely remove all packages from the repository,
+      which is probably only useful in combination
 with the option \code{package}.}
 
 \item{keep.revisions}{An integer value defining the maximum nuber of revisions to keep. This is only
-used when archiving Debian packages, i.e., if \code{type} includes \code{"deb"}. Setting this to
+used when archiving Debian packages, i.e.,
+      if \code{type} includes \code{"deb"}. Setting this to
 0 or \code{NULL} will keep all revisions of package versions that are to be kept.}
 
-\item{package}{A character vector with package names to check. If set, \code{archive.packages} will only
+\item{package}{A character vector with package names to check. If set,
+      \code{archive.packages} will only
 take actions on these packages. If \code{NULL}, all packages are affected.}
 
 \item{type}{A character vector defining the package formats to keep. Valid entries are \code{"source"},
-\code{"win.binary"}, \code{"mac.binary"}, and \code{"deb"}. By default, only the source packages are
-archived, all other packages are deleted, except for Debian repos, which currently can only be archived
+\code{"win.binary"}, \code{"mac.binary"}, and \code{"deb"}. By default,
+      only the source packages are
+archived, all other packages are deleted, except for Debian repos,
+      which currently can only be archived
 or be left as is.}
 
-\item{archive.root}{Path to the archive root, i.e., the directory to which files should be moved. Usually 
+\item{archive.root}{Path to the archive root, i.e.,
+      the directory to which files should be moved. Usually 
 the Archive is kept in \code{repo.root}.}
 
-\item{overwrite}{Logical, indicates whether existing files in the archive can be overwritten.}
+\item{overwrite}{Logical,
+      indicates whether existing files in the archive can be overwritten.}
 
-\item{reallyDoIt}{Logical, real actions are only taken if set to \code{TRUE}, otherwise the actions
+\item{reallyDoIt}{Logical, real actions are only taken if set to \code{TRUE},
+      otherwise the actions
 are only printed.}
 
-\item{graceful}{Logical, if \code{TRUE} the process will not freak out because of missing files. Use this
+\item{graceful}{Logical,
+      if \code{TRUE} the process will not freak out because of missing files. Use this
 for instance if you deleted files from the repo but did not update the package indices.}
 
 \item{deb.options}{A list of options that must be properly set if you want to archive Debian packages. After packages were
-removed from the repo, all Packages, Sources and Release files must be re-written and signed, and this is the
-minimum information required: \code{distribution}, \code{component}, \code{gpg.key}, \code{keyring}.
+removed from the repo, all Packages,
+      Sources and Release files must be re-written and signed, and this is the
+minimum information required: \code{distribution}, \code{component}, \code{gpg.key},
+      \code{keyring}.
 See \code{\link[roxyPackage:debianize]{debianize}} for details.}
 }
 \description{
@@ -77,4 +89,3 @@ archive.packages("file:///var/www/repo", to.dir="", keep=2,
 \seealso{
 \code{\link[roxyPackage:sandbox]{sandbox}} to run archive.packages() in a sandbox.
 }
-
