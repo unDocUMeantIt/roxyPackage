@@ -18,7 +18,7 @@ Encoding: UTF-8
 LazyLoad: yes
 URL: https://reaktanz.de/?c=hacking&s=roxyPackage
 Authors@R: c(person(given="m.eik", family="michalke", email="meik.michalke@hhu.de", role=c("aut", "cre")))
-Version: 0.05-2
+Version: 0.05-3
 Date: 2017-02-26
 RoxygenNote: 6.0.1
 Collate: 
