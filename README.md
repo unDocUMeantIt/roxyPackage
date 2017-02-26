@@ -37,6 +37,16 @@ want to subscribe to the package's [RSS feed](https://reaktanz.de/R/pckg/roxyPac
 If you're running a Debian based operating system, you might be interested in the
 [precompiled *.deb packages](https://reaktanz.de/R/pckg/roxyPackage/deb_repo.html).
 
+### Installation via GitHub
+
+To install it directly from GitHub, you can use `install_github()` from the [devtools](https://github.com/hadley/devtools) package:
+
+```
+library(devtools)
+install_github("unDocUMeantIt/roxyPackage") # stable release
+install_github("unDocUMeantIt/roxyPackage", ref="develop") # development release
+```
+
 ### Not on CRAN
 
 Unfortunately, one feature of roxyPackage, namely the generation of a NEWS.Rd file, violates the CRAN policy
@@ -51,7 +61,8 @@ development of the package, please use the issue tracker on GitHub.
 
 ### Branches
 
-Please note that all development happens in the `develop` branch. Pull requests against the `master` branch will be rejected, as it is reserved for the current stable release.
+Please note that all development happens in the `develop` branch. Pull requests against the `master`
+branch will be rejected, as it is reserved for the current stable release.
 
 ## Licence
 
