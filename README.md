@@ -55,7 +55,7 @@ Please note that all development happens in the `develop` branch. Pull requests 
 
 ## Licence
 
-Copyright 2012-2015 Meik Michalke <meik.michalke@hhu.de>
+Copyright 2012-2017 Meik Michalke <meik.michalke@hhu.de>
 
 roxyPackage is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
