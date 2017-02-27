@@ -144,6 +144,10 @@
 #'    Mac OS X should be copied, and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="mavericks"}
 #'    would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
 #'    make sure they're correctly transferred to your server, where applicable.
+#' @param mirror.list A character string, if set is assumed to be pointing to a list of mirrors users should choose from, rather than using one particular
+#'    host name for your Debian repository. Will only be used in the HTML instructions for a Debian repository.
+#' @param URL.path A character string, can be used to define a path users would need to specify in addition to a mirror's main URL (\code{mirror.list}).
+#'    It must start and end with a slash ("/"). Will only be used in combination with \code{mirror.list}.
 #' @param ... Additional options passed through to \code{roxygenize}.
 #' @references
 #' [1] \url{http://cran.r-project.org/package=roxygen2}
@@ -213,6 +217,8 @@ roxy.package <- function(
   Rbuildignore=NULL,
   Rinstignore=NULL,
   OSX.repo=list(main="contrib", symlinks="mavericks"),
+  mirror.list=NULL,
+  URL.path="/",
   ...){
 
   # avoid some NOTEs from R CMD check
@@ -272,6 +278,8 @@ roxy.package <- function(
         Rbuildignore=Rbuildignore,
         Rinstignore=Rinstignore,
         OSX.repo=OSX.repo,
+        mirror.list=mirror.list,
+        URL.path=URL.path,
         ...)
     }
     return(invisible(NULL))
@@ -856,7 +864,7 @@ roxy.package <- function(
     } else {}
     url.debRepo.info <- NULL
     if(file_test("-f", deb.package)){
-      if(!is.null(URL)){
+      if(any(!is.null(URL), !is.null(mirror.list))){
         # generate repository info
         url.debRepo.info <- file.path(repo.pckg.info, "deb_repo.html")
         cat(debRepoInfo(
@@ -870,11 +878,14 @@ roxy.package <- function(
           keyring.options=deb.defaults[["keyring.options"]],
           page.css="../web.css",
           package.full=pckg.name.deb,
-          repo.path=deb.repo.path),
+          repo.path=deb.repo.path,
+          mirror.list=mirror.list,
+          URL.path=URL.path
+        ),
         file=url.debRepo.info)
         message(paste0("html: updated ", url.debRepo.info))
       } else {
-        message("html: you need to specify 'URL' to generate debian repository information!")
+        message("html: you need to specify either 'URL' or 'mirror.list' to generate debian repository information!")
       }
     } else {}
     # check if there is actually any built debian package in the repo

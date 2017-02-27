@@ -13,7 +13,8 @@ roxy.package(pck.source.dir, pck.version, pck.description, R.libs, repo.root,
   "--pdf --no-preview"), URL = NULL, deb.options = NULL,
   readme.options = NULL, ChangeLog = list(changed = c("initial release"),
   fixed = c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
-  OSX.repo = list(main = "contrib", symlinks = "mavericks"), ...)
+  OSX.repo = list(main = "contrib", symlinks = "mavericks"),
+  mirror.list = NULL, URL.path = "/", ...)
 }
 \arguments{
 \item{pck.source.dir}{Character string,
@@ -142,6 +143,14 @@ Mac OS X should be copied,
       and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="mavericks"}
 would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
 make sure they're correctly transferred to your server, where applicable.}
+
+\item{mirror.list}{A character string,
+      if set is assumed to be pointing to a list of mirrors users should choose from, rather than using one particular
+host name for your Debian repository. Will only be used in the HTML instructions for a Debian repository.}
+
+\item{URL.path}{A character string,
+      can be used to define a path users would need to specify in addition to a mirror's main URL (\code{mirror.list}).
+It must start with a slash ("/") and end without one. Will only be used in combination with \code{mirror.list}.}
 
 \item{...}{Additional options passed through to \code{roxygenize}.}
 }

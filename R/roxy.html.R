@@ -97,15 +97,28 @@ rx.html.switch <- function(desc, field){
 # generates HTML code with info how to install packages from the deb repository
 #' @import XiMpLe
 debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
-  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL, repo.path=NULL){
-  apt.base.txt <- paste(paste0(URL, "/deb"), dist, comp, sep=" ")
+  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL, repo.path=NULL,
+  mirror.list=NULL, URL.path="/"){
+  # check if URL points to a list of mirrors
+  if(!is.null(mirror.list)){
+    apt.base.txt <- paste(paste0("[ftp|http]://<mirror>", URL.path, "deb"), dist, comp, sep=" ")
+    instruction <- XMLNode("p",
+      "Select a server near you from ",
+      XMLNode("a", "this list of mirrors", attrs=list(href=mirror.list, target="_blank")),
+      " and add the repository to your configuration (e.g.,",
+      XMLNode("code", paste0("/etc/apt/sources.list.d/", repo, ".list")),
+      "):"
+    )
+  } else {
+    apt.base.txt <- paste(paste0(URL, "/deb"), dist, comp, sep=" ")
+    instruction <- XMLNode("p", "Add the repository to your configuration (e.g.,", XMLNode("code", paste0("/etc/apt/sources.list.d/", repo, ".list")), "):")
+  }
   apt.types <- c("# for binary packages:\ndeb", "# for source packages:\ndeb-src")
-  stopifnot(!identical(apt.types, character()))
   apt.full.txt <- paste(paste(apt.types, apt.base.txt, sep=" "), collapse="\n")
   xml.obj.list <- list(
       XMLNode("h2", "Install R packages from this Debian repository"),
       XMLNode("h4", "Configure repository"),
-      XMLNode("p", "Add the repository to your configuration (e.g.,", XMLNode("code", paste0("/etc/apt/sources.list.d/", repo, ".list")), "):"),
+      instruction,
       XMLNode("pre", paste0("\n", apt.full.txt), attrs=list(class="repo"))
     )
 
@@ -193,7 +206,7 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
       refer="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd")
     )
 
-  return(pasteXML(html.page))
+  return(pasteXML(html.page, indent.by=" "))
 } ## end function debRepoInfo()
 
 
