@@ -32,6 +32,8 @@ set.roxyEnv <- function(name="roxygenVersion", value=2){
   assign(name, value, envir=.roxyPackage.env)
 }
 
+# set default function to roxygenize docs
+set.roxyEnv(name="roxyFunction", value=roxygen2::roxygenize)
 # set default version of roxygen to use
 set.roxyEnv(name="roxygenVersion", value=2)
 # set default for 'Rdevel'

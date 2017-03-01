@@ -544,11 +544,19 @@ roxy.package <- function(
 #     # there's still issues with S4 classes, only said to be working with devtools,
 #     # but we don't want to add new dependencies just to get this working.
 #     # so here's a call which seems to do the trick, alas we don't yet know why... ;-)
-#     if(packageVersion("roxygen2") > "2.2.2"){
+#     if(packageVersion("roxygen2") >= "2.2.2"){
 #       message("roxy: applying workaround for roxygen2 >= 3.0.0...")
 #       local(dummyResult <- roxygen2:::source_package(pck.source.dir))
 #     } else {}
-    roxygen2::roxygenize(pck.source.dir, ...)
+
+      # another experimental feature:
+      # sometimes roxygen2::roxygenize is somewhat buggy, but functions like devtools::document() still work.
+      # manually setting "roxyFunction" makes it possible to use that function instead.
+      # the default value is set in roxyPackage-internal.R!
+      useRoxyFunction <- get.roxyEnv(name="roxyFunction")
+      stopifnot(is.function(useRoxyFunction))
+      # should normally default to roxygen2::roxygenize(pck.source.dir, ...)
+      useRoxyFunction(pck.source.dir, ...)
   } else {}
 
   if("cleanRd" %in% actions){

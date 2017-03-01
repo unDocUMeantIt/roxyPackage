@@ -7,6 +7,11 @@ added:
   - two new options to roxy.package(), "mirror.list" and "URL.path", can be used
     to generate info for debian repositories that use mirror servers instead of
     one static URL
+  - new EXPERIMENTAL feature: there are cases where roxygenize() somehow fails
+    but e.g. document() of the devtools package doesn't. you can now use
+    roxyPackage:::set.roxyEnv(name="roxyFunction", value=devtools::document) to
+    overwrite the function that is being used to roxygenize the docs. use this
+    with caution! it is experimental for a reason!
 
 changes in version 0.05-2 (2017-02-26)
 fixed:
