@@ -45,9 +45,10 @@
 #'    are only printed.
 #' @param graceful Logical, if \code{TRUE} the process will not freak out because of missing files. Use this
 #'    for instance if you deleted files from the repo but did not update the package indices.
-#' @param deb.options A list of options that must be properly set if you want to archive Debian packages. After packages were
-#'    removed from the repo, all Packages, Sources and Release files must be re-written and signed, and this is the
-#'    minimum information required: \code{distribution}, \code{component}, \code{gpg.key}, \code{keyring}.
+#' @param deb.options A named list of options that must be properly set if you want to archive Debian packages. After packages were
+#'    removed from the repo, all Packages, Sources and Release files must be re-written and signed, and all of the following
+#'    information is required: \code{distribution}, \code{component}, \code{gpg.key}, and \code{keyring}
+#'    (which might be \code{NULL}). If you omit \code{gpg.version}, version 2 is assumed by default.
 #'    See \code{\link[roxyPackage:debianize]{debianize}} for details.
 #' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run archive.packages() in a sandbox.
 #' @export
@@ -74,6 +75,7 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
   deb.options=list(
     distribution="unstable",
     component="main",
+    gpg.version=2,
     gpg.key=NULL,
     keyring=NULL
   )){
@@ -170,10 +172,15 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
             deb.gen.package.index(
               repo=file.path(deb.repo, "deb"), binary=FALSE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
             )
+            # default to gpg2 if no info given
+            if(is.null(deb.options[["gpg.key"]])){
+              deb.options[["gpg.key"]] <- 2
+            } else {}
             deb.update.release(
               repo.root=deb.repo,
               gpg.key=deb.options[["gpg.key"]],
               keyring=deb.options[["keyring"]],
+              gpg=Sys.which(GPGversion(key=deb.options[["gpg.key"]], version=deb.options[["gpg.version"]])),
               distribution=deb.options[["distribution"]],
               component=deb.options[["component"]]
             )
