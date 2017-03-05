@@ -106,8 +106,8 @@
 #'      \item{Homepage}{URL in \code{DESCRIPTION}}
 #'    }
 #'    Refer to [1] for further available fields in the \code{./debian/control} file. In case you would like to add to the fields definig relations to other packages
-#'    like \code{Build.Depends} or \code{Depends} rather than replacing them, provide a named character vector with a value called "append". For example:
-#'    \code{Depends=c(append="libmysql++3")}.
+#'    like \code{Build.Depends.Indep} or \code{Depends} rather than replacing them, provide a named list with a character vector called "append". For example:
+#'    \code{Depends=list(append=c("libmysql++3"))}.
 #' @param actions Character vector, naming the actions to perform:
 #'    \describe{
 #'      \item{"deb"}{Debianize the package sources.}

@@ -156,6 +156,31 @@ debianizeDepends <- function(dep, origin="cran", origin.alt=list(), R="r-base-co
 } ## end function debianizeDepends()
 
 
+## function RVersionFromDESCRIPTION()
+# this is a shortcut to get the minimum R version from the DESCRIPTION object
+# returns NULL if R istn't specified at all or shorter than x.y
+RVersionFromDESCRIPTION <- function(R.description){
+  result <- NULL
+  allDeps <- splitDepends(queryDescription(R.description, dep="Depends"))
+  if("R" %in% allDeps[,"package"]){
+    RVersRow <- which(allDeps[,"package"] %in% "R")
+    stopifnot(isTRUE(length(RVersRow) == 1))
+    RVersion <- allDeps[RVersRow, "version"]
+    result <- as.character(gsub("[^[:digit:].]", "", RVersion))
+    # ensure we have the right format
+    if(!grepl("^([[:digit:]]+).([[:digit:]]+).([[:digit:]]+)$", result)){
+      if(grepl("^([[:digit:]]+).([[:digit:]]+)$", result)){
+        result <- paste0(result, ".0")
+      } else {
+        warning("R version in DESCRIPTION is shorter than x.y or otherwise strangely formatted!", call.=FALSE)
+        result <- NULL
+      }
+    } else {}
+  } else {}
+  return(result)
+} ## end function RVersionFromDESCRIPTION()
+
+
 ## function deb.check.sources()
 # checks if we're dealing with a sources directory, a tarball or need to download something
 deb.check.sources <- function(src,
@@ -421,15 +446,29 @@ check.append <- function(dep, check="append", value=FALSE){
 
 ## function queryDescription()
 # little helper to get clean dependency info from DESCRIPTION objects
-queryDescription <- function(description, dep=c("Depends")){
-  description <- as.data.frame(description)
-  foundDeps <- c()
-  for (thisDep in dep){
-    if(thisDep %in% colnames(description)){
-      foundDeps <- c(foundDeps, trim(unlist(strsplit(as.character(description[[thisDep]]), ","))))
-    } else {}
+queryDescription <- function(description, dep=c("Depends"), collapse=TRUE){
+  # debian descriptions are usually lists, R DESCRIPTIONs usually matrices
+  # since this previously caused silend errors, let's quit if something unexpected is found here
+  stopifnot(any(is.matrix(description), is.data.frame(description), is.list(description)))
+  if(is.matrix(description)){
+    # make a data.frame to be able to use [[...]] for both R and debian descriptions
+    description <- as.data.frame(description, stringsAsFactors=FALSE)
+  } else {}
+  if(isTRUE(collapse)){
+    foundDeps <- c()
+    for (thisDep in dep){
+      # names() should do for both lists and data.frames
+      if(thisDep %in% names(description)){
+        foundDeps <- c(foundDeps, trim(unlist(strsplit(as.character(description[[thisDep]]), ","))))
+      } else {}
+    }
+    result <- paste0(foundDeps, collapse=", ")
+  } else {
+    # this should only be done for one field at a time
+    stopifnot(isTRUE(length(dep) == 1))
+    result <- description[[dep]]
   }
-  return(paste0(foundDeps, collapse=", "))
+  return(result)
 } ## function queryDescription()
 
 
@@ -449,19 +488,27 @@ deb.prepare.description <- function(deb.description=NULL, R.description=NULL, or
 
   if(isTRUE(isRpackage)){
     thisRVers <- paste(getRvers(R.homes=R.home(), win=TRUE), "0", sep=".")
+    # for package builds, we probably don't need the R version currently used
+    # try to fallback to the version defined in DESCRIPTION
+    if(!is.null(R.description)){
+      buildDepRVers <- RVersionFromDESCRIPTION(R.description)
+      if(is.null(buildDepRVers)){
+        buildDepRVers <- thisRVers
+      } else {}
+    } else {}
 
-    if(is.null(deb.description[["Depends"]]) || check.append(queryDescription(deb.description, dep="Depends"))){
+    if(is.null(deb.description[["Depends"]]) | check.append(queryDescription(deb.description, dep="Depends", collapse=FALSE))){
       # generate alternative debian package dependencies
       deb.description[["Depends"]] <- debianizeDepends(
         dep=queryDescription(R.description, dep=c("Depends", "Imports")), origin=origin,
-        origin.alt=origin.alt, forceRVersion=thisRVers, append=check.append(queryDescription(deb.description, dep="Depends"), value=TRUE), replace.dots=replace.dots)
+        origin.alt=origin.alt, forceRVersion=thisRVers, append=check.append(queryDescription(deb.description, dep="Depends", collapse=FALSE), value=TRUE), replace.dots=replace.dots)
     } else {
       deb.description[["Depends"]] <- queryDescription(deb.description, dep="Depends")
     }
     # if arch is "all", use Build.Depends.Indep, else Build.Depends
     build.dep.field <- ifelse(identical(arch, "all"), "Build.Depends.Indep", "Build.Depends")
-    if(is.null(deb.description[[build.dep.field]]) || check.append(queryDescription(deb.description, dep=build.dep.field))){
-      build.depends <- paste0("debhelper (>> 7.0.0), r-base-dev (>= ", thisRVers, "), cdbs")
+    if(is.null(deb.description[[build.dep.field]]) | check.append(queryDescription(deb.description, dep=build.dep.field, collapse=FALSE))){
+      build.depends <- paste0("debhelper (>> 7.0.0), r-base-dev (>= ", buildDepRVers, "), cdbs")
       r.base.core <- gsub("r-base-core[^,]*[[:space:]]*[,]*[[:space:]]*", "", deb.description[["Depends"]])
       if(!identical(r.base.core, "")){
         build.depends <- paste(build.depends, r.base.core, sep=", ")
@@ -474,12 +521,12 @@ deb.prepare.description <- function(deb.description=NULL, R.description=NULL, or
     } else {
       deb.description[[build.dep.field]] <- paste(deb.description[[build.dep.field]], collapse=", ")
     }
-    if(is.null(deb.description[["Suggests"]]) || check.append(queryDescription(deb.description, dep="Suggests"))){
+    if(is.null(deb.description[["Suggests"]]) | check.append(queryDescription(deb.description, dep="Suggests", collapse=FALSE))){
       if(!is.null(R.description[["Suggests"]])){
         deb.description[["Suggests"]] <- debianizeDepends(dep=queryDescription(R.description, dep="Suggests"), origin=origin,
-            origin.alt=origin.alt, forceRVersion=NULL, append=check.append(queryDescription(deb.description, dep="Suggests"), value=TRUE), replace.dots=replace.dots)
+            origin.alt=origin.alt, forceRVersion=NULL, append=check.append(queryDescription(deb.description, dep="Suggests", collapse=FALSE), value=TRUE), replace.dots=replace.dots)
       } else {
-        deb.description[["Suggests"]] <- paste(check.append(queryDescription(deb.description, dep="Suggests"), value=TRUE), collapse=", ")
+        deb.description[["Suggests"]] <- paste(check.append(queryDescription(deb.description, dep="Suggests", collapse=FALSE), value=TRUE), collapse=", ")
       }
     } else {
       deb.description[["Suggests"]] <- queryDescription(deb.description, dep="Suggests")

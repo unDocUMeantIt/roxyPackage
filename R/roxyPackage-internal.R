@@ -102,7 +102,7 @@ getRvers <- function(R.homes=R.home(), win=FALSE){
     } else {
       R.Version.full <- shell(paste0(R.bin, " --version"), translate=TRUE, intern=TRUE)
     }
-    R.Version.full <- R.Version.full[grep("R version ([[:digit:]]).([[:digit:]])", R.Version.full)]
+    R.Version.full <- R.Version.full[grep("R version ([[:digit:]]+).([[:digit:]]+)", R.Version.full)]
     R.Version.full <- gsub("R version ([[:digit:]]+).([[:digit:]]+)([.]?)([[:digit:]]+)(.*)", "\\1.\\2\\3\\4", R.Version.full, perl=TRUE)
   }
   if(isTRUE(win)){
