@@ -150,7 +150,7 @@ host name for your Debian repository. Will only be used in the HTML instructions
 
 \item{URL.path}{A character string,
       can be used to define a path users would need to specify in addition to a mirror's main URL (\code{mirror.list}).
-It must start with a slash ("/") and end without one. Will only be used in combination with \code{mirror.list}.}
+It must start and end with a slash ("/"). Will only be used in combination with \code{mirror.list}.}
 
 \item{...}{Additional options passed through to \code{roxygenize}.}
 }

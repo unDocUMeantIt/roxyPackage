@@ -8,7 +8,7 @@ archive.packages(repo.root, to.dir = "Archive", keep = 1,
   keep.revisions = 2, package = NULL, type = "source",
   archive.root = repo.root, overwrite = FALSE, reallyDoIt = FALSE,
   graceful = FALSE, deb.options = list(distribution = "unstable", component
-  = "main", gpg.key = NULL, keyring = NULL))
+  = "main", gpg.version = 2, gpg.key = NULL, keyring = NULL))
 }
 \arguments{
 \item{repo.root}{Path to the repository root, i.e.,
@@ -53,11 +53,13 @@ are only printed.}
       if \code{TRUE} the process will not freak out because of missing files. Use this
 for instance if you deleted files from the repo but did not update the package indices.}
 
-\item{deb.options}{A list of options that must be properly set if you want to archive Debian packages. After packages were
+\item{deb.options}{A named list of options that must be properly set if you want to archive Debian packages. After packages were
 removed from the repo, all Packages,
-      Sources and Release files must be re-written and signed, and this is the
-minimum information required: \code{distribution}, \code{component}, \code{gpg.key},
-      \code{keyring}.
+      Sources and Release files must be re-written and signed, and all of the following
+information is required: \code{distribution}, \code{component}, \code{gpg.key},
+      and \code{keyring}
+(which might be \code{NULL}). If you omit \code{gpg.version},
+      version 2 is assumed by default.
 See \code{\link[roxyPackage:debianize]{debianize}} for details.}
 }
 \description{

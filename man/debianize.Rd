@@ -71,9 +71,9 @@ Note that if certain key values are missing,
   \item{Homepage}{URL in \code{DESCRIPTION}}
 }
 Refer to [1] for further available fields in the \code{./debian/control} file. In case you would like to add to the fields definig relations to other packages
-like \code{Build.Depends} or \code{Depends} rather than replacing them,
-      provide a named character vector with a value called "append". For example:
-\code{Depends=c(append="libmysql++3")}.}
+like \code{Build.Depends.Indep} or \code{Depends} rather than replacing them,
+      provide a named list with a character vector called "append". For example:
+\code{Depends=list(append=c("libmysql++3"))}.}
 
 \item{depends.origin}{A character string to set the default origin for packages which are a dependency of this one. In case all dependencies can be
 met by Debian packages from CRAN releases,
