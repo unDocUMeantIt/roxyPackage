@@ -6,6 +6,8 @@ unreleased:
 fixed:
   - debianize(): the "append" feature for dependencies in was broken
   - archive.packages() now defaults to gpg2 as well
+  - debianize(): the HTML instructions look pretty again, worked around a
+    layout problem caused by XiMpLe's auto-indentation in <pre> tags
 changed:
   - debianize(): the R version used for build dependencies in "control"
     is now taken from DESCRIPTION by default, not the current version

@@ -115,11 +115,13 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
   }
   apt.types <- c("# for binary packages:\ndeb", "# for source packages:\ndeb-src")
   apt.full.txt <- paste(paste(apt.types, apt.base.txt, sep=" "), collapse="\n")
+  # XiMpLe currently suffers from a layout glitch: it tries to auto-indent tag content, which doesn't look so great in <pre> tags
+  # therefore, all values of <pre> tags start with an empty line to produce nice output in the web browser
   xml.obj.list <- list(
       XMLNode("h2", "Install R packages from this Debian repository"),
       XMLNode("h4", "Configure repository"),
       instruction,
-      XMLNode("pre", paste0("\n", apt.full.txt), attrs=list(class="repo"))
+      XMLNode("pre", paste0("&nbsp;", paste0("\n", apt.full.txt)), attrs=list(class="repo")) # the "&nbsp;" works around a glitch in XiMpLe
     )
 
   # if we do the update call before installing the OpenPGP package, we don't need to
@@ -154,7 +156,7 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
         list(
           XMLNode("h4", "Add OpenPGP key"),
           XMLNode("p", "To be able to make use of secure apt, install the repository's OpenPGP keyring package:"),
-          XMLNode("pre", gpg.txt, attrs=list(class="repo"))
+          XMLNode("pre", paste0("&nbsp;\n", gpg.txt), attrs=list(class="repo")) # the "&nbsp;" works around a glitch in XiMpLe
         ))
     } else {
       message("html: debian keyring package not in repo yet, skipping docs!")
@@ -167,7 +169,7 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
       list(
         XMLNode("h4", "Install packages"),
         XMLNode("p", "You can then install the package:"),
-        XMLNode("pre", pkg.txt, attrs=list(class="repo"))
+        XMLNode("pre", paste0("&nbsp;\n", pkg.txt), attrs=list(class="repo")) # the "&nbsp;" works around a glitch in XiMpLe
       ))
   } else {}
 
