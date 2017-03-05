@@ -656,7 +656,7 @@ deb.gen.control <- function(srcs.name, deb.name, description, R.dscrptn, deb.dir
       fullDescription <- as.character(R.dscrptn[["Description"]])
     } else {}
     if(isTRUE(isRpackage)){
-      fullDescription <- paste0("GNU R package: ", fullDescription)
+      fullDescription <- paste0("GNU R package \"", R.dscrptn[["Title"]], "\"\n\n", fullDescription)
     } else {}
 
     deb.txt.control.pck <- data.frame(
