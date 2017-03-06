@@ -678,3 +678,39 @@ excludeVCSDirs <- function(src, exclude.dirs=c(".svn", "CVS", ".git", "_darcs", 
   }
   return(tar.extraFlags)
 } ## end function excludeVCSDirs()
+
+
+## function getURL()
+# takes the value of the URL argument and returns either NULL, if no value was set,
+# or the URL to use for the given purpose, in case multiple URLs were defined
+getURL <- function(URL=NULL, purpose="default"){
+  validPurposes <- c("default", "R", "debian")
+  stopifnot(purpose %in% validPurposes)
+  if(any(is.null(URL), is.character(URL) & isTRUE(length(URL) == 1))){
+    if(any(is.null(names(URL)), identical(names(URL), "default"))){
+      result <- URL
+    } else {
+      stop(simpleError(paste0("if you only use one named 'URL' value, the name \"default\" is mandatory!")))
+    }
+  } else if(is.character(URL) & isTRUE(length(URL) > 1)){
+    URLnames <- names(URL)
+    if(
+      all(
+        isTRUE(length(URLnames) == length(URL)),
+        all(URLnames %in% validPurposes),
+        "default" %in% URLnames
+      )
+    ){
+      if(purpose %in% URLnames){
+        result <- URL[[purpose]]
+      } else {
+        result <- URL[["default"]]
+      }
+    } else {
+      stop(simpleError(paste0("for 'URL' values, only use valid names (\"", paste0(validPurposes, collapse="\", \""), "\"), where \"default\" is mandatory!")))
+    }
+  } else {
+    stop(simpleError("if you set the 'URL' argument, it must a character vector with >= 1 values!"))
+  }
+  return(result)
+} ## end function getURL()
