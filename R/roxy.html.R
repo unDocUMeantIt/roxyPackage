@@ -97,11 +97,13 @@ rx.html.switch <- function(desc, field){
 # generates HTML code with info how to install packages from the deb repository
 #' @import XiMpLe
 debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
-  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL, repo.path=NULL,
-  mirror.list=NULL, URL.path="/"){
+  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL, repo.path=NULL){
+  mirror.list <- getURL(URL, purpose="mirror.list")
+  debian.path <- getURL(URL, purpose="debian.path")
+  deb.URL <- getURL(URL, purpose="debian")
   # check if URL points to a list of mirrors
   if(!is.null(mirror.list)){
-    apt.base.txt <- paste(paste0("[ftp|http]://<mirror>", URL.path, "deb"), dist, comp, sep=" ")
+    apt.base.txt <- paste(paste0("[ftp|http]://<mirror>", debian.path), dist, comp, sep=" ")
     instruction <- XMLNode("p",
       "Select a server near you from ",
       XMLNode("a", "this list of mirrors", attrs=list(href=mirror.list, target="_blank")),
@@ -110,7 +112,7 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
       "):"
     )
   } else {
-    apt.base.txt <- paste(paste0(URL, "/deb"), dist, comp, sep=" ")
+    apt.base.txt <- paste(paste0(deb.URL, debian.path), dist, comp, sep=" ")
     instruction <- XMLNode("p", "Add the repository to your configuration (e.g.,", XMLNode("code", paste0("/etc/apt/sources.list.d/", repo, ".list")), "):")
   }
   apt.types <- c("# for binary packages:\ndeb", "# for source packages:\ndeb-src")

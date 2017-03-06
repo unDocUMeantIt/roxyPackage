@@ -684,16 +684,23 @@ excludeVCSDirs <- function(src, exclude.dirs=c(".svn", "CVS", ".git", "_darcs", 
 # takes the value of the URL argument and returns either NULL, if no value was set,
 # or the URL to use for the given purpose, in case multiple URLs were defined
 getURL <- function(URL=NULL, purpose="default"){
-  validPurposes <- c("default", "R", "debian")
+  URLnames <- names(URL)
+  validPurposes <- c("default", "debian", "mirror.list", "debian.path")
   stopifnot(purpose %in% validPurposes)
   if(any(is.null(URL), is.character(URL) & isTRUE(length(URL) == 1))){
-    if(any(is.null(names(URL)), identical(names(URL), "default"))){
-      result <- URL
+    # these are invalid/meaningless here
+    if(identical(purpose, "mirror.list")){
+      result <- NULL
+    } else if(identical(purpose, "debian.path")){
+      result <- "/deb"
     } else {
-      stop(simpleError(paste0("if you only use one named 'URL' value, the name \"default\" is mandatory!")))
+      if(any(is.null(URLnames), identical(URLnames, "default"))){
+        result <- as.character(URL)
+      } else {
+        stop(simpleError(paste0("if you only use one named 'URL' value, the name \"default\" is mandatory!")))
+      }
     }
   } else if(is.character(URL) & isTRUE(length(URL) > 1)){
-    URLnames <- names(URL)
     if(
       all(
         isTRUE(length(URLnames) == length(URL)),
@@ -703,8 +710,23 @@ getURL <- function(URL=NULL, purpose="default"){
     ){
       if(purpose %in% URLnames){
         result <- URL[[purpose]]
+        if(
+          all(
+            identical(purpose, "debian.path"),
+            !grepl("^/", result)
+          )
+        ){
+          stop(simpleError("if you set \"debian.path\" in 'URL', it must start with a slash!"))
+        } else {}
       } else {
-        result <- URL[["default"]]
+        # check a special cases
+        if(identical(purpose, "mirror.list")){
+          result <- NULL
+        } else if(identical(purpose, "debian.path")){
+          result <- "/deb"
+        } else {
+          result <- URL[["default"]]
+        }
       }
     } else {
       stop(simpleError(paste0("for 'URL' values, only use valid names (\"", paste0(validPurposes, collapse="\", \""), "\"), where \"default\" is mandatory!")))

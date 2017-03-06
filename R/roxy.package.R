@@ -116,10 +116,23 @@
 #' @param Rcmd.options A named character vector with options to be passed on to the internal calls of \code{R CMD build},
 #'    \code{R CMD INSTALL}, \code{R CMD check} and \code{R CMD Rd2pdf} (or \code{R CMD Rd2dvi} for R < 2.15). Change these only if you know what you're doing!
 #'    Will be passed on as given here. To deactivate, options must explicitly be se to \code{""}, missing options will be used with the default values.
-#' @param URL A character string defining the URL to the root of the repository (i.e., which holds the directories \code{src}
-#'    etc.). This is not the path to the local file system, but should be the URL to the repository as it is available
+#' @param URL Either a single character string defining the URL to the root of the repository (i.e., which holds the directories \code{src}
+#'    etc., see below), or a named character vector if you need different URLs for different services. If you provide more than one URL, these are valid
+#'    names for values:
+#'    \describe{
+#'      \item{\code{default}}{A mandatory fallback URL, will be used if not overridden by one of the other values. This is fully equivalent to the global value
+#'        if only one character string is provided.}
+#'      \item{\code{debian}}{Used for the Debian package repository if different from the default.}
+#'      \item{\code{mirror.list}}{URL pointing to a list of mirrors users should choose from, rather than using one particular host name for the Debian repository.
+#'        Will only be used in the HTML instructions for a Debian repository.}
+#'      \item{\code{debian.path}}{Can be used to define a custom path users would need to specify in addition to the main URL.
+#'        Defaults to \code{"/deb"}, and if given, it must start with a slash.
+#'        Will be used in combination with \code{default}, \code{debian} or \code{mirror.list}. It is not advisable to combine it with \code{default}, because you will
+#'        have to manually rename the directory generated after each run!}
+#'    }
+#'    These URLs are not the path to the local file system, but should be the URLs to the respecive repository as it is available
 #'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"}, \code{"deb"}, and possibly \code{"html"} --
-#'    if \code{flattrUser} is also set in \code{readme.options}, a Flattr button will be added to the HTML page, using this value.
+#'    if \code{flattrUser} is also set in \code{readme.options}, a Flattr button will be added to the HTML page, using the default URL.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
 #'    will be used.
@@ -144,10 +157,6 @@
 #'    Mac OS X should be copied, and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="mavericks"}
 #'    would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
 #'    make sure they're correctly transferred to your server, where applicable.
-#' @param mirror.list A character string, if set is assumed to be pointing to a list of mirrors users should choose from, rather than using one particular
-#'    host name for your Debian repository. Will only be used in the HTML instructions for a Debian repository.
-#' @param URL.path A character string, can be used to define a path users would need to specify in addition to a mirror's main URL (\code{mirror.list}).
-#'    It must start and end with a slash ("/"). Will only be used in combination with \code{mirror.list}.
 #' @param ... Additional options passed through to \code{roxygenize}.
 #' @references
 #' [1] \url{http://cran.r-project.org/package=roxygen2}
@@ -217,8 +226,6 @@ roxy.package <- function(
   Rbuildignore=NULL,
   Rinstignore=NULL,
   OSX.repo=list(main="contrib", symlinks="mavericks"),
-  mirror.list=NULL,
-  URL.path="/",
   ...){
 
   # avoid some NOTEs from R CMD check
@@ -278,8 +285,6 @@ roxy.package <- function(
         Rbuildignore=Rbuildignore,
         Rinstignore=Rinstignore,
         OSX.repo=OSX.repo,
-        mirror.list=mirror.list,
-        URL.path=URL.path,
         ...)
     }
     return(invisible(NULL))
@@ -418,7 +423,7 @@ roxy.package <- function(
     newDefaults=list(
       pck.source.dir=pck.source.dir,
       repo.root=repo.root,
-      deb.keyring.options=list(URL=URL),
+      deb.keyring.options=list(URL=getURL(URL, purpose="debian")),
       keep.existing.orig="binonly" %in% actions
     )
   )
@@ -722,7 +727,7 @@ roxy.package <- function(
     if(is.null(URL)){
       warning("news: no URL specified, RSS feed creation was skipped!", call.=FALSE)
     } else {
-      package.URL <- paste(gsub("/*$", "", URL), "pckg", pck.package, sep="/")
+      package.URL <- paste(gsub("/*$", "", getURL(URL, purpose="default")), "pckg", pck.package, sep="/")
       RSS.atom.URL <- paste(package.URL, RSS.file.name, sep="/")
       news2rss(
         news=pckg.NEWS.Rd, rss=pckg.NEWS.rss, html=FALSE, encoding="UTF-8",
@@ -872,7 +877,7 @@ roxy.package <- function(
     } else {}
     url.debRepo.info <- NULL
     if(file_test("-f", deb.package)){
-      if(any(!is.null(URL), !is.null(mirror.list))){
+      if(!is.null(URL)){
         # generate repository info
         url.debRepo.info <- file.path(repo.pckg.info, "deb_repo.html")
         cat(debRepoInfo(
@@ -886,14 +891,12 @@ roxy.package <- function(
           keyring.options=deb.defaults[["keyring.options"]],
           page.css="../web.css",
           package.full=pckg.name.deb,
-          repo.path=deb.repo.path,
-          mirror.list=mirror.list,
-          URL.path=URL.path
+          repo.path=deb.repo.path
         ),
         file=url.debRepo.info)
         message(paste0("html: updated ", url.debRepo.info))
       } else {
-        message("html: you need to specify either 'URL' or 'mirror.list' to generate debian repository information!")
+        message("html: you need to specify 'URL' to generate debian repository information!")
       }
     } else {}
     # check if there is actually any built debian package in the repo
@@ -942,7 +945,7 @@ roxy.package <- function(
       url.deb.repo=url.deb.repo, main.path.mac=OSX.repo[["main"]],
       title=html.title, cite=pckg.cite.file.html, news=url.NEWS,
       changelog=pckg.changelog, rss.file=RSS.file.name,
-      flattrUser=readme.options[["flattrUser"]], URL=URL
+      flattrUser=readme.options[["flattrUser"]], URL=getURL(URL, purpose="default")
     )
     target.file.pckg <- file.path(repo.pckg.info, "index.html")
     cat(package.html, file=target.file.pckg)
