@@ -430,8 +430,8 @@ roxy.package <- function(
   # try to set pckg.name.deb and deb.repo.path
   # this will only work if repo.root is unchanged, the rest is too messy now...
   # don't ry to replace this without checking the outcome in the HTML file!
-  deb.repo.path.part <- file.path("deb", "dists", deb.defaults[["distribution"]], deb.defaults[["component"]], deb.defaults[["arch"]])
-  deb.repo.path <- file.path("..", "..", deb.repo.path.part)
+  deb.repo.path.part <- debRepoPath(dist=deb.defaults[["distribution"]], comp=deb.defaults[["component"]], arch=deb.defaults[["arch"]], part=TRUE)
+  deb.repo.path <- debRepoPath(dist=deb.defaults[["distribution"]], comp=deb.defaults[["component"]], arch=deb.defaults[["arch"]], URL=URL)
   # need to get repo.name to be able to call eval() on deb.defaults[["origin"]], because that pastes repo.name
   repo.name <- deb.defaults[["repo.name"]]
   deb.defaults[["origin"]] <- eval(deb.defaults[["origin"]])
@@ -785,17 +785,8 @@ roxy.package <- function(
       stop(simpleError("repo: you *must* provide a character string for \"main\" via OSX.repo (mac)!"))
     }
     removeIfExists(filePath=macosx.package)
-#     # since not all tar implementations (especially the BSD default on Mac OS X) support --exclude-vcs,
-#     # we'll exclude these manually
-#     VCS.directories <- c(".svn", "CVS", ".git", "_darcs", ".hg")
-#     VCS.allDirs <- list.dirs(file.path(R.libs,pck.package))
-#     VCS.excludeDirs <- VCS.allDirs[grepl(paste(paste0(".*", VCS.directories, "$"), collapse="|"), VCS.allDirs)]
-#     if(length(VCS.excludeDirs) > 0){
-#       tar.extraFlags <- paste(paste0(" --exclude='", VCS.excludeDirs, "'"), collapse="")
-#       message(paste("repo: excluded these directories from the mac binary:\n  ", VCS.excludeDirs, collapse="\n  "))
-#     } else {
-#       tar.extraFlags <- ""
-#     }
+    # since not all tar implementations (especially the BSD default on Mac OS X) support --exclude-vcs,
+    # we'll exclude these manually
     tar.extraFlags <- excludeVCSDirs(
       src=file.path(R.libs,pck.package),
       exclude.dirs=c(".svn", "CVS", ".git", "_darcs", ".hg"),
@@ -909,7 +900,7 @@ roxy.package <- function(
     # check for docs to link
     pdf.docs <- file.path(repo.pckg.info, pckg.pdf.doc)
     # gather information (title, file name) about built vignettes
-    vig.info <- tools::getVignetteInfo(package=pck.package)
+    vig.info <- tools::getVignetteInfo(package=pck.package, lib.loc=R.libs)
     if(file_test("-f", pdf.docs)){
       url.doc <- pckg.pdf.doc
     } else {}
@@ -918,9 +909,15 @@ roxy.package <- function(
         url.vgn <- vig.info[, "PDF"]
         title.vgn <- vig.info[, "Title"]
       } else{
-        stop(simpleError(paste("doc: the output format of tools::getVignetteInfo()", 
-                               "is not compatible with this version of roxyPackage.",
-                               "Please consider filing a bug report!")))
+        stop(
+          simpleError(
+            paste(
+              "doc: the output format of tools::getVignetteInfo()", 
+              "is not compatible with this version of roxyPackage.",
+              "Please consider filing a bug report!"
+            )
+          )
+        )
       }
     } else {}
     # check for NEWS.Rd or NEWS file

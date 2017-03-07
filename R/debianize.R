@@ -135,7 +135,7 @@
 #' @param epoch Integer value, the Debian package epoch information.
 #' @param gpg.key Character string, the GnuPG key ID for the key that should be used for signing the Release file (secure apt).
 #'    This key must be available in your keyring (or in the one specified by \code{keyring}). Note that this function defaults to using the SHA256 algorithm for signing (not SHA1).
-#'    Skipped if \code{NULL}.
+#'    Mandatory for \code{"bin"} and \code{"src"} actions.
 #' @param keyring Character string, path to an additional keyring file to use.
 #' @param gpg.version Integer number, specifiying the GnuPG major version number. By default \code{gpg2} is assumed.
 #' @param deb.keyring.options Named list, extra options to pass through to \code{\link[roxyPackage:debianizeKeyring]{debianizeKeyring}}.
@@ -253,7 +253,8 @@ debianize <- function(
     actions=actions,
     neededTools=neededTools,
     renameTools=c(gpg=gpg),
-    repo.name=repo.name)
+    repo.name=repo.name
+  )
 
   build.dir <- debChecked[["build.dir"]]
   if(all(!isTRUE(keep.build), !identical(build.dir, pck.source.dir))){

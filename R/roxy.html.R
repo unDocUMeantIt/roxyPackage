@@ -175,7 +175,7 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
       ))
   } else {}
 
-  if(!is.null(package.full) & !is.null(repo.path)){
+  if(all(!is.null(package.full), !is.null(repo.path), is.null(mirror.list))){
     xml.obj.list <- append(xml.obj.list,
       list(
         XMLNode("h3", "Manual download"),

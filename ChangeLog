@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-3 (2017-03-06)
+changes in version 0.05-3 (2017-03-07)
 unreleased:
   - this release is under development
 fixed:
@@ -8,11 +8,15 @@ fixed:
   - archive.packages() now defaults to gpg2 as well
   - debianize(): the HTML instructions look pretty again, worked around a
     layout problem caused by XiMpLe's auto-indentation in <pre> tags
+  - roxy.package(): internal use of tools::getVignetteInfo() was unaware
+    of custom R libs.
 changed:
   - debianize(): the R version used for build dependencies in "control" is
     now taken from DESCRIPTION by default, not the current version
   - debianize(): the package description in "control" is now similar to
     CRAN2deb
+  - cleaned up all tests, using two new/revised internal functions
+    roxyPackage:::generateTestPackage() and roxyPackage:::removeTestPackage()
 added:
   - roxy.package(): the "URL" option can now also be a named list to be able
     to either host the debian repo on a different server, or to configure

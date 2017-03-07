@@ -1631,3 +1631,21 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
   }
   return(didArchiveSomething)
 } ## end function deb.archive.packages()
+
+
+## function debRepoPath()
+# leave URL=NULL to get default local paths
+debRepoPath <- function(dist, comp, arch, part=FALSE, URL=NULL){
+  path.dir <- file.path("dists", dist, comp, arch)
+  if(any(is.null(URL), identical(getURL(URL, purpose="default"), getURL(URL, purpose="debian")))){
+    deb.repo.path.part <- file.path("deb", path.dir)
+    if(isTRUE(part)){
+      result <- deb.repo.path.part
+    } else {
+      result <- file.path("..", "..", deb.repo.path.part)
+    }
+  } else {
+    result <- file.path(getURL(URL, purpose="debian"), gsub("^/", "", getURL(URL, purpose="debian.path")), path.dir)
+  }
+  return(result)
+} ## end function debRepoPath()
