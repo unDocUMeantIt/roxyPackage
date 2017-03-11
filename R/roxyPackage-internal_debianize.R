@@ -48,6 +48,20 @@ debianPkgName <- function(package, origin=NULL, version=NULL, replace.dots=FALSE
 } ## end function debianPkgName()
 
 
+## function debSrcFilename()
+# function to ensure the filenames are consistent throughout the internal workflow
+# - file: can be one of "orig", "debian" or "dsc"
+debSrcFilename <- function(pck, version, revision=NULL, compression="gz", file="orig"){
+  suffix <- ifelse(identical(compression, "xz"), "xz", "gz")
+  result <- switch(file,
+    orig=paste0(pck, "_", version, ".orig.tar.", suffix),
+    debian=paste0(pck, "_", version, "-", revision, ".debian.tar.", suffix),
+    dsc=paste0(pck, "_", version, "-", revision, ".dsc")
+  )
+  return(result)
+} ## end function debSrcFilename()
+
+
 ## function splitDepends()
 # takes a dependency vector (e.g., "foo (>> 3.0), bar, baz") and splits it into a matrix with
 # one column for each package name and one for a version number, if present
@@ -1113,11 +1127,7 @@ deb.build.sources <- function(srcs.name, build, src.dir.name, version,
     setwd(file.path(build, src.dir.name))
     system("fakeroot debian/rules clean")
     setwd(file.path(build))
-    if(identical(compression, "xz")){
-      orig.file.name <- paste0(srcs.name, "_", version, ".orig.tar.xz")
-    } else {
-      orig.file.name <- paste0(srcs.name, "_", version, ".orig.tar.gz")
-    }
+    orig.file.name <- debSrcFilename(pck=srcs.name, version=version, compression=compression, file="orig")
     if(isTRUE(keep.existing.orig) & file.exists(file.path(repo.src.real.path, orig.file.name))){
       message(paste0(action, ": keeping existing *.orig.tar.[gz|xz] file."))
       # copy existing file over for dpkg-source
@@ -1635,8 +1645,12 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
 
 ## function debRepoPath()
 # leave URL=NULL to get default local paths
-debRepoPath <- function(dist, comp, arch, part=FALSE, URL=NULL){
-  path.dir <- file.path("dists", dist, comp, arch)
+debRepoPath <- function(dist=NULL, comp=NULL, arch=NULL, part=FALSE, URL=NULL, source=FALSE){
+  if(isTRUE(source)){
+    path.dir <- file.path("source", dist)
+  } else {
+    path.dir <- file.path("dists", dist, comp, arch)
+  }
   if(any(is.null(URL), identical(getURL(URL, purpose="default"), getURL(URL, purpose="debian")))){
     deb.repo.path.part <- file.path("deb", path.dir)
     if(isTRUE(part)){

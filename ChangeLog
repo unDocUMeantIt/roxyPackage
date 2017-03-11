@@ -21,6 +21,8 @@ added:
   - roxy.package(): the "URL" option can now also be a named list to be able
     to either host the debian repo on a different server, or to configure
     the use of a "mirror.list" and a custom "debian.path"
+  - roxy.package(): the HTML instructions for debian packages now also lists
+    the package source files
   - new EXPERIMENTAL feature: there are cases where roxygenize() somehow
     fails but e.g. document() of the devtools package doesn't. you can now use
     roxyPackage:::set.roxyEnv(name="roxyFunction", value=devtools::document) to

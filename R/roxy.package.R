@@ -427,11 +427,10 @@ roxy.package <- function(
       keep.existing.orig="binonly" %in% actions
     )
   )
-  # try to set pckg.name.deb and deb.repo.path
+  # try to set pckg.name.deb and deb.repo.path.part
   # this will only work if repo.root is unchanged, the rest is too messy now...
   # don't ry to replace this without checking the outcome in the HTML file!
   deb.repo.path.part <- debRepoPath(dist=deb.defaults[["distribution"]], comp=deb.defaults[["component"]], arch=deb.defaults[["arch"]], part=TRUE)
-  deb.repo.path <- debRepoPath(dist=deb.defaults[["distribution"]], comp=deb.defaults[["component"]], arch=deb.defaults[["arch"]], URL=URL)
   # need to get repo.name to be able to call eval() on deb.defaults[["origin"]], because that pastes repo.name
   repo.name <- deb.defaults[["repo.name"]]
   deb.defaults[["origin"]] <- eval(deb.defaults[["origin"]])
@@ -875,14 +874,17 @@ roxy.package <- function(
           URL=URL,
           dist=deb.defaults[["distribution"]],
           comp=deb.defaults[["component"]],
-          package=pckg.name.deb.part,
+          arch=deb.defaults[["arch"]],
+          version=pck.version,
+          revision=deb.defaults[["revision"]],
+          compression=deb.defaults[["compression"]],
           repo=deb.defaults[["origin"]],
           repo.name=deb.defaults[["repo.name"]],
           repo.root=repo.root,
+          package=pckg.name.deb.part,
           keyring.options=deb.defaults[["keyring.options"]],
           page.css="../web.css",
-          package.full=pckg.name.deb,
-          repo.path=deb.repo.path
+          package.full=pckg.name.deb
         ),
         file=url.debRepo.info)
         message(paste0("html: updated ", url.debRepo.info))

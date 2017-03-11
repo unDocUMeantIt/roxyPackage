@@ -96,11 +96,12 @@ rx.html.switch <- function(desc, field){
 ## function debRepoInfo()
 # generates HTML code with info how to install packages from the deb repository
 #' @import XiMpLe
-debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
-  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL, repo.path=NULL){
+debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, repo, repo.name, repo.root,
+  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL){
   mirror.list <- getURL(URL, purpose="mirror.list")
   debian.path <- getURL(URL, purpose="debian.path")
   deb.URL <- getURL(URL, purpose="debian")
+  repo.path <- debRepoPath(dist=dist, comp=comp, arch=arch, URL=URL)
   # check if URL points to a list of mirrors
   if(!is.null(mirror.list)){
     apt.base.txt <- paste(paste0("[ftp|http]://<mirror>", debian.path), dist, comp, sep=" ")
@@ -176,11 +177,21 @@ debRepoInfo <- function(URL, dist, comp, repo, repo.name, repo.root,
   } else {}
 
   if(all(!is.null(package.full), !is.null(repo.path), is.null(mirror.list))){
+    src.orig   <- debSrcFilename(pck=package, version=version, revision=revision, compression=compression, file="orig")
+    src.debian <- debSrcFilename(pck=package, version=version, revision=revision, compression=compression, file="debian")
+    src.dsc    <- debSrcFilename(pck=package, version=version, revision=revision, compression=compression, file="dsc")
+    repo.path.src <- debRepoPath(dist=dist, URL=URL, source=TRUE)
     xml.obj.list <- append(xml.obj.list,
       list(
         XMLNode("h3", "Manual download"),
         XMLNode("p", "In case you'd rather like to download the package manually, here it is:"),
-        XMLNode("ul", XMLNode("li", XMLNode("a", package.full, attrs=list(href=paste0(repo.path, "/", package.full)))))
+        XMLNode("ul", XMLNode("li", XMLNode("a", package.full, attrs=list(href=paste0(repo.path, "/", package.full))))),
+        XMLNode("p", "Package source code:"),
+        XMLNode("ul",
+          XMLNode("li", XMLNode("a", src.orig, attrs=list(href=paste0(repo.path.src, "/", src.orig)))),
+          XMLNode("li", XMLNode("a", src.debian, attrs=list(href=paste0(repo.path.src, "/", src.debian)))),
+          XMLNode("li", XMLNode("a", src.dsc, attrs=list(href=paste0(repo.path.src, "/", src.dsc))))
+        )
       ))
   } else {}
 
