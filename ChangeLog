@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-3 (2017-03-07)
+changes in version 0.05-3 (2017-03-23)
 unreleased:
   - this release is under development
 fixed:
@@ -18,6 +18,9 @@ changed:
   - cleaned up all tests, using two new/revised internal functions
     roxyPackage:::generateTestPackage() and roxyPackage:::removeTestPackage()
 added:
+  - new function templateFile() to quickly generate new source file templates
+    for functions, S4 classes and methods, including some hopefully useful
+    defaults (copyright, roxygen documentation and code stubs)
   - roxy.package(): the "URL" option can now also be a named list to be able
     to either host the debian repo on a different server, or to configure
     the use of a "mirror.list" and a custom "debian.path"
