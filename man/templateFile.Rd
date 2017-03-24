@@ -8,7 +8,8 @@ templateFile(name, path = getwd(), pck.description = data.frame(Package =
   "", Author = "", License = "GPL (>= 3)", stringsAsFactors = FALSE),
   year = format(Sys.time(), "\%Y"), params = list(obj = "someClass", ... =
   "\\\\code{\\\\link[somepackage]{somefunction}}"), seealso = list(aPackage =
-  "aFunction"), type = "function", write = FALSE, overwrite = FALSE)
+  "aFunction"), return = list(aPackage = "aFunction"), type = "function",
+  write = FALSE, overwrite = FALSE)
 }
 \arguments{
 \item{name}{Character string, name of the function/method/class.}
@@ -27,6 +28,12 @@ Some objects types are recognized, like "c", "character", "numeric", "logical",
 If an element is called \code{"..."},
       the value is assumend to point to a function or method where additional arguments are passed to.
 If \code{type="S4class"}, this argument is used to define the slots.}
+
+\item{seealso}{A named list,
+      where element names define packages and values objects of that package to link.}
+
+\item{return}{A named list, similar to \code{seealso},
+      but generating references for returned objects.}
 
 \item{type}{Character string, either \code{"function"}, \code{"S4class"},
       or \code{"S4method"}, depending on the template you want to create.}

@@ -121,5 +121,13 @@ roxyParams <- function(params, roxy=TRUE, collapse="\n#' ", type="function"){
 roxySeealso <- function(seealso, collapse=",\n#'   "){
   stopifnot(isTRUE(length(names(seealso)) == length(seealso)))
   result <- paste0("\\code{\\link[", names(seealso), "]{", seealso, "}}")
-  return(paste0("@seealso ", paste0(result, collapse=collapse)))
+  return(paste0("@seealso ", paste0(result, collapse=collapse), "."))
 } ## end function roxySeealso()
+
+
+## function roxyReturn()
+roxyReturn <- function(ret, collapse=",\n#'   "){
+  stopifnot(isTRUE(length(names(ret)) == length(ret)))
+  result <- paste0("\\code{\\link[", names(ret), "]{", ret, "-class}}")
+  return(paste0("@return An object of class ", paste0(result, collapse=collapse), "."))
+} ## end function roxyReturn()

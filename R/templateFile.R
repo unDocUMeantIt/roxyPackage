@@ -32,6 +32,8 @@
 #'    Some objects types are recognized, like "c", "character", "numeric", "logical", "matrix" or "data.frame".
 #'    If an element is called \code{"..."}, the value is assumend to point to a function or method where additional arguments are passed to.
 #'    If \code{type="S4class"}, this argument is used to define the slots.
+#' @param seealso A named list, where element names define packages and values objects of that package to link.
+#' @param return A named list, similar to \code{seealso}, but generating references for returned objects.
 #' @param type Character string, either \code{"function"}, \code{"S4class"}, or \code{"S4method"}, depending on the template you want to create.
 #' @param write Logical, if \code{TRUE} output will be written to a file in \code{path}, otherwise returned as a character string.
 #' @param overwrite Logical, if \code{TRUE} and the output file already exists, it will be replaced with the generated template. Otherwise you'll just get an error.
@@ -53,6 +55,7 @@ templateFile <- function(
   year=format(Sys.time(), "%Y"),
   params=list(obj="someClass", "..."="\\code{\\link[somepackage]{somefunction}}"),
   seealso=list(aPackage="aFunction"),
+  return=list(aPackage="aFunction"),
   type="function",
   write=FALSE,
   overwrite=FALSE
@@ -65,7 +68,8 @@ templateFile <- function(
     switch(type,
       "function"=paste0("#' Function ", name),
       "S4class"=paste0("#' S4 Class ", name),
-      "S4method"=paste0("#' S4 Method ", name)
+      "S4method"=paste0("#' S4 Method ", name),
+      paste0("#' ", name)
     ),
     "",
     "\\code{\\link[:]{}}",
@@ -86,6 +90,7 @@ templateFile <- function(
       paste(
         "@docType methods",
         "@import methods",
+        roxyReturn(ret=return),
         sep="\n#' "
       )
     } else if(type %in% "S4class"){
@@ -96,19 +101,20 @@ templateFile <- function(
         sep="\n#' "
       )
     } else {
-      paste0("@return An object of class \\code{\\link[<return>]{<return>-class}}.")
+      roxyReturn(ret=return)
     },
     "@references <ref>",
     roxySeealso(seealso=seealso),
     switch(type,
       "function"="@keywords functions",
       "S4class"="@keywords classes",
-      "S4method"="@keywords methods"
+      "S4method"="@keywords methods",
+      "@keywords <keywords>"
     ),
     switch(type,
-      "function"=paste0("@rdname ", name),
       "S4class"=paste0("@rdname ", name, "-class"),
-      "S4method"=paste0("@rdname ", name, "-method")
+      "S4method"=paste0("@rdname ", name, "-method"),
+      paste0("@rdname ", name)
     ),
     "@export",
     "@examples",
@@ -159,8 +165,16 @@ templateFile <- function(
   result <- paste(licenseText, roxyText, codeStub, sep="\n\n")
 
   if(isTRUE(write)){
+    # we'll add a vague scheme to file names, so that class defintions
+    # come first, methods (likely for those classes) next, and
+    # finally everthing else
+    filename <- switch(type,
+      "S4class"=paste0("01_class_",name, ".R"),
+      "S4method"=paste0("02_method_", name, ".R"),
+      paste0(name, ".R")
+    )
     writeStub(
-      file=paste0(name, ".R"),
+      file=filename,
       path=path,
       content=result,
       overwrite=overwrite
@@ -169,45 +183,3 @@ templateFile <- function(
     return(result)
   }
 }
-
-## methods
-# @docType methods
-# @import methods
-# @param ... Additional arguments passed through to <func>.
-# @rdname <name>-methods
-#
-# setGeneric("<name>", function(obj, ...){standardGeneric("<name>")})
-
-# @rdname <name>-methods
-# @aliases <name>,<class>-method
-# @param x
-# @include <file>.R
-#
-# setMethod("<name>",
-#   signature(obj="<class>"),
-#   function(obj, x){
-#   }
-# )
-
-## S4 classes
-# @slot <slot> <type>
-# @name <name>,-class
-# @aliases <name>,-class <name>-class
-# @import methods
-# @keywords classes
-# @export
-# @rdname <name>-class
-#
-# setClass("<name>",
-#   representation=representation(
-#     <slot>="<type>"
-#   ),
-#   prototype(
-#     <slot>=<type>()
-#   ),
-#   contains=c("<contains>")
-# )
-# 
-# # setValidity("<name>", function(object){
-# #   }
-# # )
