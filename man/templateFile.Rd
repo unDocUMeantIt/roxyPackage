@@ -66,5 +66,10 @@ pckg.dscrptn <- data.frame(
   License="GPL (>= 3)",
   stringsAsFactors=FALSE
 )
-templateFile(name="exampleFunction")
+cat(
+  templateFile(
+    name="exampleFunction",
+    pck.description=pckg.dscrptn
+  )
+)
 }
