@@ -285,8 +285,8 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     } else {}
 
     pckg.title <- rx.clean(pckg[,"Title"])
-    pckg.authors <- get.authors(pckg, maintainer=TRUE)
-    pckg.author <- rx.clean(pckg.authors[["aut"]])
+    pckg.authors <- get.authors(pckg, maintainer=TRUE, complete.line=TRUE)
+    pckg.authorline <- rx.clean(pckg.authors[["line"]])
     pckg.maintainer <- rx.clean(pckg.authors[["cre"]], nomail=FALSE, textmail=TRUE)
 
     page.css <- paste0("../", css)
@@ -316,7 +316,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         rx.html.switch(desc=pckg, field="Enhances"),
 #        rx.tr("Published:", pckg[,"Date"]),
         rx.tr("Published:", as.character(as.Date(getDescField(pckg, field=c("Date","Packaged","Date/Publication"))))),
-        rx.tr("Author:", pckg.author),
+        rx.tr("Author:", pckg.authorline),
         rx.tr("Maintainer:", pckg.maintainer),
         rx.html.switch(desc=pckg, field="BugReports"),
         rx.tr("License:", pckg[,"License"]),
