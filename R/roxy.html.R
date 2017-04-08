@@ -74,6 +74,7 @@ rx.html.switch <- function(desc, field){
     switch(EXPR=field,
       Depends=rx.tr("Depends:", rx.clean(desc[,"Depends"])),
       Imports=rx.tr("Imports:", rx.clean(desc[,"Imports"])),
+      LinkingTo=rx.tr("LinkingTo:", rx.clean(desc[,"LinkingTo"])),
       Suggests=rx.tr("Suggests:", rx.clean(desc[,"Suggests"])),
       Enhances=rx.tr("Enhances:", rx.clean(desc[,"Enhances"])),
       BugReports=rx.tr("BugReports:", 
@@ -85,7 +86,8 @@ rx.html.switch <- function(desc, field){
         }),
       URL=rx.tr("URL:", XMLNode("a",
         gsub("&", "&amp;", desc[,"URL"]),
-        attrs=list(href=gsub("&", "&amp;", desc[,"URL"]))))
+        attrs=list(href=gsub("&", "&amp;", desc[,"URL"])))),
+      SystemRequirements=rx.tr("SystemRequirements:", rx.clean(desc[,"SystemRequirements"]))
     )
   } else {
     return(NULL)
@@ -312,6 +314,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         rx.tr("Version:", pckg[,"Version"]),
         rx.html.switch(desc=pckg, field="Depends"),
         rx.html.switch(desc=pckg, field="Imports"),
+        rx.html.switch(desc=pckg, field="LinkingTo"),
         rx.html.switch(desc=pckg, field="Suggests"),
         rx.html.switch(desc=pckg, field="Enhances"),
 #        rx.tr("Published:", pckg[,"Date"]),
@@ -321,6 +324,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         rx.html.switch(desc=pckg, field="BugReports"),
         rx.tr("License:", pckg[,"License"]),
         rx.html.switch(desc=pckg, field="URL"),
+        rx.html.switch(desc=pckg, field="SystemRequirements"),
           if(file_test("-f", cite)){
             rx.tr("Citation:", XMLNode("a",
               paste0(pckg.name, " citation info"),
