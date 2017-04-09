@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-3 (2017-03-31)
+changes in version 0.05-3 (2017-04-09)
 unreleased:
   - this release is under development
 fixed:
@@ -18,6 +18,8 @@ changed:
   - cleaned up all tests, using two new/revised internal functions
     roxyPackage:::generateTestPackage() and roxyPackage:::removeTestPackage()
   - updated vignette to include templateFile()
+  - roxy.html(): HTML page now lists all contributors indicating their roles
+    (contributed by robert nuske)
 added:
   - new function templateFile() to quickly generate new source file templates
     for functions, S4 classes and methods, including some hopefully useful
@@ -32,6 +34,8 @@ added:
     roxyPackage:::set.roxyEnv(name="roxyFunction", value=devtools::document) to
     overwrite the function that is being used to roxygenize the docs. use this
     with caution! it is experimental for a reason!
+  - roxy.html(): HTML page now also lists LinkingTo: and SystemRequirements: if
+    present (contributed by robert nuske)
 
 changes in version 0.05-2 (2017-02-26)
 fixed:
