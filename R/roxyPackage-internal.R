@@ -170,7 +170,7 @@ get.by.role <- function(persons, role="aut"){
 
 
 ## function get.authors()
-get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyright=FALSE){
+get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyright=FALSE, all.participants=FALSE){
   if("Authors@R" %in% names(description)){
     gotPersons <- TRUE
     authorsFromDescription <- description[["Authors@R"]]
@@ -192,6 +192,9 @@ get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyrig
     got.cph <- ifelse(isTRUE(copyright),
       paste(format(get.by.role(eval(parse(text=authorsFromDescription)), role="cph"), include=c("given", "family")), collapse=", "),
       "")
+    got.participants <- ifelse(isTRUE(all.participants), 
+      paste(format(eval(parse(text=description[["Authors@R"]])), include=c("given", "family", "role")), collapse=", "), 
+      "")
   } else {
     got.aut <- description[["Author"]]
     got.cre <- ifelse(isTRUE(maintainer),
@@ -200,13 +203,14 @@ get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyrig
     # contributors should already be named in got.aut
     got.ctb <- ""
     got.cph <- ""
+    got.participants <- ifelse(isTRUE(all.participants), got.aut, "")
   }
   got.cre.clean <- gsub("<([^@]*)@([^>]*)>", "\\\\email{\\1@@\\2}", gsub("\n[[:space:]]*", "\n#' ", got.cre))
   # append contributors
   if(isTRUE(contributor) && got.ctb != ""){
     got.aut <- paste0(got.aut, ", with contributions from ", got.ctb)
   } else {}
-  gotAuthors <- list(aut=got.aut, cre=got.cre, cre.clean=got.cre.clean, ctb=got.ctb, cph=got.cph)
+  gotAuthors <- list(aut=got.aut, cre=got.cre, cre.clean=got.cre.clean, ctb=got.ctb, cph=got.cph, participants=got.participants)
   return(gotAuthors)
 } ## end function get.authors()
 

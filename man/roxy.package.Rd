@@ -256,7 +256,7 @@ pckg.dscrptn <- data.frame(
   Package="SquareTheCircle",
   Type="Package",
   Title="Squaring the circle using Heisenberg compensation",
-  Author="E.A. Dölle <doelle@eternalwondermaths.example.org>",
+  Author="Ernst Dölle [aut, cre]",
   AuthorR="c(person(given=\\"Ernst\\", family=\\"Dölle\\",
   email=\\"doelle@eternalwondermaths.example.org\\", role=c(\\"aut\\", \\"cre\\")))",
   Maintainer="E.A. Dölle <doelle@eternalwondermaths.example.org>",
