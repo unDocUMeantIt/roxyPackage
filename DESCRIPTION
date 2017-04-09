@@ -1,7 +1,7 @@
 Package: roxyPackage
 Type: Package
 Title: Utilities to Automate Package Builds
-Author: m.eik michalke [aut, cre]
+Author: m.eik michalke [aut, cre], Robert Nuske [ctb]
 Maintainer: m.eik michalke <meik.michalke@hhu.de>
 Depends: R (>= 2.9.0),methods,roxygen2,XiMpLe (>= 0.03-20)
 Suggests: testthat
@@ -17,9 +17,10 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyLoad: yes
 URL: https://reaktanz.de/?c=hacking&s=roxyPackage
-Authors@R: c(person(given="m.eik", family="michalke", email="meik.michalke@hhu.de", role=c("aut", "cre")))
+Authors@R: c(person(given="m.eik", family="michalke", email="meik.michalke@hhu.de", role=c("aut", "cre")), person(given="Robert",
+               family="Nuske", role=c("ctb")))
 Version: 0.05-3
-Date: 2017-03-31
+Date: 2017-04-09
 RoxygenNote: 6.0.1
 Collate: 
     '00_classes_01_ChangeLog_internal.R'
