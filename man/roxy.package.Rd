@@ -43,7 +43,8 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
   \item{"cite"}{Update CITATION file}
   \item{"license"}{Update LICENSE file}
   \item{"readme"}{Generate initial README.md file}
-  \item{"check"}{Do a full package check, calling \code{R CMD check}}
+  \item{"check"}{Do a full package check,
+      calling \code{R CMD check}. Combine with \code{"package"} to do the check on the tarball, not the source directory.}
   \item{"package"}{Build & install the package, update source repository,
       calling \code{R CMD build} and \code{R CMD INSTALL}}
   \item{"binonly"}{Like \code{"package"},

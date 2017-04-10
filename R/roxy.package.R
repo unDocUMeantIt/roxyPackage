@@ -88,7 +88,7 @@
 #'      \item{"cite"}{Update CITATION file}
 #'      \item{"license"}{Update LICENSE file}
 #'      \item{"readme"}{Generate initial README.md file}
-#'      \item{"check"}{Do a full package check, calling \code{R CMD check}}
+#'      \item{"check"}{Do a full package check, calling \code{R CMD check}. Combine with \code{"package"} to do the check on the tarball, not the source directory.}
 #'      \item{"package"}{Build & install the package, update source repository, calling \code{R CMD build} and \code{R CMD INSTALL}}
 #'      \item{"binonly"}{Like \code{"package"}, but doesn't copy the source package to the repository, to enable binary-only rebuilds}
 #'      \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
@@ -974,9 +974,16 @@ roxy.package <- function(
     chk.ex.file.present <- ifelse(file_test("-f", chk.ex.file), TRUE, FALSE)
     tryCatch(chk.out.dir <- tempdir(), error=function(e) stop(e))
     # checks should better be performed on built packages not source directories
-    if("package" %in% actions & file_test("-f", repo.src.gz)){
+    if(all("package" %in% actions, file_test("-f", repo.src.gz))){
       pck.check.target <- repo.src.gz
     } else {
+      warning(
+        paste0(
+          "check: checks should be done on built packages, not the unpackaged source. ",
+          "to do so, add the \"package\" action."
+        ),
+        call.=FALSE
+      )
       pck.check.target <- pck.source.dir
     }
     message(paste0("check: calling R CMD check, this might take a while..."))

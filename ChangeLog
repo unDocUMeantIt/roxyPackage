@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-3 (2017-04-09)
+changes in version 0.05-3 (2017-04-10)
 unreleased:
   - this release is under development
 fixed:
@@ -21,6 +21,9 @@ changed:
   - updated vignette to include templateFile()
   - roxy.html(): HTML page now lists all contributors indicating their roles
     (contributed by robert nuske)
+  - roxy.package(): checks should be done on built packages, the "check" action
+    now throws a warning if checks are done on unpackaged sources (which is the
+    case if you omit the "package" action)
 added:
   - new function templateFile() to quickly generate new source file templates
     for functions, S4 classes and methods, including some hopefully useful
