@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-3 (2017-04-10)
+changes in version 0.05-3 (2017-04-15)
 unreleased:
   - this release is under development
 fixed:
@@ -40,6 +40,7 @@ added:
     with caution! it is experimental for a reason!
   - roxy.html(): HTML page now also lists LinkingTo: and SystemRequirements: if
     present (contributed by robert nuske)
+  - roxy.package(): windows builds now also include an MD5 file
 
 changes in version 0.05-2 (2017-02-26)
 fixed:

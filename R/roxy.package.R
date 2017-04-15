@@ -751,7 +751,11 @@ roxy.package <- function(
     if(length(win.exclude.files) > 0){
       win.exclude.files <- paste0("-x \"", paste(file.path(pck.package, win.exclude.files), collapse="\" \""), "\"")
     } else {}
+    # windows packages also include an MD5 file, so we'll create one and remove it again
+    win.MD5.path <- file.path(R.libs, pck.package)
+    tools:::.installMD5sums(pkgDir=win.MD5.path)
     suppressWarnings(zip(win.package, pck.package, extras=win.exclude.files))
+    unlink(file.path(win.MD5.path, "MD5"), recursive=FALSE) # clean up the MD5 file again
     message(paste0("repo: created ", pckg.name.win, " (windows)"))
     setwd(jmp.back)
     tools::write_PACKAGES(dir=repo.win, type="win.binary", verbose=TRUE, latestOnly=FALSE)
