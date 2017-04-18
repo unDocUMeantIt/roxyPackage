@@ -24,6 +24,7 @@ changed:
   - roxy.package(): checks should be done on built packages, the "check" action
     now throws a warning if checks are done on unpackaged sources (which is the
     case if you omit the "package" action)
+  - roxy.html(): we're now also including the comments of person objects
 added:
   - new function templateFile() to quickly generate new source file templates
     for functions, S4 classes and methods, including some hopefully useful

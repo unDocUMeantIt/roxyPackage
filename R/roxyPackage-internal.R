@@ -193,7 +193,7 @@ get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyrig
       paste(format(get.by.role(eval(parse(text=authorsFromDescription)), role="cph"), include=c("given", "family")), collapse=", "),
       "")
     got.participants <- ifelse(isTRUE(all.participants), 
-      paste(format(eval(parse(text=description[["Authors@R"]])), include=c("given", "family", "role")), collapse=", "), 
+      paste(format(eval(parse(text=description[["Authors@R"]])), include=c("given", "family", "role", "comment")), collapse=", "), 
       "")
   } else {
     got.aut <- description[["Author"]]
