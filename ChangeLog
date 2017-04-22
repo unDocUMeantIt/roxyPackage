@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-3 (2017-04-15)
+changes in version 0.05-3 (2017-04-22)
 unreleased:
   - this release is under development
 fixed:
@@ -21,9 +21,9 @@ changed:
   - updated vignette to include templateFile()
   - roxy.html(): HTML page now lists all contributors indicating their roles
     (contributed by robert nuske)
-  - roxy.package(): checks should be done on built packages, the "check" action
-    now throws a warning if checks are done on unpackaged sources (which is the
-    case if you omit the "package" action)
+  - roxy.package(): checks should be done on built packages, the "check"
+    action now throws a warning if checks are done on unpackaged sources (which is
+    the case if you omit the "package" action)
   - roxy.html(): we're now also including the comments of person objects
 added:
   - new function templateFile() to quickly generate new source file templates
@@ -39,9 +39,9 @@ added:
     roxyPackage:::set.roxyEnv(name="roxyFunction", value=devtools::document) to
     overwrite the function that is being used to roxygenize the docs. use this
     with caution! it is experimental for a reason!
-  - roxy.html(): HTML page now also lists LinkingTo: and SystemRequirements: if
-    present (contributed by robert nuske)
-  - roxy.package(): windows builds now also include an MD5 file
+  - roxy.html(): HTML page now also lists LinkingTo: and SystemRequirements:
+    if present (contributed by robert nuske)
+  - roxy.package(): source and windows builds now also include an MD5 file
 
 changes in version 0.05-2 (2017-02-26)
 fixed:

@@ -221,7 +221,7 @@ roxy.package <- function(
   html.title="R package",
   Rcmd.options=c(
     install="--install-tests",
-    build="--no-manual --no-build-vignettes",
+    build="--no-manual --no-build-vignettes --md5",
     check="--as-cran",
     Rd2pdf="--pdf --no-preview"),
   URL=NULL,
