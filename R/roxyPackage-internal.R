@@ -50,6 +50,14 @@ if(isTRUE(R_system_version(getRversion()) < 2.15)){
   }
 } else {}
 
+## announce removal of support for old R versions in future releases
+if(isTRUE(R_system_version(getRversion()) < 3.0)){
+  .Deprecated(msg=paste0(
+    "Support for R <3.0 will be removed from roxyPackage soon. ",
+    "Please update your installation. ",
+    "Should you have a legitimate need to still run older R versions, please contact the package author immediately!")
+  )
+} else {}
 
 ## function trim()
 # cuts off space at start and end of a character string

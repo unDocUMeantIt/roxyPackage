@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-3 (2017-04-22)
+changes in version 0.05-3 (2017-04-23)
 unreleased:
   - this release is under development
 fixed:
@@ -12,6 +12,10 @@ fixed:
     custom R libs.
   - added robert nuske as an official contributor to the package
 changed:
+  - R versions older that 3.0 should no longer be around (it was released
+    four years ago). support for these older versions will be removed in
+    one of the future releases. for now, a warning is shown, announcing that
+    use with R <3.0 is deprecated
   - debianize(): the R version used for build dependencies in "control" is
     now taken from DESCRIPTION by default, not the current version
   - debianize(): the package description in "control" is now similar to
