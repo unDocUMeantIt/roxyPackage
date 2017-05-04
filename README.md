@@ -27,7 +27,7 @@ More information on roxyPackage is available on the [project homepage](https://r
 
 Installation of tha latest stable release is fairly easy, it's available from the project's own repository:
 
-```
+```r
 install.packages("roxyPackage", repo="https://reaktanz.de/R")
 ```
 
@@ -41,7 +41,7 @@ If you're running a Debian based operating system, you might be interested in th
 
 To install it directly from GitHub, you can use `install_github()` from the [devtools](https://github.com/hadley/devtools) package:
 
-```
+```r
 library(devtools)
 install_github("unDocUMeantIt/roxyPackage") # stable release
 install_github("unDocUMeantIt/roxyPackage", ref="develop") # development release

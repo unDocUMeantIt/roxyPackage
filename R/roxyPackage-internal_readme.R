@@ -145,7 +145,7 @@ readme_text <- function(
           "To install the package directly from GitHub, you can use `install_github()` from the ",
           md_url("devtools","https://github.com/hadley/devtools"),
           " package:\n\n",
-          "```\n",
+          "```r\n",
           "library(devtools)\n",
           "install_github(\"", githubUser, "/", githubRepo, "\")\n",
           "```\n"
