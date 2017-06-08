@@ -12,9 +12,10 @@ debianizeKeyring(gpg.key, repo.name, repo.root, maintainer,
   description = paste("OpenPGP keyring for Debian packages hosted at the",
   repo.name, "repository.", "This keyring is neccessary to use secure apt."),
   actions = c("bin", "src"), overwrite = c("changelog", "control",
-  "copyright", "postinst", "prerm", "rules"), bin.opts = "-rfakeroot -b -uc",
-  compat = 7, epoch = NULL, keyring = NULL, gpg.version = 2,
-  sign.key = gpg.key, compression = "xz", keep.build = FALSE)
+  "copyright", "postinst", "prerm", "rules", "compat"),
+  bin.opts = "-rfakeroot -b -uc", compat = 9, epoch = NULL,
+  keyring = NULL, gpg.version = 2, sign.key = gpg.key,
+  compression = "xz", keep.build = FALSE)
 }
 \arguments{
 \item{gpg.key}{Character string,

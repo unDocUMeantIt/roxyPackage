@@ -9,7 +9,7 @@ roxy.package(pck.source.dir, pck.version, pck.description, R.libs, repo.root,
   rm.vignette = FALSE, R.homes = R.home(),
   html.index = "Available R Packages", html.title = "R package",
   Rcmd.options = c(install = "--install-tests", build =
-  "--no-manual --no-build-vignettes", check = "--as-cran", Rd2pdf =
+  "--no-manual --no-build-vignettes --md5", check = "--as-cran", Rd2pdf =
   "--pdf --no-preview"), URL = NULL, deb.options = NULL,
   readme.options = NULL, ChangeLog = list(changed = c("initial release"),
   fixed = c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
@@ -257,9 +257,15 @@ pckg.dscrptn <- data.frame(
   Package="SquareTheCircle",
   Type="Package",
   Title="Squaring the circle using Heisenberg compensation",
-  Author="Ernst Dölle [aut, cre]",
+  Author="Ernst Dölle [aut, cre, cph], Ludwig Dölle [trl,
+      ctb] (initial translation to whitespace)",
   AuthorR="c(person(given=\\"Ernst\\", family=\\"Dölle\\",
-  email=\\"doelle@eternalwondermaths.example.org\\", role=c(\\"aut\\", \\"cre\\")))",
+       email=\\"e.a.doelle@example.com\\",
+       role=c(\\"aut\\", \\"cre\\", \\"cph\\")),
+     person(given=\\"Ludwig\\", family=\\"Dölle\\",
+       role=c(\\"trl\\", \\"ctb\\"),
+       comment=\\"initial translation to whitespace\\")
+     )",
   Maintainer="E.A. Dölle <doelle@eternalwondermaths.example.org>",
   Depends="R (>= 2.10.0),heisenberg (>= 0.23),tools",
   Enhances="rkward",
