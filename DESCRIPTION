@@ -27,7 +27,7 @@ BugReports: https://github.com/unDocUMeantIt/roxyPackage/issues
 Authors@R: c(person(given="m.eik", family="michalke",
         email="meik.michalke@hhu.de", role=c("aut", "cre")),
         person(given="Robert", family="Nuske", role=c("ctb")))
-Version: 0.05-3
+Version: 0.05-4
 Date: 2017-06-09
 RoxygenNote: 6.0.1
 Collate: 

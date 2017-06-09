@@ -1,5 +1,9 @@
 ChangeLog for package roxyPackage
 
+changes in version 0.05-4 (2017-06-09)
+unreleased:
+  - this release is under development
+
 changes in version 0.05-3 (2017-06-09)
 fixed:
   - debianize(): the "append" feature for dependencies in was broken
