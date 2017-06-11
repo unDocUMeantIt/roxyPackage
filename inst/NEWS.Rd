@@ -1,6 +1,18 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
+\section{Changes in roxyPackage version 0.05-4 (2017-06-11)}{
+  \subsection{unreleased}{
+    \itemize{
+      \item this release is under development
+    }
+  }
+  \subsection{changed}{
+    \itemize{
+      \item cleaned up dependencies, now using mostly imports instead
+    }
+  }
+}
 \section{Changes in roxyPackage version 0.05-3 (2017-06-09)}{
   \subsection{fixed}{
     \itemize{

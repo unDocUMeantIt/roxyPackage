@@ -295,7 +295,7 @@ roxy.package(pck.source.dir="~/my_R_stuff/SquareTheCircle",
 }
 }
 \references{
-[1] \url{http://cran.r-project.org/package=roxygen2}
+[1] \url{https://CRAN.R-project.org/package=roxygen2}
 }
 \seealso{
 \code{\link[roxyPackage:sandbox]{sandbox}} to run roxy.package() in a sandbox.

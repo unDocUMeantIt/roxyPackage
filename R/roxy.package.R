@@ -159,9 +159,9 @@
 #'    make sure they're correctly transferred to your server, where applicable.
 #' @param ... Additional options passed through to \code{roxygenize}.
 #' @references
-#' [1] \url{http://cran.r-project.org/package=roxygen2}
+#' [1] \url{https://CRAN.R-project.org/package=roxygen2}
 #' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run roxy.package() in a sandbox.
-#' @import roxygen2
+#' @importFrom roxygen2 roxygenize
 #' @export
 #' @examples
 #' \dontrun{

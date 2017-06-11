@@ -8,15 +8,15 @@ generateTestPackage <- function(
     Package="examplePackage",
     Type="Package",
     Title="An R Example Package",
-    Author="Ernst A. Dölle [aut, cre, cph], Ludwig Dölle [trl, ctb] (initial translation to whitespace)",
-    AuthorsR="c(person(given=\"Ernst\", family=\"Dölle\",
+    Author="Ernst A. D\u00F6lle [aut, cre, cph], Ludwig D\u00F6lle [trl, ctb] (initial translation to whitespace)",
+    AuthorsR="c(person(given=\"Ernst\", family=\"D\u00F6lle\",
         email=\"e.a.doelle@example.com\",
         role=c(\"aut\", \"cre\", \"cph\")),
-      person(given=\"Ludwig\", family=\"Dölle\",
+      person(given=\"Ludwig\", family=\"D\u00F6lle\",
         role=c(\"trl\", \"ctb\"),
         comment=\"initial translation to whitespace\")
       )",
-    Maintainer="Ernst A. Dölle <e.a.doelle@example.com>",
+    Maintainer="Ernst A. D\u00F6lle <e.a.doelle@example.com>",
     Depends="R (>= 2.10.0)",
     Description="Provides a great function to produce NULL results.",
     License="GPL (>= 3)",
@@ -33,7 +33,7 @@ generateTestPackage <- function(
     build.dir=rootDir,
     repo.name="doelle",
     deb.description=list(
-      Maintainer="Ernst A. Dölle <e.a.doelle@example.com>"
+      Maintainer="Ernst A. D\u00F6lle <e.a.doelle@example.com>"
     ),
     keep.build=FALSE
   ),
@@ -41,7 +41,7 @@ generateTestPackage <- function(
 ){
   result <- list()
   # call an internal shortcut to get the R version without patch level
-  result[["RVers"]] <- roxyPackage:::getRvers(win=TRUE)
+  result[["RVers"]] <- getRvers(win=TRUE)
   result[["rootDir"]] <- rootDir
   result[["RLibs"]] <- file.path(rootDir, "R")
   result[["repo"]] <- file.path(rootDir, "repo")

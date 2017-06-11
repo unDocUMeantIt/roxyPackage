@@ -1,8 +1,10 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-4 (2017-06-09)
+changes in version 0.05-4 (2017-06-11)
 unreleased:
   - this release is under development
+changed:
+  - cleaned up dependencies, now using mostly imports instead
 
 changes in version 0.05-3 (2017-06-09)
 fixed:
