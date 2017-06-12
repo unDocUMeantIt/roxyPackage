@@ -96,7 +96,7 @@
 #'    the \code{pck.description} parameter of \code{\link[roxyPackage:roxy.package]{roxy.package}}, only with different variables.
 #'    Note that if certain key values are missing, \code{debianize} will automatically use some defaults:
 #'    \describe{
-#'      \item{Build.Depends.Indep}{\code{"debhelper (>> 7.0.0), r-base-dev (>= <R.vers>), cdbs"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format;
+#'      \item{Build.Depends.Indep}{\code{"debhelper (>> 9.0.0), r-base-dev (>= <R.vers>), cdbs"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format;
 #'        if \code{arch} is not set to \code{"all"}, the field \code{Build.Depends} is used instead}
 #'      \item{Depends}{\code{"r-base-core (>= <R vers>)"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format}
 #'      \item{Suggests}{Suggests in \code{DESCRIPTION} in debianized format}
@@ -123,12 +123,13 @@
 #'      \item{"rules"}{Re-write \code{./debian/rules}}
 #'      \item{"gpg.key"}{Re-write the keyring package in the repository (by default present packages are left unchanged)}
 #'    }
-#' @param depends.origin A character string to set the default origin for packages which are a dependency of this one. In case all dependencies can be
+#' @param depends.origin A character string to set the default origin for R packages which are a dependency of this one. In case all dependencies can be
 #'    met by Debian packages from CRAN releases, you can leave this to the default setting. If you need more control, see \code{depends.origin.alt}.
-#' @param depends.origin.alt A named list of alternative origins for packages which are a dependency of this one. By default, \code{depends.origin} is used,
+#' @param depends.origin.alt A named list of alternative origins for R packages which are a dependency of this one. By default, \code{depends.origin} is used,
 #'    but if you know that certain dependencies are of different origin (e.g., your own repository), you can set this here. Each list element must be named after
 #'    the R package you want to set an origin for, and must be a character vector or single string, like \code{list(foo="other-janedoe")}. If more than one origin
-#'    is given, they will be set as alternatives (using the pipe \code{"|"} as "or").
+#'    is given, they will be set as alternatives (using the pipe \code{"|"} as "or"). For full control over the package name use \code{list(foo=NULL)},
+#'    which will fallback to \code{foo} as the name of the Debian package.
 #' @param bin.opts Character string, options to pass through to \code{dpkg-buildpackage} for the \code{"bin"} action.
 #' @param arch Character string, architecture the package is build for.
 #' @param compat Integer value, specifying the \code{debhelper} compatibility level.

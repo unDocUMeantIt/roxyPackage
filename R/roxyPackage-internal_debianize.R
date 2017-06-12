@@ -40,7 +40,7 @@ debianPkgName <- function(package, origin=NULL, version=NULL, replace.dots=FALSE
       result <- paste(package, version, sep=" ")
     }
 
-    if(!is.null(origin)){
+    if(all(!is.null(origin), !identical(origin, ""))){
       result <- paste("r", origin, result, sep="-", collapse=" | ")
     } else {}
 
@@ -92,7 +92,7 @@ splitDepends <- function(dep){
 
 ## function debianizeDepends()
 # origin: string or vector
-# origin.alt: *named* list(pckgname=c("origin.string"))
+# origin.alt: *named* list(pckgname=c("origin.string")); if string is empty, returns the name as-is
 # R: the package name for R, usually not "r-cran-<something>". if set to NULL, R will be dropped completely if present
 # forceRVersion: omitted if NULL, i.e., the R version string is used as defined in DESCRIPTION (if any)
 # collapse: if NULL returns a named vector (names are the original R package names, values the debian package names)
@@ -522,7 +522,7 @@ deb.prepare.description <- function(deb.description=NULL, R.description=NULL, or
     # if arch is "all", use Build.Depends.Indep, else Build.Depends
     build.dep.field <- ifelse(identical(arch, "all"), "Build.Depends.Indep", "Build.Depends")
     if(is.null(deb.description[[build.dep.field]]) | check.append(queryDescription(deb.description, dep=build.dep.field, collapse=FALSE))){
-      build.depends <- paste0("debhelper (>> 7.0.0), r-base-dev (>= ", buildDepRVers, "), cdbs")
+      build.depends <- paste0("debhelper (>> 9.0.0), r-base-dev (>= ", buildDepRVers, "), cdbs")
       r.base.core <- gsub("r-base-core[^,]*[[:space:]]*[,]*[[:space:]]*", "", deb.description[["Depends"]])
       if(!identical(r.base.core, "")){
         build.depends <- paste(build.depends, r.base.core, sep=", ")
@@ -635,7 +635,7 @@ deb.basic.checks <- function(
 
 
 ## function deb.gen.compat()
-deb.gen.compat <- function(compat=7, deb.dir, overwrite=FALSE, action="deb"){
+deb.gen.compat <- function(compat=9, deb.dir, overwrite=FALSE, action="deb"){
   file <- file.path(deb.dir, "compat")
   if(!file_test("-f", file) | isTRUE(overwrite)){
     stopifnot(is.numeric(compat))

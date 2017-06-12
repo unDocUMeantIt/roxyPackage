@@ -57,7 +57,7 @@ the \code{pck.description} parameter of \code{\link[roxyPackage:roxy.package]{ro
 Note that if certain key values are missing,
       \code{debianize} will automatically use some defaults:
 \describe{
-  \item{Build.Depends.Indep}{\code{"debhelper (>> 7.0.0), r-base-dev (>= <R.vers>),
+  \item{Build.Depends.Indep}{\code{"debhelper (>> 9.0.0), r-base-dev (>= <R.vers>),
       cdbs"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format;
     if \code{arch} is not set to \code{"all"},
       the field \code{Build.Depends} is used instead}

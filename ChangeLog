@@ -5,6 +5,10 @@ unreleased:
   - this release is under development
 changed:
   - cleaned up dependencies, now using mostly imports instead
+  - set debhelper default dependency to >> 9.0.0 (instead of >> 7.0.0)
+added:
+  - debianize(): explain in the docs that setting a package in "depends.origin.alt"
+    to NULL will enable you to provide the full R debian package name
 
 changes in version 0.05-3 (2017-06-09)
 fixed:
