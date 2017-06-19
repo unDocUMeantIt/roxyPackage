@@ -6,6 +6,8 @@ unreleased:
 changed:
   - cleaned up dependencies, now using mostly imports instead
   - set debhelper default dependency to >> 9.0.0 (instead of >> 7.0.0)
+  - worked around the news2Rd issue by copying the function to the internal namespace
+  - there's also no longer a need to call private functions from the XiMpLe package
 added:
   - debianize(): explain in the docs that setting a package in "depends.origin.alt"
     to NULL will enable you to provide the full R debian package name

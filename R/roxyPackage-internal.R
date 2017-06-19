@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -49,6 +49,10 @@ if(isTRUE(R_system_version(getRversion()) < 2.15)){
     return(paste(..., sep="", collapse=collapse))
   }
 } else {}
+
+## work around some limitations regarding private functions
+installMD5sums <- getFromNamespace(".installMD5sums", "tools")
+news2Rd <- getFromNamespace("news2Rd", "tools")
 
 ## announce removal of support for old R versions in future releases
 if(isTRUE(R_system_version(getRversion()) < 3.0)){
@@ -748,3 +752,103 @@ getURL <- function(URL=NULL, purpose="default"){
   }
   return(result)
 } ## end function getURL()
+
+## function XML.value()
+# checks if 'tag' is actually not a tag but value/content/data. returns TRUE or FALSE
+# simplified from a function originally in the XiMpLe package
+XML.value <- function(tag){
+  return(sapply(
+    tag,
+    function(this.tag){
+      return(grepl("^[[:space:]]*[^<]", this.tag))
+    },
+    USE.NAMES=FALSE
+  ))
+} ## end function XML.value()
+
+
+## function split.chars()
+# used to split a character string into parts at each occurrence of the start and end of a regex pattern
+# this private function was originally a part of the XiMpLe package and copied here in a simplified version
+split.chars <- function(txt, pattern){
+  found.pattern <- gregexpr(pattern, text=txt, perl=TRUE)
+  found.pattern.start <- found.pattern[[1]]
+  found.pattern.end <- found.pattern.start + attr(found.pattern[[1]], "match.length") - 1
+  # returned -1 if pattern wasn't found
+  if(found.pattern.start[1] == -1){
+    return(txt)
+  } else {
+    txt.length <- nchar(txt)
+    num.found.patterns <- length(found.pattern.start)
+    result <- unlist(sapply(
+      0:num.found.patterns,
+      function(pat.idx){
+        # 0: chars before first match
+        if(pat.idx == 0){
+          if(found.pattern.start[1] > 1){
+            return(substr(txt, 1, found.pattern.start[1] - 1))
+          } else {}
+        } else {
+          result.match <- substr(txt, found.pattern.start[pat.idx], found.pattern.end[pat.idx])
+          # check if there's stuff between two matches
+          aft.match <- found.pattern.end[pat.idx] + 1
+            if(pat.idx < num.found.patterns){
+              nxt.match <- found.pattern.start[pat.idx + 1]
+            } else {
+              nxt.match <- txt.length + 1
+            }
+          if(aft.match < nxt.match){
+            result.aft.match <- trim(substr(txt, aft.match, nxt.match - 1))
+            # remove empty space
+            if(!identical("", result.aft.match)){
+              result.match <- c(result.match, result.aft.match)
+            } else {}
+          } else {}
+          return(result.match)
+        }
+      },
+      USE.NAMES=FALSE
+    ), use.names=FALSE)
+    return(result)
+  }
+} ## end function split.chars()
+
+
+## function XML.single.tags()
+# Splits one character string or vector with an XML tree into a vector with its single tags.
+# - tree: The XML tree, must be character.
+# this private function was originally a part of the XiMpLe package and copied here in a simplified version
+XML.single.tags <- function(tree){
+  if(!is.character(tree)){
+    stop(simpleError("'tree' must be character!"))
+  } else {}
+  if(length(tree) > 1) {
+    # force tree into one string
+    tree <- paste(tree, collapse="")
+  } else {}
+  # remove space at beginning (and end)
+  tree <- trim(tree)
+
+  ## the main splitting process
+  # we don't need CDATA or comments
+  tree <- gsub(
+    pattern="<!\\[CDATA\\[((?s).*?)\\]\\]>|/\\*[[:space:]]*<!\\[CDATA\\[[[:space:]]*\\*/((?s).*?)/\\*[[:space:]]*\\]\\]>[[:space:]]*\\*/|<!--((?s).*?)-->",
+    replacement="",
+    x=tree,
+    perl=TRUE
+  )
+  # now do the splitting
+  single.tags <- sapply(
+    tree,
+    function(this.tree){
+      these.tags <- unlist(split.chars(txt=this.tree, "<((?s).*?)>"), use.names=FALSE)
+      # remove probably troublesome content like newlines
+      these.tags[!XML.value(these.tags)] <- gsub("[[:space:]]+", " ", these.tags[!XML.value(these.tags)])
+      return(these.tags)
+    },
+    USE.NAMES=FALSE
+  )
+  single.tags <- unlist(single.tags, use.names=FALSE)
+  single.tags <- as.character(single.tags)
+  return(single.tags)
+} ## end function XML.single.tags()

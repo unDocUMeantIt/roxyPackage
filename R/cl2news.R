@@ -67,7 +67,7 @@ cl2news <- function(log, news=NULL, codify=TRUE, overwrite=TRUE){
       on.exit(unlink(tmp.NEWS.Rd))
     }
     wrote.RD.file <- tryCatch(
-      tools:::news2Rd(file=log, out=tmp.NEWS.Rd, codify=codify),
+      news2Rd(file=log, out=tmp.NEWS.Rd, codify=codify),
         error=function(e){
           warning(paste0("news: could not translate ", log," into NEWS.Rd file!"), call.=FALSE)
           return(FALSE)

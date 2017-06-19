@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -33,13 +33,15 @@
 #'      \item{\code{atom}:}{Optional, full URL to the RSS feed on the web, used for \code{atom:link rel="self"}.}
 #'    }
 #' @return No return value, writes a file or to stdout()
+#' @importFrom tools Rd2HTML
+#' @importFrom XiMpLe parseXMLTree node XMLNode XMLTree
 #' @export
 #' @examples
 #' \dontrun{
 #' channel.info <- c(
 #'   title="roxyPackage",
 #'   link="http://R.reaktanz.de/pckg/roxyPackage",
-#'   description=roxyPackage:::pckg.dscrptn[["Description"]],
+#'   description="Utilities to Automate Package Builds",
 #'   atom="http://R.reaktanz.de/pckg/roxyPackage/rss.xml")
 #' rss.tree <- news2rss("~/R/roxyPackage/NEWS.Rd",
 #'   channel=channel.info)
@@ -91,7 +93,7 @@ news2rss <- function(news, rss=NULL, html=NULL, encoding="UTF-8",
     # at least until R 2.14 <ul> and <ol> blocks missed a closing </li>, so
     # XiMpLe::parseXMLTree() comes to really strange results
     # we'll try to fix this, before we parse the object
-    html.tags <- XiMpLe:::XML.single.tags(html.raw)
+    html.tags <- XML.single.tags(html.raw)
     tag.li.open <- tolower(html.tags) %in% "<li>"
     tag.li.close <- tolower(html.tags) %in% "</li>"
     if(sum(tag.li.open) > sum(tag.li.close)){

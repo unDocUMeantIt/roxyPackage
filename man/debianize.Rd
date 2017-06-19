@@ -75,17 +75,19 @@ like \code{Build.Depends.Indep} or \code{Depends} rather than replacing them,
       provide a named list with a character vector called "append". For example:
 \code{Depends=list(append=c("libmysql++3"))}.}
 
-\item{depends.origin}{A character string to set the default origin for packages which are a dependency of this one. In case all dependencies can be
+\item{depends.origin}{A character string to set the default origin for R packages which are a dependency of this one. In case all dependencies can be
 met by Debian packages from CRAN releases,
       you can leave this to the default setting. If you need more control, see \code{depends.origin.alt}.}
 
-\item{depends.origin.alt}{A named list of alternative origins for packages which are a dependency of this one. By default,
+\item{depends.origin.alt}{A named list of alternative origins for R packages which are a dependency of this one. By default,
       \code{depends.origin} is used,
 but if you know that certain dependencies are of different origin (e.g.,
       your own repository), you can set this here. Each list element must be named after
 the R package you want to set an origin for,
       and must be a character vector or single string, like \code{list(foo="other-janedoe")}. If more than one origin
-is given, they will be set as alternatives (using the pipe \code{"|"} as "or").}
+is given,
+      they will be set as alternatives (using the pipe \code{"|"} as "or"). For full control over the package name use \code{list(foo=NULL)},
+which will fallback to \code{foo} as the name of the Debian package.}
 
 \item{actions}{Character vector, naming the actions to perform:
 \describe{

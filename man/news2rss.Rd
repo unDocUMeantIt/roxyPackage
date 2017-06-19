@@ -41,7 +41,7 @@ This function should take either HTML or Rd files and return a valid RSS 2.0 XML
 channel.info <- c(
   title="roxyPackage",
   link="http://R.reaktanz.de/pckg/roxyPackage",
-  description=roxyPackage:::pckg.dscrptn[["Description"]],
+  description="Utilities to Automate Package Builds",
   atom="http://R.reaktanz.de/pckg/roxyPackage/rss.xml")
 rss.tree <- news2rss("~/R/roxyPackage/NEWS.Rd",
   channel=channel.info)
