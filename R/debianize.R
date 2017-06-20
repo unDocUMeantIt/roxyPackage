@@ -377,7 +377,7 @@ debianize <- function(
     deb.build.sources(
       srcs.name=deb.srcs.name,
       build=build.dir,
-      src.dir.name=last.dir.name(pck.source.dir),
+      src.dir.name=basename(pck.source.dir),
       version=pck.version,
       repo=repo.deb.path,
       distribution=distribution,
@@ -394,7 +394,7 @@ debianize <- function(
     deb.build.binary(
       deb.name=deb.pckg.name,
       build=build.dir,
-      src.dir.name=last.dir.name(pck.source.dir),
+      src.dir.name=basename(pck.source.dir),
       options=bin.opts,
       version=pck.version,
       repo=repo.deb.path,

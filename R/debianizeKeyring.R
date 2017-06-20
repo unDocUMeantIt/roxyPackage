@@ -320,7 +320,7 @@ debianizeKeyring <- function(
     deb.build.sources(
       srcs.name=deb.srcs.name,
       build=build.dir,
-      src.dir.name=last.dir.name(pck.source.dir),
+      src.dir.name=basename(pck.source.dir),
       version=version,
       repo=repo.deb.path,
       distribution=distribution,
@@ -337,7 +337,7 @@ debianizeKeyring <- function(
     deb.build.binary(
       deb.name=deb.pckg.name,
       build=build.dir,
-      src.dir.name=last.dir.name(pck.source.dir),
+      src.dir.name=basename(pck.source.dir),
       options=bin.opts,
       version=version,
       repo=repo.deb.path,

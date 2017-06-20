@@ -1039,14 +1039,6 @@ deb.gen.prerm <- function(deb.dir, key, action="deb-key", overwrite=FALSE){
 } ## end function deb.gen.prerm()
 
 
-## function last.dir.name()
-last.dir.name <- function(path){
-  path.parts <- unlist(strsplit(path, .Platform$file.sep))
-  last.name <- path.parts[length(path.parts)]
-  return(last.name)
-} ## end function last.dir.name()
-
-
 ## function deb.prepare.buildDir()
 deb.prepare.buildDir <- function(source, build, tar=Sys.which("tar")){
   old.wd <- getwd()
@@ -1056,8 +1048,13 @@ deb.prepare.buildDir <- function(source, build, tar=Sys.which("tar")){
   if(!identical(build, source)){
     # unfortunately, file.copy() cannot exclude patterns, so we'll circumvent this by using tar
     tmp.tar.dest <- file.path(build, "energize.tar")
-    tar(tmp.tar.dest, files=last.dir.name(source), tar=tar,
-      compression="none", extra_flags="-h --exclude=*\\~ --exclude-vcs")
+    # ok, in R 3.4.0, tar() was so broken that it printed each and every single file of a
+    # directory, rendering it completely useless for large directories like ones including
+    # a git repository. we're calling it manually
+    #     tar(tmp.tar.dest, files=basename(source), tar=tar,
+    #       compression="none", extra_flags="-h --exclude=*\\~ --exclude-vcs")
+    tar.call <- paste0(tar, " -chf ", tmp.tar.dest, " --exclude=*\\~ --exclude-vcs ", basename(source))
+    system(tar.call, ignore.stdout=TRUE, ignore.stderr=TRUE, intern=FALSE)
     setwd(build)
     untar("energize.tar")
     stopifnot(file.remove("energize.tar"))

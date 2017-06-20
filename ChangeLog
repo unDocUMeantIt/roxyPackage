@@ -3,11 +3,14 @@ ChangeLog for package roxyPackage
 changes in version 0.05-4 (2017-06-11)
 unreleased:
   - this release is under development
+fixed:
+  - debianize(): worked around a bug in utils::tar() rendering it almost useless
 changed:
   - cleaned up dependencies, now using mostly imports instead
   - set debhelper default dependency to >> 9.0.0 (instead of >> 7.0.0)
   - worked around the news2Rd issue by copying the function to the internal namespace
   - there's also no longer a need to call private functions from the XiMpLe package
+  - replaced private function last.dir.name() with base function basename()
 added:
   - debianize(): explain in the docs that setting a package in "depends.origin.alt"
     to NULL will enable you to provide the full R debian package name
