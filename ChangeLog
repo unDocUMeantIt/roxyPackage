@@ -5,6 +5,8 @@ unreleased:
   - this release is under development
 fixed:
   - debianize(): worked around a bug in utils::tar() rendering it almost useless
+  - fixed a really dumb bug in archive.packages() setting the
+    PGP key to 2 by default for "deb" archives
 changed:
   - cleaned up dependencies, now using mostly imports instead
   - set debhelper default dependency to >> 9.0.0 (instead of >> 7.0.0)

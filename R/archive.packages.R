@@ -173,8 +173,8 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
               repo=file.path(deb.repo, "deb"), binary=FALSE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
             )
             # default to gpg2 if no info given
-            if(is.null(deb.options[["gpg.key"]])){
-              deb.options[["gpg.key"]] <- 2
+            if(is.null(deb.options[["gpg.version"]])){
+              deb.options[["gpg.version"]] <- 2
             } else {}
             deb.update.release(
               repo.root=deb.repo,
