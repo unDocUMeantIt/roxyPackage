@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-4 (2017-06-11)
+changes in version 0.05-4 (2017-09-28)
 unreleased:
   - this release is under development
 fixed:
@@ -13,6 +13,9 @@ changed:
   - worked around the news2Rd issue by copying the function to the internal namespace
   - there's also no longer a need to call private functions from the XiMpLe package
   - replaced private function last.dir.name() with base function basename()
+  - repo: changed the way symlinks are set for macOS; we're now creating the top
+    level directory and link to ../contrib, to work around issues with infinite
+    link loops; this does not affect existing repos, only new ones
 added:
   - debianize(): explain in the docs that setting a package in "depends.origin.alt"
     to NULL will enable you to provide the full R debian package name

@@ -774,13 +774,22 @@ roxy.package <- function(
       createMissingDir(dirPath=repo.macosx.R, action="repo")
       if(!is.null(OSX.repo[["symlinks"]])){
         for (thisSymlink in OSX.repo[["symlinks"]]){
-          thisSymPath <- file.path(repo.macosx, thisSymlink)
+          thisSymPathRoot <- file.path(repo.macosx, thisSymlink)
+          thisSymPath <- file.path(thisSymPathRoot, "contrib")
           if(isTRUE(unix.OS)){
             if(!file.exists(thisSymPath)){
               jmp.back <- getwd()
-              setwd(repo.macosx)
-              r.cmd.symlink.call <- paste0(Sys.which("ln"), " -s . ", thisSymlink)
               message(paste0("repo: creating symbolic link ", thisSymPath))
+              # if we create the symlink directly, some use cases (like github project pages)
+              # get into trouble because of infinite link loops. so we first create the symlink directory
+              if(!file.exists(thisSymPathRoot)){
+                setwd(repo.macosx)
+                r.cmd.symfldr.call <- paste0(Sys.which("mkdir"), " ", thisSymlink)
+                system(r.cmd.symfldr.call, ignore.stdout=TRUE, ignore.stderr=TRUE, intern=FALSE)
+              } else {}
+              # now create the actual symlink in the newly created directory
+              setwd(file.path(repo.macosx, thisSymlink))
+              r.cmd.symlink.call <- paste0(Sys.which("ln"), " -s ../contrib .")
               system(r.cmd.symlink.call, ignore.stdout=TRUE, ignore.stderr=TRUE, intern=FALSE)
               setwd(jmp.back)
             } else {}
