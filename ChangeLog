@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-4 (2017-09-28)
+changes in version 0.05-4 (2017-10-03)
 unreleased:
   - this release is under development
 fixed:
@@ -19,6 +19,10 @@ changed:
 added:
   - debianize(): explain in the docs that setting a package in "depends.origin.alt"
     to NULL will enable you to provide the full R debian package name
+  - roxy.html(): URLs in the form of "(... <...>)" are now automatically turned into
+    <a href> nodes; i hope the parser doesn't introduce new issues
+  - roxy.html(): fields "Additional_repositories" and "NeedsCompilation" are now also
+    evaluated
 
 changes in version 0.05-3 (2017-06-09)
 fixed:

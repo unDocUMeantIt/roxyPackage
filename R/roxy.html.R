@@ -77,6 +77,22 @@ rx.html.switch <- function(desc, field){
       LinkingTo=rx.tr("LinkingTo:", rx.clean(desc[,"LinkingTo"])),
       Suggests=rx.tr("Suggests:", rx.clean(desc[,"Suggests"])),
       Enhances=rx.tr("Enhances:", rx.clean(desc[,"Enhances"])),
+      Additional_repositories=rx.tr("Additional repositories:", 
+          if(isTRUE(grepl(",", desc[,"Additional_repositories"]))){
+            # more than one extra repo
+            XMLNode("span", .children=lapply(
+                unlist(strsplit(desc[,"Additional_repositories"], ",")),
+                function(thisURL){
+                  URLnoSpace <- gsub("&", "&amp;", gsub("^[[:space:]]*|[[:space:]]*$","",thisURL))
+                  return(XMLNode("a", URLnoSpace, attrs=list(href=URLnoSpace)))
+                }
+              )
+            )
+          } else {
+            XMLNode("a", gsub("&", "&amp;", desc[,"Additional_repositories"]),
+            attrs=list(href=gsub("&", "&amp;", desc[,"Additional_repositories"])))
+         }
+        ),
       BugReports=rx.tr("BugReports:", 
         if(substr(desc[,"BugReports"], 1, 4) != 'http'){
           rx.clean(desc[,"BugReports"], nomail=FALSE, textmail=TRUE)
@@ -87,12 +103,16 @@ rx.html.switch <- function(desc, field){
       URL=rx.tr("URL:", XMLNode("a",
         gsub("&", "&amp;", desc[,"URL"]),
         attrs=list(href=gsub("&", "&amp;", desc[,"URL"])))),
+      NeedsCompilation=rx.tr("NeedsCompilation:", desc[,"NeedsCompilation"]),
       SystemRequirements=rx.tr("SystemRequirements:", rx.clean(desc[,"SystemRequirements"]))
     )
   } else {
+    if(field %in% "NeedsCompilation"){
+      return(rx.tr("NeedsCompilation:", "no"))
+    } else {}
     return(NULL)
   }
-}
+} ## end function rx.html.switch()
 
 
 ## function debRepoInfo()
@@ -227,6 +247,53 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
 } ## end function debRepoInfo()
 
 
+## function URLs_in_DESCRIPTION()
+# looks for patterns in the form of "<...>)" in a given character string and
+# replaces it with proper XiMpLe hyperlinks. returns everything in a given result node
+URLs_in_DESCRIPTION <- function(desc, result_node="p"){
+  desc <- rx.clean(desc)
+  if(isTRUE(grepl("\\<.+>\\)", desc))){
+    # we split the string at each "(<"
+    desc_split <- unlist(strsplit(desc, "<"))
+    desc_list <- list()
+    for (thisString in desc_split){
+      # then look for the presence of a closing ">)" in each substring
+      if(isTRUE(grepl(">\\)", thisString))){
+        # if one is found, we assume that the start of this substring is
+        # the start of a URL. we then split the string at the ">)", turn
+        # the first half into a <a href> node and leave the rest as text
+        thisString_split <- unlist(strsplit(thisString, ">\\)"))
+        if(length(thisString_split) > 2){
+          stop(simpleError("html: something very odd happened in your DESCRIPTION text. please check all URLs for proper '(<...>)' bracket structure!"))
+        } else {}
+        if(isTRUE(grepl("\\($", desc_list[[length(desc_list)]]))){
+          # no extra space here
+          desc_list[[length(desc_list)]] <- paste0(desc_list[[length(desc_list)]], "<")
+        } else {
+          desc_list[[length(desc_list) + 1]] <- "<"
+        }
+        desc_list[[length(desc_list) + 1]] <- XMLNode("a", attrs=list(href=thisString_split[1]), thisString_split[1])
+        desc_list[[length(desc_list) + 1]] <- ">)"
+        if(length(thisString_split) > 1){
+          if(isTRUE(grepl("^[[:alnum:]]", thisString_split[2]))){
+            desc_list[[length(desc_list) + 1]] <- thisString_split[2]
+          } else {
+            # no extra space here
+            desc_list[[length(desc_list)]] <- paste0(desc_list[[length(desc_list)]], thisString_split[2])
+          }
+        } else {}
+      } else {
+        desc_list[[length(desc_list) + 1]] <- thisString
+      }
+    }
+    result <- XMLNode(result_node, .children=desc_list)
+  } else {
+    result <- XMLNode(result_node, desc)
+  }
+  return(result)
+} ## end function URLs_in_DESCRIPTION()
+
+
 ## function roxy.html()
 # if index=TRUE, pckg is treated as a list
 # for global repository index outside pckg dir, set index=TRUE and redirect="pckg/"
@@ -294,7 +361,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     page.css <- paste0("../", css)
     html.body <- XMLNode("body",
       XMLNode("h2", paste0(pckg.name, ": ", pckg.title)),
-      XMLNode("p", rx.clean(pckg[,"Description"])),
+      URLs_in_DESCRIPTION(pckg[,"Description"]),
       if(all(!is.null(flattrUser), !is.null(URL))){
         XMLNode("p",
           readme_flattr(
@@ -317,13 +384,14 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         rx.html.switch(desc=pckg, field="LinkingTo"),
         rx.html.switch(desc=pckg, field="Suggests"),
         rx.html.switch(desc=pckg, field="Enhances"),
-#        rx.tr("Published:", pckg[,"Date"]),
+        rx.html.switch(desc=pckg, field="Additional_repositories"),
         rx.tr("Published:", as.character(as.Date(getDescField(pckg, field=c("Date","Packaged","Date/Publication"))))),
         rx.tr("Author:", pckg.participants),
         rx.tr("Maintainer:", pckg.maintainer),
         rx.html.switch(desc=pckg, field="BugReports"),
         rx.tr("License:", pckg[,"License"]),
         rx.html.switch(desc=pckg, field="URL"),
+        rx.html.switch(desc=pckg, field="NeedsCompilation"),
         rx.html.switch(desc=pckg, field="SystemRequirements"),
           if(file_test("-f", cite)){
             rx.tr("Citation:", XMLNode("a",
