@@ -13,7 +13,8 @@
 \maketitle
 
 \begin{abstract}
-R packages consist of numerous files in various formats, like \texttt{*.R}, \texttt{*.Rd}, \texttt{DESCRIPTION}, \texttt{NAMESPACE} or \texttt{CITATION}, ordered in a specific directory structure. \pckg{} tries to automatically generate most of these structures and files, so that you can concentrate on writing the actual R code for your package. If your code includes \texttt{roxygen2}-style documentation, this package can update your docs as well. It is also capable of creating a local package repository, including limited support for generating Mac OS X, Windows and Debian packages.
+R packages consist of numerous files in various formats, like \texttt{*.R}, \texttt{*.Rd}, \texttt{DESCRIPTION}, \texttt{NAMESPACE} or \texttt{CITATION}, ordered in a specific directory structure. \pckg{} tries to automatically generate most of these structures and files, so that you can concentrate on writing the actual R code for your package.
+If your code includes \texttt{roxygen2}-style documentation, this package can update your docs as well. It is also capable of creating a local package repository, including limited support for generating Mac OS X, Windows and Debian packages.
 \end{abstract}
 
 \section{Getting started}
