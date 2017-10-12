@@ -24,7 +24,14 @@
 #' 
 #' @param file Path to an *.Rnw file to convert.
 #' @param output Character string defining the R markdown output format.
+#' @param output_options A named character vector with additional options. If you need
+#'    more than the default indentaion, you have to provide it directly (see default
+#'    values for \code{toc_float}).
 #' @param engine Character string defining the \code{VignetteEngine} value.
+#' @param csl Character string defining a CSL style file for the bibliography.
+#'    Please note that you will have to provide an existing file of that name in an
+#'    appropriate location, like the *.Rmd file's directory. Ignored if \code{NULL},
+#'    or if no bibliography was detected.
 #' @param eval Logical, a default value for all R code chunks that are found. This is
 #'    like a safety net to be able to disable all code by default. Setting the default
 #'    value will be omitted if set to \code{NULL}.
@@ -43,16 +50,16 @@
 #' }
 rnw2rmd <- function(
   file,
-  output=paste(
-    "\n  html_document:",
-    "    toc: true",
-    "    toc_float:",
-    "      collapsed: false",
-    "      smooth_scroll: false",
-    "    toc_depth: 3",
-    sep="\n"
+  output="html_document",
+  output_options=c(
+    theme="cerulean",
+    highlight="kate",
+    toc="true",
+    toc_float="\n      collapsed: false\n      smooth_scroll: false",
+    toc_depth=3
   ),
   engine="knitr::rmarkdown",
+  csl=NULL,
   eval=FALSE,
   replace=NULL
 ){
@@ -80,7 +87,7 @@ rnw2rmd <- function(
     c(from="\\s*\\\\end{Sinput}", to="```"),
     c(from="\\s*\\\\begin{Schunk}", to=""),
     c(from="\\s*\\\\end{Schunk}", to=""),
-    c(from="\\s*\\\\begin{Soutput}", to="<-- \\\\begin{Soutput}"),
+    c(from="\\s*\\\\begin{Soutput}", to="<!-- \\\\begin{Soutput}"),
     c(from="\\s*\\\\end{Soutput}", to="\\\\end{Soutput} -->"),
     c(from="\\s*\\\\begin{Verbatim}", to="```"),
     c(from="\\s*\\\\end{Verbatim}", to="```"),
@@ -92,6 +99,7 @@ rnw2rmd <- function(
     c(from="\\\\Biocannopkg{(.+?)}", to="`r Biocannopkg(\"\\1\")`"),
     c(from="\\\\Biocpkg{(.+?)}", to="`r Biocpkg(\"\\1\")`"),
     c(from="\\\\cite{(.+?)}", to="[\\@\\1]"),
+    c(from="\\\\cite<(.+?)>{(.+?)}", to="[\\1 \\@\\2]"),
     c(from="\\\\ref{(.+?)}", to="\\\\@ref(\\1)"),
     c(from="\\\\url{(.+?)}", to="<\\1>"),
     c(from="\\\\href{(.+?)}{(.+?)}", to="[\\2](\\1)"),
@@ -99,6 +107,11 @@ rnw2rmd <- function(
     c(from="\\\\label{", to=" {#"), # only for sections
     c(from="\\\\deseqtwo{}", to="DESeq2"),
     c(from="\\\\footnote{(.+?)}", to="^[\\1]"),
+    c(from="\\\\bibliography{(.+?)}", to="# References"),
+    c(from="\\\\bibliographystyle{(.+?)}", to=""),
+    c(from="\\\\addcontentsline{(.+)}", to=""),
+    c(from="\\\\\\$", to="\\$"),
+    c(from="^(\\s*)%(.*)[^->]\\s*$", to="\\1<!-- \\2 -->"),
     c(from="\\\\,", to="")
   )
   if(is.list(replace)){
@@ -132,9 +145,15 @@ rnw2rmd <- function(
     preamble[["author"]] <- gsub("\\\\author{(.+?)}", "\"\\1\"", txt[[author]], perl=TRUE)
   } else {}
   preamble[["date"]] <- "\"`r Sys.Date()`\""
-  preamble[["output"]] <- output
+  if(!is.null(output_options)){
+    output_options_print <- paste(paste0("    ", names(output_options), ":"), output_options, collapse="\n")
+  } else {}
+  preamble[["output"]] <- paste0("\n  ", output, ":\n", output_options_print)
   if(isTRUE(bibliography > 0)){
     preamble[["bibliography"]] <- gsub("\\\\bibliography{(.+?)}", "\\1.bib", txt[[bibliography]], perl=TRUE)
+    if(!is.null(csl)){
+      preamble[["csl"]] <- csl
+    } else {}
   } else {}
   if(isTRUE(begin_abstract > 0)){
     abstract_text <- txt_body[c((begin_abstract + 1):(end_abstract - 1))]
@@ -161,7 +180,7 @@ rnw2rmd <- function(
   for (thisPat in pat){
     txt_body <- gsub(thisPat[["from"]], thisPat[["to"]], txt_body, perl=TRUE)
   }
-  
+
   txt_body <- paste0(preamble_rmd, paste0(txt_body, collapse="\n"))
 
   # clean up multiple newlines
