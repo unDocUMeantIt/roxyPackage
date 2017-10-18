@@ -180,6 +180,8 @@ rnw2rmd <- function(
   for (thisPat in pat){
     txt_body <- gsub(thisPat[["from"]], thisPat[["to"]], txt_body, perl=TRUE)
   }
+  
+  txt_body <- nested_env(txt=txt_body)
 
   txt_body <- paste0(preamble_rmd, paste0(txt_body, collapse="\n"))
 
@@ -188,3 +190,64 @@ rnw2rmd <- function(
   
   return(txt_body)
 }
+
+
+## internal function nested_env()
+# iterates through a character vector and tries to replace
+# itemize or enumerate blocks with R markdown equivalents
+nested_env <- function(txt){
+  begin_itemize <- paste0("\\s*\\\\begin{itemize}\\s*")
+  begin_enumerate <- paste0("\\s*\\\\begin{enumerate}\\s*")
+  level <- 0
+  enum <- 0
+  envir_in <- ""
+  for (thisTxtNum in 1:length(txt)){
+    if(isTRUE(grepl(begin_itemize, txt[thisTxtNum], perl=TRUE))){
+      envir_in <- "itemize"
+      level <- level + 1
+      txt[thisTxtNum] <- gsub(begin_itemize, "", txt[thisTxtNum], perl=TRUE)
+    } else if(isTRUE(grepl(begin_enumerate, txt[thisTxtNum], perl=TRUE))){
+      envir_in <- "enumerate"
+      enum <- 0
+      level <- level + 1
+      txt[thisTxtNum] <- gsub(begin_enumerate, "", txt[thisTxtNum], perl=TRUE)
+    } else {}
+    if(isTRUE(grepl("\\\\item", txt[thisTxtNum], perl=TRUE))){
+      if(level > 2){
+        warning("list depths of more than two levels are not supported in Rmarkdown, reducing to two levels -- please check!")
+      } else {}
+      if(envir_in %in% "itemize"){
+        indent <- switch(as.character(level),
+          "0"="",
+          "1"="* ",
+          "2"="    + ",
+          "    + "
+        )
+        txt[thisTxtNum] <- gsub("\\s*\\\\item[(.+?)]\\s*", indent, txt[thisTxtNum], perl=TRUE)
+        txt[thisTxtNum] <- gsub("\\s*\\\\item\\s*", indent, txt[thisTxtNum], perl=TRUE)
+      } else if(envir_in %in% "enumerate"){
+      message(level)
+        enum <- enum + 1
+        if(level > 1){
+          indent <- paste0("    ", letters[enum], ". ")
+        } else if(level > 0){
+          indent <- paste0(enum, ". ")
+        } else {
+          indent <- ""
+        }
+        txt[thisTxtNum] <- gsub("\\s*\\\\item\\s*", indent, txt[thisTxtNum], perl=TRUE)
+      } else {}
+    } else {}
+    if(envir_in %in% c("itemize","enumerate")){
+      envir_end <- paste0("\\s*\\\\end{",envir_in,"}\\s*")
+      if(isTRUE(grepl(envir_end, txt[thisTxtNum], perl=TRUE))){
+        level <- level - 1
+        txt[thisTxtNum] <- gsub(envir_end, "", txt[thisTxtNum], perl=TRUE)
+      } else {}
+    } else {}
+  }
+  if(level != 0){
+    warning("looks like we were not able to correctly detect all levels of ",envir," environments. is the input document valid?")
+  } else {}
+  return(txt)
+} ## end internal function nested_env()
