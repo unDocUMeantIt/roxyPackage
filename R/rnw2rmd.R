@@ -39,10 +39,16 @@
 #'    to do custom replacements in the text body. The list must contain vectors with
 #'    two character elements named \code{from} and \code{to}, to define what expressions
 #'    should be replaced and with what.
-#' @value A character string with the converted text. No file will be written.
+#' @param write_file Logical, if set to \code{TRUE} results will be written to a file in
+#'    the same directory as the input \code{file}, but with *.Rmd file ending. Default is
+#'    \code{FALSE}, meaning results are returned as a character string.
+#' @param overwrite Logical, whether existing files should be overwritten if \code{write_file=TRUE}.
+#' @value A character string with the converted text. No file will be written by default,
+#'    unless you set \code{write_file=TRUE}.
 #' @export
 #' @references
 #'  [1] https://gist.github.com/mikelove/5618f935ace6e389d3fbac03224860cd
+#'
 #'  [2] https://gist.github.com/lgatto/d9d0e3afcc0a4417e5084e5ca46a4d9e
 #' @examples
 #' \dontrun{
@@ -61,7 +67,9 @@ rnw2rmd <- function(
   engine="knitr::rmarkdown",
   csl=NULL,
   eval=FALSE,
-  replace=NULL
+  replace=NULL,
+  write_file=FALSE,
+  overwrite=FALSE
 ){
   if(is.null(eval)){
     eval_print <- ""
@@ -187,9 +195,23 @@ rnw2rmd <- function(
 
   # clean up multiple newlines
   txt_body <- gsub("[\\\n]{3,}?", "\\\n\\\n", txt_body, perl=TRUE)
-  
+
+  if(isTRUE(write_file)){
+    normalPath <- normalizePath(file)
+    outDir <- dirname(normalPath)
+    outFile <- paste0(gsub("\\.[rRsS][nN][wW]$", "", basename(normalPath)), ".Rmd")
+    outPath <- file.path(outDir, outFile)
+    if(all(file.exists(outPath), !isTRUE(overwrite))){
+      warning(paste0("file already exists, set 'overwrite=TRUE' if you want to replace it:\n  ", outPath), call.=FALSE)
+    } else {
+      message(paste0("writing to file:\n  ", outPath))
+      cat(txt_body, file=outPath)
+    }
+    return(invisible(NULL))
+  } else {}
+
   return(txt_body)
-}
+} ## end function rnw2rmd()
 
 
 ## internal function nested_env()
@@ -247,7 +269,7 @@ nested_env <- function(txt){
     } else {}
   }
   if(level != 0){
-    warning("looks like we were not able to correctly detect all levels of ",envir," environments. is the input document valid?")
+    warning("looks like we were not able to correctly detect all levels of ", envir, " environments. is the input document valid?")
   } else {}
   return(txt)
 } ## end internal function nested_env()

@@ -7,7 +7,8 @@
 rnw2rmd(file, output = "html_document", output_options = c(theme =
   "cerulean", highlight = "kate", toc = "true", toc_float =
   "\\n      collapsed: false\\n      smooth_scroll: false", toc_depth = 3),
-  engine = "knitr::rmarkdown", csl = NULL, eval = FALSE, replace = NULL)
+  engine = "knitr::rmarkdown", csl = NULL, eval = FALSE, replace = NULL,
+  writeFile = FALSE, overwrite = FALSE)
 }
 \arguments{
 \item{file}{Path to an *.Rnw file to convert.}
@@ -33,6 +34,13 @@ value will be omitted if set to \code{NULL}.}
 to do custom replacements in the text body. The list must contain vectors with
 two character elements named \code{from} and \code{to}, to define what expressions
 should be replaced and with what.}
+
+\item{writeFile}{Logical, if set to \code{TRUE} results will be written to a file in
+the same directory as the input \code{file}, but with *.Rmd file ending. Default is
+\code{FALSE}, meaning results are returned as a character string.}
+
+\item{overwrite}{Logical,
+      whether existing files should be overwritten if \code{writeFile=TRUE}.}
 }
 \description{
 This is a much enhanced R port of Perl code gists from GitHub [1, 2].
@@ -47,5 +55,6 @@ rnw2rmd(file.path(find.package("roxyPackage"),"doc","roxyPackage_vignette.Rnw"))
 }
 \references{
 [1] https://gist.github.com/mikelove/5618f935ace6e389d3fbac03224860cd
+
  [2] https://gist.github.com/lgatto/d9d0e3afcc0a4417e5084e5ca46a4d9e
 }
