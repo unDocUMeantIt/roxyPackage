@@ -852,3 +852,34 @@ XML.single.tags <- function(tree){
   single.tags <- as.character(single.tags)
   return(single.tags)
 } ## end function XML.single.tags()
+
+
+## function keep_files()
+# takes a vector of files and the supposed location of .install_extras,
+# which should be a collection of perl regexes, and return only those
+# files that match one of the rules. if the .install_extras files
+# is not found, all files are returned
+keep_files <- function(files, install_extras){
+  if(file.exists(install_extras)){
+    vign_inst_extras <- readLines(install_extras, warn=FALSE)
+    # we'll create a logical vector with the same length as
+    # files, and the value indicates whether at least one
+    # regex was matched by that file
+    keep <- sapply(
+      files,
+      function(thisFile){
+        return(any(sapply(
+          vign_inst_extras,
+          function(thisRegex){
+            return(grepl(thisRegex, thisFile, perl=TRUE))
+          }
+        )))
+      },
+      USE.NAMES=FALSE
+    )
+    result <- files[keep]
+  } else {
+    result <- files
+  }
+  return(result)
+} ## end function keep_files()

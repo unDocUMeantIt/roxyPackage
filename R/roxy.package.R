@@ -626,19 +626,27 @@ roxy.package <- function(
       pckg.vigns <- tools::pkgVignettes(dir=pck.source.dir, output=TRUE, source=TRUE)
       
       # only do the moving if any vignettes were built
-      if(length(pckg.vigns$outputs > 0)){
+      if(length(pckg.vigns$outputs) > 0){
         message("build: vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
         
         # what to move and where to move it to
-        what.mv <- c(pckg.vigns$outputs, unlist(pckg.vigns$sources, use.names=FALSE))
+        what.mv <- unique(c(pckg.vigns$outputs, unlist(pckg.vigns$sources, use.names=FALSE)))
         what.cp <- pckg.vigns$docs
+        # filter files according to .install_extras
+        inst_extras_path <- file.path(pckg.vigns$dir, ".install_extras")
+        what.mv <- keep_files(files=what.mv, install_extras=inst_extras_path)
+        what.cp <- keep_files(files=what.cp, install_extras=inst_extras_path)
         to.bin.doc <- file.path(R.libs, pck.package, "doc")
         to.src.inst.doc <- file.path(pck.source.dir, "inst", "doc")
         
         # copy to bin-package
         createMissingDir(to.bin.doc, action="doc")
-        stopifnot(file.copy(what.mv, to.bin.doc, overwrite=TRUE))
-        stopifnot(file.copy(what.cp, to.bin.doc, overwrite=TRUE))
+        if(length(what.mv) > 0){
+          stopifnot(file.copy(what.mv, to.bin.doc, overwrite=TRUE))
+        } else {}
+        if(length(what.cp) > 0){
+          stopifnot(file.copy(what.cp, to.bin.doc, overwrite=TRUE))
+        } else {}
         
         ## copy to repo/website
         stopifnot(file.copy(pckg.vigns$outputs, repo.pckg.info, overwrite=TRUE))
@@ -647,16 +655,21 @@ roxy.package <- function(
         # copy to src-package's inst/doc if not already there (this is the case if they live in directory vignettes)
         if(!grepl("inst/doc$", pckg.vigns$dir)){
           createMissingDir(to.src.inst.doc, action="doc")
-          stopifnot(file.copy(what.mv, to.src.inst.doc, overwrite=TRUE))
-          stopifnot(file.copy(what.cp, to.src.inst.doc, overwrite=TRUE))
-          stopifnot(file.remove(what.mv))
+          if(length(what.mv) > 0){
+            stopifnot(file.copy(what.mv, to.src.inst.doc, overwrite=TRUE))
+            stopifnot(file.remove(what.mv))
+          } else {}
+          if(length(what.cp) > 0){
+            stopifnot(file.copy(what.cp, to.src.inst.doc, overwrite=TRUE))
+          } else {}
         } else {
           # mimicking previous implementation
           if(isTRUE(rm.vignette)){
-            stopifnot(file.remove(what.mv))
-          }
+            if(length(what.mv) > 0){
+              stopifnot(file.remove(what.mv))
+            } else {}
+          } else {}
         }
-        # Enhancement: handle vignettes/.install_extras (cf. devtools:::copy_vignettes)
       } else {
         warning("build: Couldn't build all vignettes")
       }

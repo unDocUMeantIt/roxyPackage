@@ -24,6 +24,8 @@ added:
     <a href> nodes; i hope the parser doesn't introduce new issues
   - roxy.html(): fields "Additional_repositories" and "NeedsCompilation" are now also
     evaluated
+  - roxy.package(): vignette generation now takes an existing .install_extras file
+    into account when moving/copying files
 
 changes in version 0.05-3 (2017-06-09)
 fixed:
