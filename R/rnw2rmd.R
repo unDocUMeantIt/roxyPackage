@@ -39,6 +39,8 @@
 #'    to do custom replacements in the text body. The list must contain vectors with
 #'    two character elements named \code{from} and \code{to}, to define what expressions
 #'    should be replaced and with what.
+#' @param flattr_id Character string, the ID value of your Flattr meta tag. If set will be
+#'    added to the header of the resulting HTML file of the vignette.
 #' @param write_file Logical, if set to \code{TRUE} results will be written to a file in
 #'    the same directory as the input \code{file}, but with *.Rmd file ending. Default is
 #'    \code{FALSE}, meaning results are returned as a character string.
@@ -68,6 +70,7 @@ rnw2rmd <- function(
   csl=NULL,
   eval=FALSE,
   replace=NULL,
+  flattr_id=NULL,
   write_file=FALSE,
   overwrite=FALSE
 ){
@@ -156,6 +159,17 @@ rnw2rmd <- function(
     preamble[["author"]] <- gsub("\\\\author{(.+?)}", "\"\\1\"", txt[[author]], perl=TRUE)
   } else {}
   preamble[["date"]] <- "\"`r Sys.Date()`\""
+  if(all(!is.null(flattr_id), identical(output, "html_document"))){
+    output_options <- c(output_options, includes=paste0("\n      in_header: vignette_header.html"))
+    r_setup <- paste0(
+      "\n```{r setup, include=FALSE}\n",
+      "header_con <- file(\"vignette_header.html\")\n",
+      "writeLines('<meta name=\"flattr:id\" content=\"",flattr_id,"\" />', header_con)\n",
+      "close(header_con)\n```\n"
+    )
+  } else {
+    r_setup <- ""
+  }
   if(!is.null(output_options)){
     output_options_print <- paste(paste0("    ", names(output_options), ":"), output_options, collapse="\n")
   } else {}
@@ -194,7 +208,7 @@ rnw2rmd <- function(
   
   txt_body <- nested_env(txt=txt_body)
 
-  txt_body <- paste0(preamble_rmd, paste0(txt_body, collapse="\n"))
+  txt_body <- paste0(preamble_rmd, r_setup, paste0(txt_body, collapse="\n"))
 
   # clean up multiple newlines
   txt_body <- gsub("[\\\n]{3,}?", "\\\n\\\n", txt_body, perl=TRUE)

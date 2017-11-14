@@ -8,7 +8,7 @@ rnw2rmd(file, output = "html_document", output_options = c(theme =
   "cerulean", highlight = "kate", toc = "true", toc_float =
   "\\n      collapsed: false\\n      smooth_scroll: false", toc_depth = 3),
   engine = "knitr::rmarkdown", csl = NULL, eval = FALSE, replace = NULL,
-  writeFile = FALSE, overwrite = FALSE)
+  flattr_id = NULL, write_file = FALSE, overwrite = FALSE)
 }
 \arguments{
 \item{file}{Path to an *.Rnw file to convert.}
@@ -35,12 +35,15 @@ to do custom replacements in the text body. The list must contain vectors with
 two character elements named \code{from} and \code{to}, to define what expressions
 should be replaced and with what.}
 
-\item{writeFile}{Logical, if set to \code{TRUE} results will be written to a file in
+\item{flattr_id}{Character string, the ID value of your Flattr meta tag. If set will be
+added to the header of the resulting HTML file of the vignette.}
+
+\item{write_file}{Logical, if set to \code{TRUE} results will be written to a file in
 the same directory as the input \code{file}, but with *.Rmd file ending. Default is
 \code{FALSE}, meaning results are returned as a character string.}
 
 \item{overwrite}{Logical,
-      whether existing files should be overwritten if \code{writeFile=TRUE}.}
+      whether existing files should be overwritten if \code{write_file=TRUE}.}
 }
 \description{
 This is a much enhanced R port of Perl code gists from GitHub [1, 2].
