@@ -344,15 +344,6 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         attrs=list(href=rss.file))
     } else {}
 
-    # check if we need to prepare for flattr button
-    if(!is.null(flattrUser)){
-      if(is.null(URL)){
-        message("html: you need to specify 'URL' to generate a Flattr button!")
-      } else {
-        flattrImage <- "../flattr-badge-large.png"
-      }
-    } else {}
-
     pckg.title <- rx.clean(pckg[,"Title"])
     pckg.authors <- get.authors(pckg, maintainer=TRUE, all.participants=TRUE)
     pckg.participants <- rx.clean(pckg.authors[["participants"]])
@@ -362,21 +353,6 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     html.body <- XMLNode("body",
       XMLNode("h2", paste0(pckg.name, ": ", pckg.title)),
       URLs_in_DESCRIPTION(pckg[,"Description"]),
-      if(all(!is.null(flattrUser), !is.null(URL))){
-        XMLNode("p",
-          readme_flattr(
-            user_id=flattrUser,
-            url=paste0(URL,"/pckg/", pckg.name, "/index.html"),
-            title=pckg.name,
-            language="en_GB",
-            tags="stats,R",
-            category="software",
-            buttonText="Flattr this R package",
-            img=flattrImage,
-            md=FALSE
-          )
-        )
-      },
       XMLNode("table",
         rx.tr("Version:", pckg[,"Version"]),
         rx.html.switch(desc=pckg, field="Depends"),
@@ -484,6 +460,11 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         XMLNode("meta", attrs=list(
           "http-equiv"="Content-Type",
           content="text/html; charset=utf-8")),
+        if(!is.null(flattrUser)){
+          XMLNode("meta", attrs=list(
+            name="flattr:id",
+            content=flattrUser))
+        } else {},
         XMLNode("meta", attrs=list(
           name="generator",
           content="roxyPackage")),

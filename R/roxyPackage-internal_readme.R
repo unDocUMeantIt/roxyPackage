@@ -79,14 +79,7 @@ readme_text <- function(
     author=NULL,
     githubUser=NULL,
     githubRepo=NULL,
-    flattrUser=NULL,
-    fl_url=NULL,
-    fl_title=NULL,
-    fl_language="en_GB",
-    fl_tags="github",
-    fl_category="software",
-    fl_buttonText="Flattr this git repo",
-    fl_img="https://api.flattr.com/button/flattr-badge-large.png"
+    flattrUser=NULL
   ){
     includeFlattr <- includeLicense <- ""
 
@@ -105,25 +98,11 @@ readme_text <- function(
     } else {}
 
     if(!is.null(flattrUser)){
-      if(all(is.null(fl_url), !is.null(githubUser), !is.null(githubRepo))){
-        # if no flattr url was given but we have all github info, we'll use that
-        fl_url <- paste0("https://github.com/", githubUser, "/", githubRepo)
-      } else {}
-      if(all(!is.null(fl_url), !is.null(fl_title))){
-        includeFlattr <- paste0(
-          readme_flattr(
-            user_id=flattrUser,
-            url=fl_url,
-            title=fl_title,
-            language=fl_language,
-            tags=fl_tags,
-            category=fl_category,
-            buttonText=fl_buttonText,
-            img=fl_img
-          ),
-          "\n\n"
-        )
-      } else {}
+      message("readme: flattr is deactivated for the time being, due to the changes to its API.")
+#       preamble <- paste0(
+#         "---"
+#         "---\n"
+#       )
     } else {}
 
     result <- paste0(

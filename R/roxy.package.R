@@ -133,16 +133,16 @@
 #'    }
 #'    These URLs are not the path to the local file system, but should be the URLs to the respecive repository as it is available
 #'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"}, \code{"deb"}, and possibly \code{"html"} --
-#'    if \code{flattrUser} is also set in \code{readme.options}, a Flattr button will be added to the HTML page, using the default URL.
+#'    if \code{flattrUser} is also set in \code{readme.options}, a Flattr meta tag be added to the HTML page.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
 #'    will be used.
 #' @param readme.options A named list with parameters that add optional extra information to an initial README.md file, namely instructions to install the package
-#'    directly from a GitHub repository, and a Flattr button. Ignore this if you don't use either. Theoretically, you can overwrite all values of the internal
+#'    directly from a GitHub repository, and a Flattr meta header tag. Ignore this if you don't use either. Theoretically, you can overwrite all values of the internal
 #'    function \code{readme_text} (e.g., try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
 #'    \describe{
-#'      \item{\code{githubUser}}{Your GitHub user name, can be used both to contruct the GitHub repo URL as well as the Flattr URL}
-#'      \item{\code{flattrUser}}{Your Flattr user name, also used by the \code{"html"} action in combination with \code{URL}}
+#'      \item{\code{githubUser}}{Your GitHub user name, can be used to contruct the GitHub repo URL}
+#'      \item{\code{flattrUser}}{Your Flattr meta ID, also used by the \code{"html"} action in combination with \code{URL}}
 #'    }
 #'    All other missing values are then guessed from the other package information. It is then assumed that the GitHub repo has the same name as the package.
 #' @param ChangeLog A named list of character vectors with log entry items. The element names will be used as section names in the ChangeLog entry,
@@ -525,8 +525,7 @@ roxy.package <- function(
             ),
             collapse=", "
           ),
-          githubRepo=pck.package,
-          fl_title=pck.package
+          githubRepo=pck.package
         )
       )
       formals(readme_text) <- readme.defaults
@@ -893,15 +892,6 @@ roxy.package <- function(
       RSS.local.image <- file.path(roxyPackage.lib.dir(), "images", "feed-icon-14x14.png")
       stopifnot(file.copy(RSS.local.image, RSS.image))
       message(paste0("html: copied RSS image to ", RSS.image))
-    } else {}
-    if(all(!is.null(readme.options[["flattrUser"]]), !is.null(URL))){
-      # copy flattr image, if not present
-      flattr.image <- file.path(repo.pckg.info.main, "flattr-badge-large.png")
-      if(!file_test("-f", flattr.image)){
-        flattr.local.image <- file.path(roxyPackage.lib.dir(), "images", "flattr-badge-large.png")
-        stopifnot(file.copy(flattr.local.image, flattr.image))
-        message(paste0("html: copied Flattr button image to ", flattr.image))
-      } else {}
     } else {}
     # check for binaries to link
     url.src <- url.win <- url.mac <- url.deb <- url.doc <- url.vgn <- title.vgn <- deb.repo <- NULL

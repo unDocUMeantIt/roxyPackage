@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-4 (2017-10-13)
+changes in version 0.05-4 (2017-11-15)
 unreleased:
   - this release is under development
 fixed:
@@ -16,6 +16,10 @@ changed:
   - repo: changed the way symlinks are set for macOS; we're now creating the top
     level directory and link to ../contrib, to work around issues with infinite
     link loops; this does not affect existing repos, only new ones
+  - since Flattr totally changed its API and stuff, the Flattr integration was
+    updated. no more buttons will be generated, instead a meta tag is added
+    to HTML and/or markdown documents. this also means you need to change the
+    value of 'flattrUser' to the meta tag ID for this to work correctly
 added:
   - rnw2rmd(): new function that tries to convert Sweave vignettes into R markdown
   - debianize(): explain in the docs that setting a package in "depends.origin.alt"
