@@ -93,15 +93,16 @@
 #'      \item{"binonly"}{Like \code{"package"}, but doesn't copy the source package to the repository, to enable binary-only rebuilds}
 #'      \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
 #'      \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
-#'        \code{URL} accordingly.}
+#'        \code{URL} accordingly}
 #'      \item{"doc"}{Update PDF documentation and vignette (if present), \code{R CMD Rd2pdf} (or \code{R CMD Rd2dvi} for R < 2.15)}
 #'      \item{"html"}{Update HTML index files}
 #'      \item{"win"}{Update the Windows binary package}
 #'      \item{"macosx"}{Update the Mac OS X binary package}
 #'      \item{"log"}{Generate initial ChangeLog or update a present ChangeLog file}
 #'      \item{"deb"}{Update the Debian binary package with \code{\link[roxyPackage:debianize]{debianize}} (works only on Debian systems;
-#'        see \code{deb.options}, too). \code{URL} must also be set to generate Debian repository information.}
+#'        see \code{deb.options}, too). \code{URL} must also be set to generate Debian repository information}
 #'      \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
+#'      \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}}
 #'    }
 #'    Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources, which will overwrite
 #'    an existing file with the same name! Also note that if both a \code{NEWS/NEWS.Rd} and \code{ChangeLog} file are found, only
@@ -265,7 +266,7 @@ roxy.package <- function(
       if(this.R > 1){
         # well, the same is true for some other actions
         # we'll only perform them during the *first* run
-        this.actions <- actions[!actions %in% c("roxy", "cite", "license", "doc", "cl2news", "news2rss", "cleanRd", "readme")]
+        this.actions <- actions[!actions %in% c("roxy", "cite", "license", "doc", "cl2news", "news2rss", "cleanRd", "readme", "vignette")]
         # we also don't need to repeat handling of .Rbuildignore and .Rinstignore
         Rbuildignore <- Rinstignore <- NULL
       } else {}
@@ -416,6 +417,8 @@ roxy.package <- function(
   pckg.license.file.old <- file.path(pck.source.dir, "LICENSE.txt")
   pckg.readme.file <- file.path(pck.source.dir, "README.md")
   pckg.pdf.doc <- paste0(pck.package, ".pdf")
+  pckg.vign.dir <- file.path(pck.source.dir, "vignettes")
+  pckg.vign.file <- file.path(pckg.vign.dir, paste0(pck.package, "_vignette.Rmd"))
   
   # take care of .Rbuildignore and .Rinstignore
   pckg.Rbuildignore <- configFile(root=pck.source.dir, type="build", content=Rbuildignore)
@@ -549,23 +552,14 @@ roxy.package <- function(
     cat(paste(pckg.package), file=pckg.package.file.R)
     message(paste0("roxy: updated ", pckg.package.file.R, "."))
 
-#     # a -- hopefully temporary -- workaround for roxygen2 >= 3.0.0
-#     # there's still issues with S4 classes, only said to be working with devtools,
-#     # but we don't want to add new dependencies just to get this working.
-#     # so here's a call which seems to do the trick, alas we don't yet know why... ;-)
-#     if(packageVersion("roxygen2") >= "2.2.2"){
-#       message("roxy: applying workaround for roxygen2 >= 3.0.0...")
-#       local(dummyResult <- roxygen2:::source_package(pck.source.dir))
-#     } else {}
-
-      # another experimental feature:
-      # sometimes roxygen2::roxygenize is somewhat buggy, but functions like devtools::document() still work.
-      # manually setting "roxyFunction" makes it possible to use that function instead.
-      # the default value is set in roxyPackage-internal.R!
-      useRoxyFunction <- get.roxyEnv(name="roxyFunction")
-      stopifnot(is.function(useRoxyFunction))
-      # should normally default to roxygen2::roxygenize(pck.source.dir, ...)
-      useRoxyFunction(pck.source.dir, ...)
+    # another experimental feature:
+    # sometimes roxygen2::roxygenize is somewhat buggy, but functions like devtools::document() still work.
+    # manually setting "roxyFunction" makes it possible to use that function instead.
+    # the default value is set in roxyPackage-internal.R!
+    useRoxyFunction <- get.roxyEnv(name="roxyFunction")
+    stopifnot(is.function(useRoxyFunction))
+    # should normally default to roxygen2::roxygenize(pck.source.dir, ...)
+    useRoxyFunction(pck.source.dir, ...)
   } else {}
 
   if("cleanRd" %in% actions){
@@ -609,6 +603,30 @@ roxy.package <- function(
       }
     }
   } else {}
+
+  ## generate vignette stub
+  if("vignette" %in% actions){
+    if(file.exists(pckg.vign.file)){
+      warning("vignette: Rmd file exists, please remove it if you want it re-written!", call.=FALSE)
+    } else {
+      createMissingDir(dirPath=pckg.vign.dir, action="vignette")
+      stub_text <- vignette_stub(
+        preamble=NULL,
+        txt_body=paste0(
+          "\n# A Section\n\n",
+          "## A Subsection\n\n",
+          "* Level 1\n",
+          "  + Level 2\n\n...\n\n",
+          "Don't forget to add 'knitr,rmarkdown' to the 'Suggests' field and 'VignetteBuilder=\"knitr\"' to your package description!\n"
+        ),
+        flattr_id=readme.options[["flattrUser"]],
+        R.dscrptn=pck.description
+      )
+      cat(stub_text, file=pckg.vign.file)
+      message(paste0("vignette: stub file written to ", pckg.vign.file))
+      warning("vignette: don't forget to add 'knitr,rmarkdown' to the 'Suggests' field and 'VignetteBuilder=\"knitr\"' to your package description!", call.=FALSE)
+    }
+  }
 
   ## update docs (reference manual and vignettes)
   if("doc" %in% actions){

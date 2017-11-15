@@ -51,7 +51,7 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
       but doesn't copy the source package to the repository, to enable binary-only rebuilds}
   \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
   \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
-    \code{URL} accordingly.}
+    \code{URL} accordingly}
   \item{"doc"}{Update PDF documentation and vignette (if present),
       \code{R CMD Rd2pdf} (or \code{R CMD Rd2dvi} for R < 2.15)}
   \item{"html"}{Update HTML index files}
@@ -60,8 +60,9 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
   \item{"log"}{Generate initial ChangeLog or update a present ChangeLog file}
   \item{"deb"}{Update the Debian binary package with \code{\link[roxyPackage:debianize]{debianize}} (works only on Debian systems;
     see \code{deb.options},
-      too). \code{URL} must also be set to generate Debian repository information.}
+      too). \code{URL} must also be set to generate Debian repository information}
   \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
+  \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}}
 }
 Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources,
       which will overwrite

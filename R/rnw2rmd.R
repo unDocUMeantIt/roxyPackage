@@ -159,17 +159,11 @@ rnw2rmd <- function(
     preamble[["author"]] <- gsub("\\\\author{(.+?)}", "\"\\1\"", txt[[author]], perl=TRUE)
   } else {}
   preamble[["date"]] <- "\"`r Sys.Date()`\""
-  if(all(!is.null(flattr_id), identical(output, "html_document"))){
-    output_options <- c(output_options, includes=paste0("\n      in_header: vignette_header.html"))
-    r_setup <- paste0(
-      "\n```{r setup, include=FALSE}\n",
-      "header_con <- file(\"vignette_header.html\")\n",
-      "writeLines('<meta name=\"flattr:id\" content=\"",flattr_id,"\" />', header_con)\n",
-      "close(header_con)\n```\n"
-    )
-  } else {
-    r_setup <- ""
-  }
+  output_options <- flattr_header(
+    output_options=output_options,
+    flattr_id=flattr_id,
+    output=output
+  )[["output_options"]]
   if(!is.null(output_options)){
     output_options_print <- paste(paste0("    ", names(output_options), ":"), output_options, collapse="\n")
   } else {}
@@ -196,22 +190,24 @@ rnw2rmd <- function(
     sep="\n  "
   )
 
-  preamble_rmd <- "---"
-  for (thisPreamble in names(preamble)){
-    preamble_rmd <- paste0(preamble_rmd, "\n", thisPreamble, ": ", preamble[[thisPreamble]])
-  }
-  preamble_rmd <- paste0(preamble_rmd, "\n---\n")
-
   for (thisPat in pat){
     txt_body <- gsub(thisPat[["from"]], thisPat[["to"]], txt_body, perl=TRUE)
   }
   
   txt_body <- nested_env(txt=txt_body)
 
-  txt_body <- paste0(preamble_rmd, r_setup, paste0(txt_body, collapse="\n"))
-
   # clean up multiple newlines
   txt_body <- gsub("[\\\n]{3,}?", "\\\n\\\n", txt_body, perl=TRUE)
+  
+  txt_body <- vignette_stub(
+    preamble=preamble,
+    txt_body=txt_body,
+    output=output,
+    output_options=output_options,
+    engine=engine,
+    flattr_id=flattr_id,
+    R.dscrptn=NULL
+  )
 
   if(isTRUE(write_file)){
     normalPath <- normalizePath(file)
@@ -290,3 +286,96 @@ nested_env <- function(txt){
   } else {}
   return(txt)
 } ## end internal function nested_env()
+
+
+## internal function flattr_header()
+flattr_header <- function(
+  output_options,
+  flattr_id=NULL,
+  output="html_document"
+){
+  result <- list()
+  if(all(!is.null(flattr_id), identical(output, "html_document"))){
+    result[["output_options"]] <- c(output_options, includes=paste0("\n      in_header: vignette_header.html"))
+    result[["r_setup"]] <- paste0(
+      "\n```{r setup, include=FALSE}\n",
+      "header_con <- file(\"vignette_header.html\")\n",
+      "writeLines('<meta name=\"flattr:id\" content=\"",flattr_id,"\" />', header_con)\n",
+      "close(header_con)\n```\n"
+    )
+  } else {
+    result[["output_options"]] <- output_options
+    result[["r_setup"]] <- ""
+  }
+  return(result)
+} ## end internal function flattr_header()
+
+
+## internal function vignette_stub()
+# writes a proper *.Rmd file according to the given defaults
+# preamble: a list of named character strings, where each element will become one entry in the document preamble
+#   indentation must already be present
+# R.dscrptn: if the preamble is empty, you can also give the package's description to generate a basic preamble
+vignette_stub <- function(
+  preamble=NULL,
+  txt_body=NULL,
+  output="html_document",
+  output_options=c(
+    theme="cerulean",
+    highlight="kate",
+    toc="true",
+    toc_float="\n      collapsed: false\n      smooth_scroll: false",
+    toc_depth=3
+  ),
+  engine="knitr::rmarkdown",
+  flattr_id=NULL,
+  R.dscrptn=NULL
+){
+  fl_hd <- flattr_header(
+    output_options=output_options,
+    flattr_id=flattr_id,
+    output=output
+  )
+  if(is.null(preamble)){
+    if(is.null(R.dscrptn)){
+      stop(simpleError("vignette_stub: you need to provide either a preamble or a package description to generate a vignette!"))
+    } else {}
+    preamble <- list()
+    preamble[["title"]] <- paste0("Using the ", R.dscrptn[["Package"]], " Package")
+    ## author
+    if(is.null(R.dscrptn[["Authors@R"]])){
+      preamble[["author"]] <- gsub("[[:space:]]*<[^>]*>", "", as.character(R.dscrptn[["Author"]]))
+    } else {
+      preamble[["author"]] <- paste(
+        format(
+          get.by.role(eval(parse(text=as.character(R.dscrptn[["Authors@R"]]))), "aut"),
+          include=c("given", "family")
+        ),
+        collapse=", "
+      )
+    }
+    preamble[["date"]] <- "\"`r Sys.Date()`\""
+    output_options <- fl_hd[["output_options"]]
+    if(!is.null(output_options)){
+      output_options_print <- paste(paste0("    ", names(output_options), ":"), output_options, collapse="\n")
+    } else {}
+    preamble[["output"]] <- paste0("\n  ", output, ":\n", output_options_print)
+    preamble[["abstract"]] <- paste0(">\n  ", paste(R.dscrptn[["Description"]], collapse="\n  "))
+    preamble[["vignette"]] <- paste(
+      ">",
+      paste0("%\\VignetteIndexEntry{", preamble[["title"]], "}"),
+      paste0("%\\VignetteEngine{", engine, "}"),
+      sep="\n  "
+    )
+  } else {}
+
+  preamble_rmd <- "---"
+  for (thisPreamble in names(preamble)){
+    preamble_rmd <- paste0(preamble_rmd, "\n", thisPreamble, ": ", preamble[[thisPreamble]])
+  }
+  preamble_rmd <- paste0(preamble_rmd, "\n---\n")
+
+  txt_body <- paste0(preamble_rmd, fl_hd[["r_setup"]], paste0(txt_body, collapse="\n"))
+
+  return(txt_body)
+} ## end internal function vignette_stub()

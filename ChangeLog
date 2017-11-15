@@ -26,6 +26,8 @@ added:
     evaluated
   - roxy.package(): vignette generation now takes an existing .install_extras file
     into account when moving/copying files
+  - roxy.package(): new action "vignette" can be used to generate an initial vignette
+    stub file
 
 changes in version 0.05-3 (2017-06-09)
 fixed:
