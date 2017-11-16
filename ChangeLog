@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-4 (2017-11-15)
+changes in version 0.05-4 (2017-11-16)
 unreleased:
   - this release is under development
 fixed:
@@ -8,6 +8,9 @@ fixed:
   - fixed a really dumb bug in archive.packages() setting the
     PGP key to 2 by default for "deb" archives
 changed:
+  - the arguments 'html.index' and 'html.title' were moved to 'index' and 'title' of
+    a new option list called 'html.options' for more consistency; old code should still
+    work for the time being, but trigger a warning -- please update your scripts!
   - cleaned up dependencies, now using mostly imports instead
   - set debhelper default dependency to >> 9.0.0 (instead of >> 7.0.0)
   - worked around the news2Rd issue by copying the function to the internal namespace
@@ -18,8 +21,9 @@ changed:
     link loops; this does not affect existing repos, only new ones
   - since Flattr totally changed its API and stuff, the Flattr integration was
     updated. no more buttons will be generated, instead a meta tag is added
-    to HTML and/or markdown documents. this also means you need to change the
-    value of 'flattrUser' to the meta tag ID for this to work correctly
+    to HTML and/or markdown documents. this also means you need to remove the
+    'flattrUser' value from 'readme.options' and add your meta tag ID to the new
+    'html.options' for this to work correctly
 added:
   - rnw2rmd(): new function that tries to convert Sweave vignettes into R markdown
   - debianize(): explain in the docs that setting a package in "depends.origin.alt"

@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -102,7 +102,7 @@
 #'      \item{"deb"}{Update the Debian binary package with \code{\link[roxyPackage:debianize]{debianize}} (works only on Debian systems;
 #'        see \code{deb.options}, too). \code{URL} must also be set to generate Debian repository information}
 #'      \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
-#'      \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}}
+#'      \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}; if \code{html.options} has a \code{flattr.id}, it will be included}
 #'    }
 #'    Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources, which will overwrite
 #'    an existing file with the same name! Also note that if both a \code{NEWS/NEWS.Rd} and \code{ChangeLog} file are found, only
@@ -112,8 +112,6 @@
 #'    they will not be kept in the source package but just be moved to the \code{./pckg/$PACKAGENAME} directory of the repository.
 #' @param R.homes Path to the R installation to use. Can be set manually to build packages for other R versions than the default one,
 #'    if you have installed them in parallel. Should probably be used together with \code{R.libs}.
-#' @param html.index A character string for the headline of the global index HTML file.
-#' @param html.title A character string for the title tag prefix of the package index HTML file.
 #' @param Rcmd.options A named character vector with options to be passed on to the internal calls of \code{R CMD build},
 #'    \code{R CMD INSTALL}, \code{R CMD check} and \code{R CMD Rd2pdf} (or \code{R CMD Rd2dvi} for R < 2.15). Change these only if you know what you're doing!
 #'    Will be passed on as given here. To deactivate, options must explicitly be se to \code{""}, missing options will be used with the default values.
@@ -133,18 +131,24 @@
 #'    }
 #'    These URLs are not the path to the local file system, but should be the URLs to the respecive repository as it is available
 #'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"}, \code{"deb"}, and possibly \code{"html"} --
-#'    if \code{flattrUser} is also set in \code{readme.options}, a Flattr meta tag be added to the HTML page.
+#'    if \code{flattr.id} is also set in \code{html.options}, a Flattr meta tag be added to the HTML page.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
 #'    will be used.
 #' @param readme.options A named list with parameters that add optional extra information to an initial README.md file, namely instructions to install the package
-#'    directly from a GitHub repository, and a Flattr meta header tag. Ignore this if you don't use either. Theoretically, you can overwrite all values of the internal
+#'    directly from a GitHub repository. Ignore this if you don't use GitHub. Theoretically, you can overwrite all values of the internal
 #'    function \code{readme_text} (e.g., try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
 #'    \describe{
 #'      \item{\code{githubUser}}{Your GitHub user name, can be used to contruct the GitHub repo URL}
-#'      \item{\code{flattrUser}}{Your Flattr meta ID, also used by the \code{"html"} action in combination with \code{URL}}
 #'    }
 #'    All other missing values are then guessed from the other package information. It is then assumed that the GitHub repo has the same name as the package.
+#' @param html.options A named list with parameters to be used for generating the HTML files of the repository. These values are recognized:
+#'    \describe{
+#'      \item{\code{index}}{A character string for the headline of the global index HTML file; if missing, "Available R Packages" will be used as default}
+#'      \item{\code{title}}{A character string for the title tag prefix of the package index HTML file; if missing, "R package" will be used as default}
+#'      \item{\code{flattr.id}}{A Flattr meta ID, will be added to the headers of package specific HTML files, and to a vignette stub if the \code{"vignette"} action is active}
+#'      \item{\code{repo.flattr.id}}{A Flattr meta ID, will be added to the headers of all global HTML files of the repository}
+#'    }
 #' @param ChangeLog A named list of character vectors with log entry items. The element names will be used as section names in the ChangeLog entry,
 #'    and each character string in a vector will be pasted as a log item. The news you provide here will be appended to probably present news, while
 #'    trying to prevent duplicate entries to appear. If you need more control, don't use the \code{"log"} action, but have a look at
@@ -218,8 +222,6 @@ roxy.package <- function(
   cleanup=FALSE,
   rm.vignette=FALSE,
   R.homes=R.home(),
-  html.index="Available R Packages",
-  html.title="R package",
   Rcmd.options=c(
     install="--install-tests",
     build="--no-manual --no-build-vignettes --md5",
@@ -228,11 +230,28 @@ roxy.package <- function(
   URL=NULL,
   deb.options=NULL,
   readme.options=NULL,
+  html.options=NULL,
   ChangeLog=list(changed=c("initial release"), fixed=c("missing ChangeLog")),
   Rbuildignore=NULL,
   Rinstignore=NULL,
   OSX.repo=list(main="contrib", symlinks="mavericks"),
   ...){
+  
+  # ensure backwards compatibility
+  extra_options <- list(...)
+  if("html.index" %in% names(extra_options)){
+    warning("The 'html.index' argument was moved to 'html.options', please see the docs and adjust your code!", call.=FALSE)
+    html.options[["index"]] <- extra_options[["html.index"]]
+  } else {}
+  if("html.title" %in% names(extra_options)){
+    warning("The 'html.title' argument was moved to 'html.options', please see the docs and adjust your code!", call.=FALSE)
+    html.options[["title"]] <- extra_options[["html.title"]]
+  } else {}
+  if("flattrUser" %in% names(readme.options)){
+    warning("The 'flattrUser' argument was renamed into 'flattr.id' and moved from 'readme.options' to 'html.options', please see the docs and adjust your code!", call.=FALSE)
+    html.options[["flattr.id"]] <- readme.options[["flattrUser"]]
+    readme.options[["flattrUser"]] <- NULL
+  } else {}
 
   # avoid some NOTEs from R CMD check
   AuthorR <- AuthorsR <- Author.R <- Authors.R <- NULL
@@ -281,12 +300,11 @@ roxy.package <- function(
         cleanup=cleanup,
         rm.vignette=rm.vignette,
         R.homes=this.home,
-        html.index=html.index,
-        html.title=html.title,
         Rcmd.options=Rcmd.options,
         URL=URL,
         deb.options=this.deb.options,
         readme.options=readme.options,
+        html.options=html.options,
         ChangeLog=ChangeLog,
         Rbuildignore=Rbuildignore,
         Rinstignore=Rinstignore,
@@ -449,6 +467,16 @@ roxy.package <- function(
     deb.defaults[["arch"]], ".deb"
   )
   deb.package <- file.path(repo.root, deb.repo.path.part, pckg.name.deb)
+
+  # ensure we have at least 'index' and 'title' set to defaults
+  html.options <- mergeOptions(
+    someFunction=function(index, title, flattr.id=NULL, repo.flattr.id=NULL){},
+    customOptions=html.options,
+    newDefaults=list(
+      index="Available R Packages",
+      title="R package"
+    )
+  )
 
   # check for additional CMD options
   if("build" %in% names(Rcmd.options)){
@@ -618,7 +646,7 @@ roxy.package <- function(
           "  + Level 2\n\n...\n\n",
           "Don't forget to add 'knitr,rmarkdown' to the 'Suggests' field and 'VignetteBuilder=\"knitr\"' to your package description!\n"
         ),
-        flattr_id=readme.options[["flattrUser"]],
+        flattr_id=html.options[["flattr.id"]],
         R.dscrptn=pck.description
       )
       cat(stub_text, file=pckg.vign.file)
@@ -981,9 +1009,9 @@ roxy.package <- function(
     package.html <- roxy.html(pckg.dscrptn, index=FALSE, css="web.css", R.version=R.Version.win,
       url.src=url.src, url.win=url.win, url.mac=url.mac, url.doc=url.doc, url.vgn=url.vgn, title.vgn=title.vgn,
       url.deb.repo=url.deb.repo, main.path.mac=OSX.repo[["main"]],
-      title=html.title, cite=pckg.cite.file.html, news=url.NEWS,
+      title=html.options[["title"]], cite=pckg.cite.file.html, news=url.NEWS,
       changelog=pckg.changelog, rss.file=RSS.file.name,
-      flattrUser=readme.options[["flattrUser"]], URL=getURL(URL, purpose="default")
+      flattr.id=html.options[["flattr.id"]], URL=getURL(URL, purpose="default")
     )
     target.file.pckg <- file.path(repo.pckg.info, "index.html")
     cat(package.html, file=target.file.pckg)
@@ -998,11 +1026,11 @@ roxy.package <- function(
         } else {}
       }
     target.file.pckg <- file.path(repo.pckg.info.main, "index.html")
-    pckg.index.html <- roxy.html(all.descs, index=TRUE, css="web.css", title=html.index)
+    pckg.index.html <- roxy.html(all.descs, index=TRUE, css="web.css", title=html.options[["index"]], flattr.id=html.options[["repo.flattr.id"]])
     cat(pckg.index.html, file=target.file.pckg)
     message(paste0("html: updated pckg index ", target.file.pckg))
     target.file.glob <- file.path(repo.root, "index.html")
-    global.html <- roxy.html(all.descs, index=TRUE, css="web.css", title=html.index, redirect="pckg/")
+    global.html <- roxy.html(all.descs, index=TRUE, css="web.css", title=html.options[["index"]], redirect="pckg/", flattr.id=html.options[["repo.flattr.id"]])
     cat(global.html, file=target.file.glob)
     message(paste0("html: updated global index ", target.file.glob))
   } else {}

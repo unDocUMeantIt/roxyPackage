@@ -1,4 +1,4 @@
-# Copyright 2016 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2016-2017 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -16,47 +16,6 @@
 # along with roxyPackage.  If not, see <http://www.gnu.org/licenses/>.
 
 # this file contains helper functions to write an initial REAMDE.md file
-
-# creates code for a flattr button
-#  - md: if TRUE returns markdown, if FALSE returns as XiMpLe X(HT)ML node
-readme_flattr <- function(
-    user_id,
-    url,
-    title,
-    language="en_GB",
-    tags="github",
-    category="software",
-    buttonText="Flattr this git repo",
-    img="https://api.flattr.com/button/flattr-badge-large.png",
-    md=TRUE
-  ){
-    flattrURL <- paste0(
-      "https://flattr.com/submit/auto?",
-      "user_id=", user_id,
-      "&url=", url,
-      "&title=", title,
-      if(!identical(language, "")){
-        paste0("&language=", language)
-      } else {},
-      if(!identical(tags, "")){
-        paste0("&tags=", tags)
-      } else {},
-      if(!identical(category, "")){
-        paste0("&category=", category)
-      } else {}
-    )
-    if(isTRUE(md)){
-      result <- paste0(
-        "[![", buttonText, "](", img, ")](",flattrURL,")"
-      )
-    } else {
-      result <- XMLNode("a",
-        XMLNode("img", attrs=list(src=img, alt=buttonText, style="max-width:100%;")),
-        attrs=list(href=flattrURL, target="_blank")
-      )
-    }
-    return(result)
-}
 
 # some functions for easier construction
 # headlines
@@ -78,8 +37,7 @@ readme_text <- function(
     year=format(Sys.time(), "%Y"),
     author=NULL,
     githubUser=NULL,
-    githubRepo=NULL,
-    flattrUser=NULL
+    githubRepo=NULL
   ){
     includeFlattr <- includeLicense <- ""
 
@@ -95,14 +53,6 @@ readme_text <- function(
           deb=FALSE
         )
       )
-    } else {}
-
-    if(!is.null(flattrUser)){
-      message("readme: flattr is deactivated for the time being, due to the changes to its API.")
-#       preamble <- paste0(
-#         "---"
-#         "---\n"
-#       )
     } else {}
 
     result <- paste0(

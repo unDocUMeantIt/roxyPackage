@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -300,7 +300,7 @@ URLs_in_DESCRIPTION <- function(desc, result_node="p"){
 #' @import XiMpLe
 roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
   url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, title.vgn=NULL, url.deb.repo=NULL, main.path.mac=NULL, title=NULL,
-  cite="", news="", changelog="", redirect="", rss.file=NULL, flattrUser=NULL, URL=NULL) {
+  cite="", news="", changelog="", redirect="", rss.file=NULL, flattr.id=NULL, URL=NULL) {
 
   rss.header <- rss.feed <- NULL
 
@@ -460,10 +460,10 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         XMLNode("meta", attrs=list(
           "http-equiv"="Content-Type",
           content="text/html; charset=utf-8")),
-        if(!is.null(flattrUser)){
+        if(!is.null(flattr.id)){
           XMLNode("meta", attrs=list(
             name="flattr:id",
-            content=flattrUser))
+            content=flattr.id))
         } else {},
         XMLNode("meta", attrs=list(
           name="generator",
