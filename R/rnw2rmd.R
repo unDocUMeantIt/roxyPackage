@@ -45,7 +45,7 @@
 #'    the same directory as the input \code{file}, but with *.Rmd file ending. Default is
 #'    \code{FALSE}, meaning results are returned as a character string.
 #' @param overwrite Logical, whether existing files should be overwritten if \code{write_file=TRUE}.
-#' @value A character string with the converted text. No file will be written by default,
+#' @param value A character string with the converted text. No file will be written by default,
 #'    unless you set \code{write_file=TRUE}.
 #' @export
 #' @references

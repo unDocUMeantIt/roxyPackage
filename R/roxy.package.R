@@ -94,7 +94,7 @@
 #'      \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
 #'      \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
 #'        \code{URL} accordingly}
-#'      \item{"doc"}{Update PDF documentation and vignette (if present), \code{R CMD Rd2pdf} (or \code{R CMD Rd2dvi} for R < 2.15)}
+#'      \item{"doc"}{Update PDF documentation (\code{R CMD Rd2pdf}) and vignettes if present}
 #'      \item{"html"}{Update HTML index files}
 #'      \item{"win"}{Update the Windows binary package}
 #'      \item{"macosx"}{Update the Mac OS X binary package}
@@ -113,8 +113,10 @@
 #' @param R.homes Path to the R installation to use. Can be set manually to build packages for other R versions than the default one,
 #'    if you have installed them in parallel. Should probably be used together with \code{R.libs}.
 #' @param Rcmd.options A named character vector with options to be passed on to the internal calls of \code{R CMD build},
-#'    \code{R CMD INSTALL}, \code{R CMD check} and \code{R CMD Rd2pdf} (or \code{R CMD Rd2dvi} for R < 2.15). Change these only if you know what you're doing!
+#'    \code{R CMD INSTALL}, \code{R CMD check} and \code{R CMD Rd2pdf}. Change these only if you know what you're doing!
 #'    Will be passed on as given here. To deactivate, options must explicitly be se to \code{""}, missing options will be used with the default values.
+#'    Please note that if you've set \code{VignetteBuilder} in the package description, the vignettes will always be rebuild even if you disabled the
+#'    \code{"doc"} action and keep \code{--no-build-vignettes} in the build options; this is needed to properly generate a vignette index.
 #' @param URL Either a single character string defining the URL to the root of the repository (i.e., which holds the directories \code{src}
 #'    etc., see below), or a named character vector if you need different URLs for different services. If you provide more than one URL, these are valid
 #'    names for values:
@@ -723,6 +725,12 @@ roxy.package <- function(
   if(any(c("package", "binonly") %in% actions)){
     ## fill source repo
     createMissingDir(dirPath=repo.src.contrib, action="repo")
+    # if the package uses 'VignetteBuilder' we do need to rebuild vignettes
+    # because otherwise the resulting tarball will be missing the vignette index
+    if(all("VignetteBuilder" %in% names(pckg.dscrptn), grepl("--no-build-vignettes", Rcmd.opt.build))){
+      message("build: dropping '--no-build-vignettes' from build options to force generation of vignette index")
+      Rcmd.opt.build <- gsub("--no-build-vignettes", "", Rcmd.opt.build)
+    } else {}
     ## TODO: find a solution without sedwd()
     jmp.back <- getwd()
     pck.source.dir.parent <- dirname(file.path(pck.source.dir))

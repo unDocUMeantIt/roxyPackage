@@ -51,8 +51,7 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
   \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
   \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
     \code{URL} accordingly}
-  \item{"doc"}{Update PDF documentation and vignette (if present),
-      \code{R CMD Rd2pdf} (or \code{R CMD Rd2dvi} for R < 2.15)}
+  \item{"doc"}{Update PDF documentation (\code{R CMD Rd2pdf}) and vignettes if present}
   \item{"html"}{Update HTML index files}
   \item{"win"}{Update the Windows binary package}
   \item{"macosx"}{Update the Mac OS X binary package}
@@ -82,9 +81,12 @@ if you have installed them in parallel. Should probably be used together with \c
 
 \item{Rcmd.options}{A named character vector with options to be passed on to the internal calls of \code{R CMD build},
 \code{R CMD INSTALL},
-      \code{R CMD check} and \code{R CMD Rd2pdf} (or \code{R CMD Rd2dvi} for R < 2.15). Change these only if you know what you're doing!
+      \code{R CMD check} and \code{R CMD Rd2pdf}. Change these only if you know what you're doing!
 Will be passed on as given here. To deactivate,
-      options must explicitly be se to \code{""}, missing options will be used with the default values.}
+      options must explicitly be se to \code{""}, missing options will be used with the default values.
+Please note that if you've set \code{VignetteBuilder} in the package description,
+      the vignettes will always be rebuild even if you disabled the
+\code{"doc"} action and keep \code{--no-build-vignettes} in the build options; this is needed to properly generate a vignette index.}
 
 \item{URL}{Either a single character string defining the URL to the root of the repository (i.e.,
       which holds the directories \code{src}
