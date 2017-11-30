@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.05-4 (2017-11-16)
+changes in version 0.06-1 (2017-11-30)
 unreleased:
   - this release is under development
 fixed:
@@ -8,6 +8,9 @@ fixed:
   - fixed a really dumb bug in archive.packages() setting the
     PGP key to 2 by default for "deb" archives
 changed:
+  - the package now needs at least R >= 3.0.0, all code fragments which tried to
+    keep supporting R 2.14 and even earlier were removed. no-one should use that
+    any longer
   - the arguments 'html.index' and 'html.title' were moved to 'index' and 'title' of
     a new option list called 'html.options' for more consistency; old code should still
     work for the time being, but trigger a warning -- please update your scripts!

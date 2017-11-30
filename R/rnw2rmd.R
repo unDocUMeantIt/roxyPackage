@@ -282,7 +282,7 @@ nested_env <- function(txt){
     } else {}
   }
   if(level != 0){
-    warning("looks like we were not able to correctly detect all levels of ", envir, " environments. is the input document valid?")
+    warning("looks like we were not able to correctly detect all levels of ", envir_in, " environments. is the input document valid?")
   } else {}
   return(txt)
 } ## end internal function nested_env()

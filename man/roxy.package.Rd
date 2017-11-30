@@ -6,13 +6,12 @@
 \usage{
 roxy.package(pck.source.dir, pck.version, pck.description, R.libs, repo.root,
   pck.date = Sys.Date(), actions = c("roxy", "package"), cleanup = FALSE,
-  rm.vignette = FALSE, R.homes = R.home(),
-  html.index = "Available R Packages", html.title = "R package",
-  Rcmd.options = c(install = "--install-tests", build =
-  "--no-manual --no-build-vignettes --md5", check = "--as-cran", Rd2pdf =
-  "--pdf --no-preview"), URL = NULL, deb.options = NULL,
-  readme.options = NULL, ChangeLog = list(changed = c("initial release"),
-  fixed = c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
+  rm.vignette = FALSE, R.homes = R.home(), Rcmd.options = c(install =
+  "--install-tests", build = "--no-manual --no-build-vignettes --md5", check =
+  "--as-cran", Rd2pdf = "--pdf --no-preview"), URL = NULL,
+  deb.options = NULL, readme.options = NULL, html.options = NULL,
+  ChangeLog = list(changed = c("initial release"), fixed =
+  c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
   OSX.repo = list(main = "contrib", symlinks = "mavericks"), ...)
 }
 \arguments{
@@ -62,7 +61,8 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
     see \code{deb.options},
       too). \code{URL} must also be set to generate Debian repository information}
   \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
-  \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}}
+  \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}; if \code{html.options} has a \code{flattr.id},
+      it will be included}
 }
 Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources,
       which will overwrite
@@ -79,10 +79,6 @@ they will not be kept in the source package but just be moved to the \code{./pck
 
 \item{R.homes}{Path to the R installation to use. Can be set manually to build packages for other R versions than the default one,
 if you have installed them in parallel. Should probably be used together with \code{R.libs}.}
-
-\item{html.index}{A character string for the headline of the global index HTML file.}
-
-\item{html.title}{A character string for the title tag prefix of the package index HTML file.}
 
 \item{Rcmd.options}{A named character vector with options to be passed on to the internal calls of \code{R CMD build},
 \code{R CMD INSTALL},
@@ -113,8 +109,8 @@ These URLs are not the path to the local file system,
       but should be the URLs to the respecive repository as it is available
 via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"},
       \code{"deb"}, and possibly \code{"html"} --
-if \code{flattrUser} is also set in \code{readme.options},
-      a Flattr button will be added to the HTML page, using the default URL.}
+if \code{flattr.id} is also set in \code{html.options},
+      a Flattr meta tag be added to the HTML page.}
 
 \item{deb.options}{A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default,
       \code{pck.source.dir}
@@ -124,17 +120,27 @@ will be used.}
 
 \item{readme.options}{A named list with parameters that add optional extra information to an initial README.md file,
       namely instructions to install the package
-directly from a GitHub repository,
-      and a Flattr button. Ignore this if you don't use either. Theoretically, you can overwrite all values of the internal
+directly from a GitHub repository. Ignore this if you don't use GitHub. Theoretically,
+      you can overwrite all values of the internal
 function \code{readme_text} (e.g.,
       try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
 \describe{
   \item{\code{githubUser}}{Your GitHub user name,
-      can be used both to contruct the GitHub repo URL as well as the Flattr URL}
-  \item{\code{flattrUser}}{Your Flattr user name,
-      also used by the \code{"html"} action in combination with \code{URL}}
+      can be used to contruct the GitHub repo URL}
 }
 All other missing values are then guessed from the other package information. It is then assumed that the GitHub repo has the same name as the package.}
+
+\item{html.options}{A named list with parameters to be used for generating the HTML files of the repository. These values are recognized:
+\describe{
+  \item{\code{index}}{A character string for the headline of the global index HTML file; if missing,
+      "Available R Packages" will be used as default}
+  \item{\code{title}}{A character string for the title tag prefix of the package index HTML file; if missing,
+      "R package" will be used as default}
+  \item{\code{flattr.id}}{A Flattr meta ID,
+      will be added to the headers of package specific HTML files, and to a vignette stub if the \code{"vignette"} action is active}
+  \item{\code{repo.flattr.id}}{A Flattr meta ID,
+      will be added to the headers of all global HTML files of the repository}
+}}
 
 \item{ChangeLog}{A named list of character vectors with log entry items. The element names will be used as section names in the ChangeLog entry,
 and each character string in a vector will be pasted as a log item. The news you provide here will be appended to probably present news,

@@ -345,6 +345,12 @@ roxy.package <- function(
     stop(simpleError("R version number cannot be detected, it seems."))
   } else {}
 
+  # keep checking for older R versions, as they might still be requested
+  # in multi-version builds
+  if(isTRUE(R_system_version(R.Version.full) < "3.0")){
+    stop(simpleError("Sorry, but support for R < 3.0.0 was dropped with roxyPackage 0.06-1!"))
+  } else {}
+
   # special cases: if actions do not include "roxy",
   # take infos from the DESCRIPTION file
   if(!"roxy" %in% actions | is.null(pck.description)){
@@ -368,7 +374,7 @@ roxy.package <- function(
     rss.description <- pck.description[["Description"]]
     pck.package <- roxy.description("package", description=pck.description)
     pck.title <- roxy.description("title", description=pck.description)
-    pckg.dscrptn <- roxy.description("description", description=pck.description, version=pck.version, date=as.character(pck.date), R.vers=R.Version.full)
+    pckg.dscrptn <- roxy.description("description", description=pck.description, version=pck.version, date=as.character(pck.date))
     pckg.license <- pck.description[["License"]]
   }
   pckg.package <- roxy.description("pckg.description", description=pck.description, version=pck.version, date=as.character(pck.date))
@@ -481,34 +487,15 @@ roxy.package <- function(
   # check for additional CMD options
   if("build" %in% names(Rcmd.options)){
     Rcmd.opt.build <- paste0(Rcmd.options[["build"]], " ")
-    # replace options to enable them in multi-version builds
-    if(isTRUE(R_system_version(R.Version.full) < "3.0")){
-      Rcmd.opt.build <- gsub("--no-build-vignettes", "--no-vignettes", Rcmd.opt.build)
-    } else {
-      Rcmd.opt.build <- gsub("--no-vignettes", "--no-build-vignettes", Rcmd.opt.build)
-    }
   } else {
-    # --no-vignettes is deprecated since R 3.0.0, need version check here
-    Rcmd.opt.novignettes <- ifelse(isTRUE(R_system_version(R.Version.full) < "3.0"), "--no-vignettes ", "--no-build-vignettes ")
-    # --no-manual was introduced with R 2.12, need version check here
-    Rcmd.opt.build <- ifelse(isTRUE(R_system_version(R.Version.full) < "2.12"),
-      Rcmd.opt.novignettes,
-      paste0("--no-manual ", Rcmd.opt.novignettes))
+    Rcmd.opt.build <- "--no-manual --no-build-vignettes "
   }
   
   Rcmd.opt.install <- ifelse("install" %in% names(Rcmd.options), paste0(Rcmd.options[["install"]], " "), "")
   Rcmd.opt.check <- ifelse("check" %in% names(Rcmd.options), paste0(Rcmd.options[["check"]], " "), "")
-  # --as-cran was introduced with R 2.15, strip if this is an older version
-  if(isTRUE(R_system_version(R.Version.full) < "2.15")){
-    Rcmd.opt.check <- gsub("--as-cran", "", Rcmd.opt.check)
-  } else {}
-  # R 2.15 switched from Rd2dvi to Rd2pdf
-  Rcmd.cmd.Rd2pdf <- ifelse(isTRUE(R_system_version(R.Version.full) < "2.15"), "Rd2dvi", "Rd2pdf")
+  Rcmd.cmd.Rd2pdf <- "Rd2pdf"
   if("Rd2pdf" %in% names(Rcmd.options)){
     Rcmd.opt.Rd2pdf <- paste0(Rcmd.options[["Rd2pdf"]], " ")
-  } else if("Rd2dvi" %in% names(Rcmd.options)){
-    warning("Rcmd.options: Rd2dvi is now called Rd2pdf, please update your scripts! used the settings anyway, though.", call.=FALSE)
-    Rcmd.opt.Rd2pdf <- paste0(Rcmd.options[["Rd2dvi"]], " ")
   } else {
     Rcmd.opt.Rd2pdf <- "--pdf --no-preview "
   }
@@ -695,7 +682,7 @@ roxy.package <- function(
         
         ## copy to repo/website
         stopifnot(file.copy(pckg.vigns$outputs, repo.pckg.info, overwrite=TRUE))
-        message("repo: updated  vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
+        message("repo: updated vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
         
         # copy to src-package's inst/doc if not already there (this is the case if they live in directory vignettes)
         if(!grepl("inst/doc$", pckg.vigns$dir)){
@@ -917,7 +904,7 @@ roxy.package <- function(
     # copy RSS image, if not present
     RSS.image <- file.path(repo.pckg.info.main, "feed-icon-14x14.png")
     if(!file_test("-f", RSS.image)){
-      RSS.local.image <- file.path(roxyPackage.lib.dir(), "images", "feed-icon-14x14.png")
+      RSS.local.image <- file.path(find.package("roxyPackage"), "images", "feed-icon-14x14.png")
       stopifnot(file.copy(RSS.local.image, RSS.image))
       message(paste0("html: copied RSS image to ", RSS.image))
     } else {}
@@ -991,7 +978,7 @@ roxy.package <- function(
     } else {}
     # check for NEWS.Rd or NEWS file
     if(file_test("-f", pckg.NEWS.Rd)){
-      roxy.NEWS2HTML(newsRd=pckg.NEWS.Rd, newsHTML=file.path(repo.pckg.info, "NEWS.html"), pckg=pck.package, css="../web.css", R.version=R.Version.full)
+      roxy.NEWS2HTML(newsRd=pckg.NEWS.Rd, newsHTML=file.path(repo.pckg.info, "NEWS.html"), pckg=pck.package, css="../web.css")
       url.NEWS <- pckg.NEWS.html
     } else if(file_test("-f", pckg.NEWS.inst)){
       stopifnot(file.copy(pckg.NEWS.inst, file.path(repo.pckg.info, "NEWS"), overwrite=TRUE))

@@ -3,9 +3,9 @@
 #' \tabular{ll}{
 #' Package: \tab roxyPackage\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.05-4\cr
-#' Date: \tab 2017-11-15\cr
-#' Depends: \tab R (>= 2.9.0)\cr
+#' Version: \tab 0.06-1\cr
+#' Date: \tab 2017-11-30\cr
+#' Depends: \tab R (>= 3.0.0)\cr
 #' Encoding: \tab UTF-8\cr
 #' License: \tab GPL (>= 3)\cr
 #' LazyLoad: \tab yes\cr

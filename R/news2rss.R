@@ -166,7 +166,7 @@ news2rss <- function(news, rss=NULL, html=NULL, encoding="UTF-8",
 
     xml.channel.title <- XiMpLe::XMLNode("title", channel[["title"]])
     xml.channel.link <- XiMpLe::XMLNode("link", channel[["link"]])
-    roxyPackage.version <- read.dcf(file.path(roxyPackage.lib.dir(), "DESCRIPTION"), fields="Version")
+    roxyPackage.version <- read.dcf(file.path(find.package("roxyPackage"), "DESCRIPTION"), fields="Version")
     xml.channel.generator <- XiMpLe::XMLNode("generator", paste0("roxyPackage (", roxyPackage.version, ")"))
     xml.channel.desc <- XiMpLe::XMLNode("description", XiMpLe::XMLNode("![CDATA[", channel[["description"]]))
     xml.channel.lang <- xml.channel.atom <- NULL

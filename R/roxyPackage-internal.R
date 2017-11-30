@@ -41,27 +41,10 @@ set.roxyEnv(name="Rdevel", value=FALSE)
 # sandboxing defaults to false
 set.roxyEnv(name="sandbox", value=new("roxySandbox", active=FALSE))
 
-## wrapper for paste0() needed?
-if(isTRUE(R_system_version(getRversion()) < 2.15)){
-  # if this is an older R version, we need a wrapper function for paste0()
-  # which was introduced with R 2.15 as a more efficient shortcut to paste(..., sep="")
-  paste0 <- function(..., collapse=NULL){
-    return(paste(..., sep="", collapse=collapse))
-  }
-} else {}
-
 ## work around some limitations regarding private functions
 installMD5sums <- getFromNamespace(".installMD5sums", "tools")
 news2Rd <- getFromNamespace("news2Rd", "tools")
 
-## announce removal of support for old R versions in future releases
-if(isTRUE(R_system_version(getRversion()) < 3.0)){
-  .Deprecated(msg=paste0(
-    "Support for R <3.0 will be removed from roxyPackage soon. ",
-    "Please update your installation. ",
-    "Should you have a legitimate need to still run older R versions, please contact the package author immediately!")
-  )
-} else {}
 
 ## function trim()
 # cuts off space at start and end of a character string
@@ -142,15 +125,6 @@ listRDirs <- function(path, full.path=TRUE){
     return(R.dirs)
   }
 } ## end function listRDirs()
-
-
-## function roxyPackage.lib.dir()
-# find.package() was introduced with R 2.13, need version check here
-if(isTRUE(R_system_version(getRvers()) < "2.13")){
-  roxyPackage.lib.dir <- function(){.find.package("roxyPackage")}
-} else {
-  roxyPackage.lib.dir <- function(){find.package("roxyPackage")}
-} ## end function roxyPackage.lib.dir()
 
 
 ## function filter.repo.packages()

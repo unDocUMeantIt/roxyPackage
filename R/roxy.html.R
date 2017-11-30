@@ -50,14 +50,9 @@ rx.clean <- function(txt, nomail=TRUE, newline=TRUE, textmail=TRUE){
 ## function roxy.NEWS2HTML()
 # newsRd: path to existing NEWS.Rd file
 # newsHTML: path to NEWS.html file to be written
-roxy.NEWS2HTML <- function(newsRd, newsHTML, pckg, css, R.version){
+roxy.NEWS2HTML <- function(newsRd, newsHTML, pckg, css){
   if(file_test("-f", newsRd)){
-    # stylesheet was introduced with R 2.14, need version check here
-    if(isTRUE(R_system_version(R.version) < "2.14")){
-      tools::Rd2HTML(Rd=newsRd, out=newsHTML, package=pckg)
-    } else {
-      tools::Rd2HTML(Rd=newsRd, out=newsHTML, package=pckg, stylesheet=css)
-    }
+    tools::Rd2HTML(Rd=newsRd, out=newsHTML, package=pckg, stylesheet=css)
     message(paste0("news: updated ", newsHTML, " from NEWS.Rd"))
   } else {
     warning(paste0("news: ", newsRd," does not exist, no NEWS.HTML file created!"), call.=FALSE)

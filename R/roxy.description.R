@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -18,7 +18,7 @@
 
 ## function roxy.description()
 # create package description
-roxy.description <- function(val, description, version=NULL, date=NULL, R.vers=NULL){
+roxy.description <- function(val, description, version=NULL, date=NULL){
 
   if(!is.null(version)){
     description[["Version"]] <- version
@@ -45,19 +45,6 @@ roxy.description <- function(val, description, version=NULL, date=NULL, R.vers=N
     return(description[["Depends"]])
   } else {}
   if(identical(val, "description")){
-    # check if we need to add old Author/Maintainer fields
-    if(is.null(R.vers) || isTRUE(R_system_version(R.vers) < "2.14")){
-      if(!"Author" %in% names(description)){
-        if(pck.contributor != "") {
-          description[["Author"]] <- paste0(pck.author, ", with contributions from ", pck.contributor)
-        } else {
-          description[["Author"]] <- pck.author
-        }
-      } else {}
-      if(!"Maintainer" %in% names(description)){
-        description[["Maintainer"]] <- pck.maintainer
-      } else {}
-    } else {}
     return(description)
   } else {}
 
