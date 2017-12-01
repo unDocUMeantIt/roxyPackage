@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-1 (2017-11-30)
+changes in version 0.06-1 (2017-12-01)
 unreleased:
   - this release is under development
 fixed:
@@ -39,6 +39,10 @@ added:
     into account when moving/copying files
   - roxy.package(): new action "vignette" can be used to generate an initial vignette
     stub file
+  - roxy.package(): new action "buildVignettes" forces rebuilding all vignettes during
+    the "package" action, to make sure a proper vignette index is present in
+    the source tarball; this was made configurable via its own action because it is
+    a bit time consuming during builds and usually only neccessary for actual releases
 
 changes in version 0.05-3 (2017-06-09)
 fixed:

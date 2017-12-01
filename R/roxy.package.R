@@ -94,7 +94,7 @@
 #'      \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
 #'      \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
 #'        \code{URL} accordingly}
-#'      \item{"doc"}{Update PDF documentation (\code{R CMD Rd2pdf}) and vignettes if present}
+#'      \item{"doc"}{Update PDF documentation (\code{R CMD Rd2pdf}) and vignettes if present; }
 #'      \item{"html"}{Update HTML index files}
 #'      \item{"win"}{Update the Windows binary package}
 #'      \item{"macosx"}{Update the Mac OS X binary package}
@@ -103,6 +103,8 @@
 #'        see \code{deb.options}, too). \code{URL} must also be set to generate Debian repository information}
 #'      \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
 #'      \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}; if \code{html.options} has a \code{flattr.id}, it will be included}
+#'      \item{"buildVignettes"}{Re-build all vignettes during the \code{"package"} action, to force generation of a vignette index in
+#'        the source package (recommended if \code{VignetteBuilder} is set in the package description)}
 #'    }
 #'    Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources, which will overwrite
 #'    an existing file with the same name! Also note that if both a \code{NEWS/NEWS.Rd} and \code{ChangeLog} file are found, only
@@ -115,8 +117,8 @@
 #' @param Rcmd.options A named character vector with options to be passed on to the internal calls of \code{R CMD build},
 #'    \code{R CMD INSTALL}, \code{R CMD check} and \code{R CMD Rd2pdf}. Change these only if you know what you're doing!
 #'    Will be passed on as given here. To deactivate, options must explicitly be se to \code{""}, missing options will be used with the default values.
-#'    Please note that if you've set \code{VignetteBuilder} in the package description, the vignettes will always be rebuild even if you disabled the
-#'    \code{"doc"} action and keep \code{--no-build-vignettes} in the build options; this is needed to properly generate a vignette index.
+#'    Please note that if you've set \code{VignetteBuilder} in the package description, the vignettes will always be re-build if you enabled the
+#'    \code{"buildVignettes"} action, even if you keep \code{--no-build-vignettes} in the build options.
 #' @param URL Either a single character string defining the URL to the root of the repository (i.e., which holds the directories \code{src}
 #'    etc., see below), or a named character vector if you need different URLs for different services. If you provide more than one URL, these are valid
 #'    names for values:
@@ -705,7 +707,7 @@ roxy.package <- function(
           } else {}
         }
       } else {
-        warning("build: Couldn't build all vignettes")
+        warning("build: Couldn't build all vignettes", call.=FALSE)
       }
     } else {}
 
@@ -727,11 +729,22 @@ roxy.package <- function(
     createMissingDir(dirPath=repo.src.contrib, action="repo")
     # if the package uses 'VignetteBuilder' we do need to rebuild vignettes
     # because otherwise the resulting tarball will be missing the vignette index
-    if(all("VignetteBuilder" %in% names(pckg.dscrptn), grepl("--no-build-vignettes", Rcmd.opt.build))){
-      message("build: dropping '--no-build-vignettes' from build options to force generation of vignette index")
-      Rcmd.opt.build <- gsub("--no-build-vignettes", "", Rcmd.opt.build)
+    if(
+      all(
+        "package" %in% actions,
+        !"binonly" %in% actions,
+        "VignetteBuilder" %in% names(pckg.dscrptn),
+        grepl("--no-build-vignettes", Rcmd.opt.build)
+      )
+    ){
+      if("buildVignettes" %in% actions){
+        message("build: dropping '--no-build-vignettes' from build options to force generation of vignette index")
+        Rcmd.opt.build <- gsub("--no-build-vignettes", "", Rcmd.opt.build)
+      } else {
+        warning("build: 'VignetteBuilder' is specified but '--no-build-vignettes' set; run with \"buildVignettes\" action to force generation of vignette index!", call.=FALSE)
+      }
     } else {}
-    ## TODO: find a solution without sedwd()
+    ## TODO: find a solution without setwd()
     jmp.back <- getwd()
     pck.source.dir.parent <- dirname(file.path(pck.source.dir))
     setwd(pck.source.dir.parent)

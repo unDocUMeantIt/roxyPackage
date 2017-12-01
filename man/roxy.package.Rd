@@ -51,7 +51,7 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
   \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
   \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
     \code{URL} accordingly}
-  \item{"doc"}{Update PDF documentation (\code{R CMD Rd2pdf}) and vignettes if present}
+  \item{"doc"}{Update PDF documentation (\code{R CMD Rd2pdf}) and vignettes if present; }
   \item{"html"}{Update HTML index files}
   \item{"win"}{Update the Windows binary package}
   \item{"macosx"}{Update the Mac OS X binary package}
@@ -62,6 +62,9 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
   \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
   \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}; if \code{html.options} has a \code{flattr.id},
       it will be included}
+  \item{"buildVignettes"}{Re-build all vignettes during the \code{"package"} or \code{"binonly"} action,
+      to force generation of a vignette index in
+    the source package (recommended if \code{VignetteBuilder} is set in the package description)}
 }
 Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources,
       which will overwrite
