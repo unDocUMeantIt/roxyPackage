@@ -134,7 +134,7 @@
 #'        have to manually rename the directory generated after each run!}
 #'    }
 #'    These URLs are not the path to the local file system, but should be the URLs to the respecive repository as it is available
-#'    via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"}, \code{"deb"}, and possibly \code{"html"} --
+#'    via internet. This option is necessary for (and only interpreted by) the actions \code{"news2rss"}, \code{"deb"}, and possibly \code{"html"} --
 #'    if \code{flattr.id} is also set in \code{html.options}, a Flattr meta tag be added to the HTML page.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}

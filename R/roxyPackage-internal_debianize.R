@@ -1558,7 +1558,7 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
     thisPackages[["Version"]] <- gsub("-[[:digit:]]+$", "", thisPackages[["FullVersion"]])
     thisPackages[["Revision"]] <- gsub("(^.*)-([[:digit:]]+)$", "\\2", thisPackages[["FullVersion"]], perl=TRUE)
     
-    # now iterate through found package names, check respective versions and move files, if neccessary
+    # now iterate through found package names, check respective versions and move files, if necessary
     for (this.package in unique(thisPackages[,"Package"])){
       presentPackages <- archiveSubset(data=thisPackages, var="Package", values=this.package)
 

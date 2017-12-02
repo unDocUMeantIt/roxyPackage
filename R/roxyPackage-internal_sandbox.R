@@ -134,7 +134,7 @@ prepare.sandbox <- function(package, description, pck.source.dir, R.libs, R.vers
   snd.repo.root <- slot(snd.config, "repo.root")
   result <- list()
   # now check if the given files differ from sandbox definitions. if so
-  #  - try to create the neccessary directories
+  #  - try to create the necessary directories
   #  - return the new directories as the ones to use
 
   result[["pck.source.dir"]] <- prep.sndbx.source.dir(
@@ -190,7 +190,7 @@ prepare.sandbox.archive <- function(repo.root, archive.root, to.dir){
   snd.to.dir <- slot(snd.config, "to.dir")
   result <- list()
   # now check if the given files differ from sandbox definitions. if so
-  #  - try to create the neccessary directories
+  #  - try to create the necessary directories
   #  - return the new directories as the ones to use
   result[["repo.root"]] <- prep.sndbx.repo.root(
     snd.repo.root=snd.repo.root,

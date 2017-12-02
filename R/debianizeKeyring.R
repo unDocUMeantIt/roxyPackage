@@ -97,7 +97,7 @@ debianizeKeyring <- function(
   URL=NULL,
   changelog=c("new upstream release"),
   description=paste("OpenPGP keyring for Debian packages hosted at the", repo.name, "repository.",
-    "This keyring is neccessary to use secure apt."),
+    "This keyring is necessary to use secure apt."),
   actions=c("bin", "src"),
   overwrite=c("changelog", "control", "copyright", "postinst", "prerm", "rules", "compat"),
   bin.opts="-rfakeroot -b -uc",
