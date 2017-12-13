@@ -62,7 +62,7 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
   \item{"cleanRd"}{Insert line breaks in Rd files with lines longer than 90 chars}
   \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}; if \code{html.options} has a \code{flattr.id},
       it will be included}
-  \item{"buildVignettes"}{Re-build all vignettes during the \code{"package"} or \code{"binonly"} action,
+  \item{"buildVignettes"}{Re-build all vignettes during the \code{"package"} action,
       to force generation of a vignette index in
     the source package (recommended if \code{VignetteBuilder} is set in the package description)}
 }
@@ -88,8 +88,9 @@ if you have installed them in parallel. Should probably be used together with \c
 Will be passed on as given here. To deactivate,
       options must explicitly be se to \code{""}, missing options will be used with the default values.
 Please note that if you've set \code{VignetteBuilder} in the package description,
-      the vignettes will always be rebuild even if you disabled the
-\code{"doc"} action and keep \code{--no-build-vignettes} in the build options; this is needed to properly generate a vignette index.}
+      the vignettes will always be re-build if you enabled the
+\code{"buildVignettes"} action,
+      even if you keep \code{--no-build-vignettes} in the build options.}
 
 \item{URL}{Either a single character string defining the URL to the root of the repository (i.e.,
       which holds the directories \code{src}
@@ -112,7 +113,7 @@ names for values:
 }
 These URLs are not the path to the local file system,
       but should be the URLs to the respecive repository as it is available
-via internet. This option is neccessary for (and only interpreted by) the actions \code{"news2rss"},
+via internet. This option is necessary for (and only interpreted by) the actions \code{"news2rss"},
       \code{"deb"}, and possibly \code{"html"} --
 if \code{flattr.id} is also set in \code{html.options},
       a Flattr meta tag be added to the HTML page.}

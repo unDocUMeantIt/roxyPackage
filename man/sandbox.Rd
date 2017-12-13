@@ -12,7 +12,7 @@ sandbox(active = FALSE, sandbox.dir = file.path(tempdir(), "roxyPackge",
 \item{active}{Logical, whether sandboxing should be active or not}
 
 \item{sandbox.dir}{Character string, full path to the sandbox root directory to use.
-Will be created if neccessary (at first use, not when setting this here!).}
+Will be created if necessary (at first use, not when setting this here!).}
 
 \item{pck.source.dir}{Logical, whether to sandbox the package sources. If \code{TRUE}
 the full package sources will be copied to \code{file.path(sandbox.dir, "src")}

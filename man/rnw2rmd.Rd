@@ -4,11 +4,10 @@
 \alias{rnw2rmd}
 \title{Convert vognettes from *.Rnw to *.Rmd}
 \usage{
-rnw2rmd(file, output = "html_document", output_options = c(theme =
-  "cerulean", highlight = "kate", toc = "true", toc_float =
-  "\\n      collapsed: false\\n      smooth_scroll: false", toc_depth = 3),
-  engine = "knitr::rmarkdown", csl = NULL, eval = FALSE, replace = NULL,
-  flattr_id = NULL, write_file = FALSE, overwrite = FALSE)
+rnw2rmd(file, output = "rmarkdown::html_vignette", output_options = c(toc =
+  "true"), engine = "knitr::rmarkdown", csl = NULL, eval = FALSE,
+  replace = NULL, flattr_id = NULL, write_file = FALSE,
+  overwrite = FALSE)
 }
 \arguments{
 \item{file}{Path to an *.Rnw file to convert.}
@@ -57,6 +56,19 @@ for conversions.
 \examples{
 \dontrun{
 rnw2rmd(file.path(find.package("roxyPackage"),"doc","roxyPackage_vignette.Rnw"))
+
+# use a fancy theme (not so good for CRAN, bloats the HTML file)
+rnw2rmd(
+  file.path(find.package("roxyPackage"),"doc","roxyPackage_vignette.Rnw"),
+  output="html_document",
+  output_options=c(
+    theme="cerulean",
+    highlight="kate",
+    toc="true",
+    toc_float="\\n      collapsed: false\\n      smooth_scroll: false",
+    toc_depth=3
+  )
+)
 }
 }
 \references{

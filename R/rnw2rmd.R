@@ -55,16 +55,25 @@
 #' @examples
 #' \dontrun{
 #' rnw2rmd(file.path(find.package("roxyPackage"),"doc","roxyPackage_vignette.Rnw"))
+#' 
+#' # use a fancy theme (not so good for CRAN, bloats the HTML file)
+#' rnw2rmd(
+#'   file.path(find.package("roxyPackage"),"doc","roxyPackage_vignette.Rnw"),
+#'   output="html_document",
+#'   output_options=c(
+#'     theme="cerulean",
+#'     highlight="kate",
+#'     toc="true",
+#'     toc_float="\n      collapsed: false\n      smooth_scroll: false",
+#'     toc_depth=3
+#'   )
+#' )
 #' }
 rnw2rmd <- function(
   file,
-  output="html_document",
+  output="rmarkdown::html_vignette",
   output_options=c(
-    theme="cerulean",
-    highlight="kate",
-    toc="true",
-    toc_float="\n      collapsed: false\n      smooth_scroll: false",
-    toc_depth=3
+    toc="true"
   ),
   engine="knitr::rmarkdown",
   csl=NULL,

@@ -4,7 +4,7 @@
 #' Package: \tab roxyPackage\cr
 #' Type: \tab Package\cr
 #' Version: \tab 0.06-1\cr
-#' Date: \tab 2017-12-01\cr
+#' Date: \tab 2017-12-12\cr
 #' Depends: \tab R (>= 3.0.0)\cr
 #' Encoding: \tab UTF-8\cr
 #' License: \tab GPL (>= 3)\cr
