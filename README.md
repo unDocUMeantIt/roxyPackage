@@ -26,7 +26,7 @@ More information on roxyPackage is available on the [project homepage](https://r
 Installation of tha latest stable release is fairly easy, it's available from the project's own repository:
 
 ```r
-install.packages("roxyPackage", repo="https://reaktanz.de/R")
+install.packages("roxyPackage", repo=c(getOption("repos"), reaktanz="https://reaktanz.de/R"))
 ```
 
 To automatically get updates, consider adding the repository to your R configuration. You might also
