@@ -304,7 +304,7 @@ flattr_header <- function(
   output="html_document"
 ){
   result <- list()
-  if(all(!is.null(flattr_id), identical(output, "html_document"))){
+  if(all(!is.null(flattr_id), isTRUE(output %in% c("html_document","rmarkdown::html_vignette","html_vignette")))){
     result[["output_options"]] <- c(output_options, includes=paste0("\n      in_header: vignette_header.html"))
     result[["r_setup"]] <- paste0(
       "\n```{r setup, include=FALSE}\n",
