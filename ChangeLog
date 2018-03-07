@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-1 (2017-12-01)
+changes in version 0.06-1 (2018-03-07)
 unreleased:
   - this release is under development
 fixed:
@@ -29,6 +29,8 @@ changed:
     'html.options' for this to work correctly
 added:
   - rnw2rmd(): new function that tries to convert Sweave vignettes into R markdown
+  - package_description(): new function to make it easier to generate proper package
+    description objects (prevent typos, demand mandatory fields, value checks)
   - debianize(): explain in the docs that setting a package in "depends.origin.alt"
     to NULL will enable you to provide the full R debian package name
   - roxy.html(): URLs in the form of "(... <...>)" are now automatically turned into

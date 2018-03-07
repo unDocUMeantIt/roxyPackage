@@ -24,26 +24,30 @@
 #' That is because it would be next to impossible to check for wrong spelling of
 #' the default parameters.
 #' 
-#' All values must be a single character string.
+#' All values must be a single character string, except \code{extra} (named character vector).
+#' Logical values are also possible for \code{LazyLoad} and all entries of \code{extra}.
+#' They will be translated into \code{"yes"} or \code{"no"}.
 #' 
-#' @param Package
-#' @param Title
-#' @param Description
-#' @param AuthorsR
-#' @param Author
-#' @param Maintainer
-#' @param Depends
-#' @param Imports
-#' @param Enhances
-#' @param Suggests
-#' @param VignetteBuilder
-#' @param URL
-#' @param BugReports
-#' @param Additional_repositories
-#' @param Type "Package"
-#' @param License "GPL (>= 3)"
-#' @param Encoding "UTF-8"
-#' @param LazyLoad "yes"
+#' @param Package Mandatory: Name of the package.
+#' @param Title Mandatory: Short description in one catchy sentence and with proper capitalization.
+#' @param Description Mandatory: Long description.
+#' @param AuthorsR Mandatory: A character string that, if parsed and evaluated, will result in a vector of \code{\link[utils::person]{person}} objects (see example).
+#'    All authors, maintainers and significant comtributors must be given.
+#' @param Author Optional author field in old format. Should be omitted for CRAN releases, as it is automatically generated from \code{AuthorsR}.
+#' @param Maintainer Like \code{Author}, but for the maintainer field.
+#' @param Depends Optional: Comma separated names of packages this package depends on.
+#' @param Imports Optional: Comma separated names of packages this package imports from.
+#' @param Enhances Optional: Comma separated names of packages this package enhances.
+#' @param Suggests Optional: Comma separated names of packages this package suggests.
+#' @param VignetteBuilder Optional: Specify a vignette builder, e.g., \code{"knitr"} for vignettes in RMarkdown format.
+#' @param URL Optional: Homepage.
+#' @param BugReports Optional URL to a bug tracker, mailing list etc.
+#' @param Additional_repositories Optional URL to additional repositories for suggested packages that are not available from the standard repos.
+#' @param Type "Package" Package type, mandatory.
+#' @param License "GPL (>= 3)" Optional: License information.
+#' @param Encoding "UTF-8" Optional: Default character encoding.
+#' @param LazyLoad "yes" Optional: Should lazy loading be supported?
+#' @param extra A named character vector with additional extra fields not explicitly defined above, will be added as-is.
 #' @return A data.frame.
 #' @export
 #' @examples
@@ -89,29 +93,65 @@ package_description <- function(
   Type="Package",
   License="GPL (>= 3)",
   Encoding="UTF-8",
-  LazyLoad="yes"
+  LazyLoad="yes",
+  extra=c()
 ){
+  all_args <- as.list(match.call()[-1])
+  all_args_extra <- as.list(all_args[["extra"]])[-1]
+  all_args[["extra"]] <- NULL
+
   result <- data.frame(
     Package=Package,
     Type=Type,
     Title=Title,
     Description=Description,
     AuthorsR=AuthorsR,
-    Author=Author,
-    Maintainer=Maintainer,
-    Depends=Depends,
-    Imports=Imports,
-    Enhances=Enhances,
-    Suggests=Suggests,
-    VignetteBuilder=VignetteBuilder,
-    URL=URL,
-    BugReports=BugReports,
-    Additional_repositories=Additional_repositories,
-    License=License,
-    Encoding=Encoding,
-    LazyLoad=LazyLoad,
     stringsAsFactors=FALSE
   )
-  # TODO: check: is.character(result)
+
+  # we'll do this separately for all_args and all_args_extra for easier checking
+  for (this_arg in names(all_args)){
+    if(is.null(all_args[[this_arg]])){
+      next
+    } else if(is.character(all_args[[this_arg]])){
+      result[[this_arg]] <- all_args[[this_arg]]
+    } else if(all(
+      this_arg %in% c("LazyLoad"),
+      is.logical(all_args[[this_arg]])
+    )){
+      result[[this_arg]] <- ifelse(isTRUE(all_args[[this_arg]]), "yes", "no")
+    } else {
+      stop(simpleError(
+        paste0(
+          "all values must be character, please check the following:\n  ", this_arg
+        )
+      ))
+    }
+  }
+  for (this_arg in names(all_args_extra)){
+    if(is.null(all_args_extra[[this_arg]])){
+      next
+    } else if(is.character(all_args_extra[[this_arg]])){
+      result[[this_arg]] <- all_args_extra[[this_arg]]
+    } else if(is.logical(all_args_extra[[this_arg]])){
+      result[[this_arg]] <- ifelse(isTRUE(all_args_extra[[this_arg]]), "yes", "no")
+    } else {
+      stop(simpleError(
+        paste0(
+          "all values must be character, please check the following:\n  ", this_arg
+        )
+      ))
+    }
+  }
+  # final check: is.character(result)
+  characterCheck <- sapply(result, is.character)
+  if(!all(characterCheck)){
+    stop(simpleError(
+      paste0(
+        "all values must be character, please check the following:\n  ",
+        paste0(names(result)[!characterCheck], collapse=", ")
+      )
+    ))
+  }
   return(result)
 }
