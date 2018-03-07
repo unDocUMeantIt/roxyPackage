@@ -1,4 +1,4 @@
-# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -180,7 +180,7 @@
 #'   Type="Package",
 #'   Title="Squaring the circle using Heisenberg compensation",
 #'   Author="Ernst Dölle [aut, cre, cph], Ludwig Dölle [trl, ctb] (initial translation to whitespace)",
-#'   AuthorR="c(person(given=\"Ernst\", family=\"Dölle\",
+#'   AuthorsR="c(person(given=\"Ernst\", family=\"Dölle\",
 #'        email=\"e.a.doelle@example.com\",
 #'        role=c(\"aut\", \"cre\", \"cph\")),
 #'      person(given=\"Ludwig\", family=\"Dölle\",
