@@ -31,7 +31,7 @@
 #' @param Package Mandatory: Name of the package.
 #' @param Title Mandatory: Short description in one catchy sentence and with proper capitalization.
 #' @param Description Mandatory: Long description.
-#' @param AuthorsR Mandatory: A character string that, if parsed and evaluated, will result in a vector of \code{\link[utils::person]{person}} objects (see example).
+#' @param AuthorsR Mandatory: A character string that, if parsed and evaluated, will result in a vector of \code{\link[utils:person]{person}} objects (see example).
 #'    All authors, maintainers and significant comtributors must be given.
 #' @param Author Optional author field in old format. Should be omitted for CRAN releases, as it is automatically generated from \code{AuthorsR}.
 #' @param Maintainer Like \code{Author}, but for the maintainer field.

@@ -19,7 +19,7 @@ package_description(Package, Title, Description, AuthorsR, Author = NULL,
 \item{Description}{Mandatory: Long description.}
 
 \item{AuthorsR}{Mandatory: A character string that, if parsed and evaluated,
-      will result in a vector of \code{\link[utils::person]{person}} objects (see example).
+      will result in a vector of \code{\link[utils:person]{person}} objects (see example).
 All authors, maintainers and significant comtributors must be given.}
 
 \item{Author}{Optional author field in old format. Should be omitted for CRAN releases,

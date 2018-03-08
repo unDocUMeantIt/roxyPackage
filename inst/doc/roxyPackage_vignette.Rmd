@@ -9,7 +9,7 @@ output:
       in_header: vignette_header.html
 abstract: >
   R packages consist of numerous files in various formats, like `*.R`, `*.Rd`, `DESCRIPTION`, `NAMESPACE` or `CITATION`, ordered in a specific directory structure. `roxyPackage` tries to automatically generate most of these structures and files, so that you can concentrate on writing the actual R code for your package.
-  If your code includes `roxygen2`-style documentation, this package can update your docs as well. It is also capable of creating a local package repository, including limited support for generating Mac OS X, Windows and Debian packages.
+  If your code includes `roxygen2`-style documentation, this package can update your docs as well. It is also capable of creating a local package repository, including limited support for generating macOS, Windows and Debian packages.
 vignette: >
   %\VignetteIndexEntry{Managing R Packages with roxyPackage}
   %\VignetteEngine{knitr::rmarkdown}
@@ -26,7 +26,7 @@ close(header_con)
 
 # Getting started
 
-Apart from installing `roxyPackage` and having written some R code, no further requirements for building your first R package need to be fulfilled. I tried to keep the dependencies for `roxyPackage` to a minimum, and basically they come down to `roxygen2`^[<https://cran.r-project.org/web/packages/roxygen2>] (used to generate the documentation) and `XiMpLe`^[<https://www.reaktanz.de/?c=hacking\&s=XiMpLe>] (used to generate the HTML and RSS files of the repository).
+Apart from installing `roxyPackage` and having written some R code, no further requirements for building your first R package need to be fulfilled. I tried to keep the dependencies for `roxyPackage` to a minimum, and basically they come down to `roxygen2`^[<https://CRAN.R-project.org/package=roxygen2>] (used to generate the documentation) and `XiMpLe`^[<https://www.reaktanz.de/?c=hacking\&s=XiMpLe>] (used to generate the HTML and RSS files of the repository).
 
 To demonstrate this, we will start with an extremely simple one: Let's assume you would like to have an R package called "examplePackage" and have just written a first function for it, called "simpleExample", which does nothing but return `NULL`:
 
@@ -36,7 +36,7 @@ simpleExample <- function(){NULL}
 ```
 
 
-To transform this code into a package, save it as a file called `"examplePackage/R/simpleExample.R"`, that is, create a directory with the package name and in it another one named `"R"`. If you were to create the package manually,^[see <https://cran.r-project.org/doc/manuals/R-exts.html>] you would now at least write a `DESCRIPTION` file with meta information like the license, version number and release date, a `NAMESPSACE` file to export the function so it can acually be seen and used after the package was loaded, and a `*-package.Rd` file, which has the meta information in Rd format so it's accessible via the R help system. In a minute, all of this will be done automatically by \pckg.
+To transform this code into a package, save it as a file called `"examplePackage/R/simpleExample.R"`, that is, create a directory with the package name and in it another one named `"R"`. If you were to create the package manually,^[see <https://cran.r-project.org/doc/manuals/R-exts.html>] you would now at least write a `DESCRIPTION` file with meta information like the license, version number and release date, a `NAMESPSACE` file to export the function so it can acually be seen and used after the package was loaded, and a `*-package.Rd` file, which has the meta information in Rd format so it's accessible via the R help system. In a minute, all of this will be done automatically by `roxyPackage`.
 
 Before this, we need to add at least one `roxygen2` command to the function code, which will make sure that the function is exported and user accessible:
 
@@ -47,15 +47,15 @@ simpleExample <- function(){NULL}
 ```
 
 
-This must be done for every function, class etc. you would like to export. But that's about it -- we can now call `roxy.package()` to create a valid R package. Of course you have to tell the function some things:
+This must be done for every function, class etc. you would like to export. But that's about it -- we can now call `roxy.package()` to create a valid R package. You only have to tell the function a few things:
 
-* where is the source directory of the package (`"~/myRcode/examplePackage"`)
-* where is the R library the package can be installed to (e.g., `"~/R"`)
-* in which directory should the repository be created (e.g., `"~/myRcode/repo"`)
-* what is the package version number, description, author, its dependencies etc.
+* where is the source directory of the package (e.g., `"~/myRcode/examplePackage"`)?
+* where is the R library the package can be installed to (e.g., `"~/R"`)?
+* in which directory should the repository be created (e.g., `"~/myRcode/repo"`)?
+* what is the package version number, description, author, its dependencies etc.?
 
 
-This is what such a call would look like:
+This is what such a call could look like:
 
 
 ```{r, eval=FALSE}
@@ -68,12 +68,10 @@ roxy.package(
     Package="examplePackage",
     Type="Package",
     Title="An R Example Package",
-    Author="Ernst A. Dölle <e.a.doelle@example.com>",
     AuthorsR="c(person(given=\"Ernst\", family=\"Dölle\",
       email=\"e.a.doelle@example.com\",
       role=c(\"aut\", \"cre\")))",
-    Maintainer="Ernst A. Dölle <e.a.doelle@example.com>",
-    Depends="R (>= 2.10.0)",
+    Depends="R (>= 3.0.0)",
     Description="Provides a great function to produce NULL results.",
     License="GPL (>= 3)",
     Encoding="UTF-8",
@@ -84,7 +82,7 @@ roxy.package(
 ```
 
 
-The `data.frame` which is used for the `pck.description` can include every valid field of R `DESCRIPTION` files,^[see <https://cran.r-project.org/doc/manuals/R-exts.html#The-DESCRIPTION-file>] except "Version:" and "Date:", as these have their own parameters (`pck.version` and `pck.date`, which defaults to `Sys.Date()`), and "Authors@R" was simplified to "AuthorsR".
+We're using a function called `package_description()` to set `pck.description`. It returns a simple `data.frame` which is used for the  `DESCRIPTION` file. You can alternative use any ordinary `data.frame` as long as it only includes valid `DESCRIPTION` fields^[see <https://cran.r-project.org/doc/manuals/R-exts.html#The-DESCRIPTION-file>] except "Version:" and "Date:", as these have their own parameters (`pck.version` and `pck.date`, which defaults to `Sys.Date()`), and `Authors@R` was simplified to `AuthorsR`.
 
 At a first glance this maybe look like a lot. But as you can see, except for of course the version number and release date, most of this information will probably remain the same over time, so you can write all of this in a script and then run the script to generate/update your package.
 
@@ -123,13 +121,13 @@ Now, if you inspect the project directory, you will see that the new files `DESC
 
 # Why the local repository?
 
-I assumed, if you build a package of your R code you probably want to share your work with others. Of course you can upload your package to CRAN. But there might be reasons to have your own repository, for example, if your release pace is considerably higher than the volunteers running CRAN are able to cope with.
+If you build a package of your R code you probably want to share your work with others. Of course you can upload your package to CRAN. But there might be reasons to have your own repository, for example, if your release pace is considerably higher than the volunteers running CRAN are able to cope with.
 
-Since `roxyPackage` needed to save its packages somewhere anyway, it seemed obvious to organize this place like an R package repository. So effectively, you can simply copy the generated repository directory to your webserver, and you're done. Packages in that repository can then easily be installed from an R session:
+Since `roxyPackage` needed to save its packages somewhere anyway, i chose to organize this place like a proper R package repository. So effectively, you can simply copy the generated repository directory to your webserver, and you're done. Packages in that repository can then easily be installed from an R session:
 
 
 ```{r, eval=FALSE}
-> install.packages("examplePackage", repos="https://myRepoURL.example.com")
+install.packages("examplePackage", repos="https://myRepoURL.example.com")
 ```
 
 
@@ -141,18 +139,21 @@ The tasks performed at each call of `roxy.package()` are called "actions". The d
 
 There are a number of additional actions, and most of them run out of the box without the need to provide more information:
 
-* `"cite":` Use the data from `pck.description` to write a proper CITATION file.
-* `"license":` Try to detect the software license of this package from the "License" info in `pck.description`, and add a copy as the LICENSE file; will let you know if it doesn't know the license you specified.
-* `"doc":` Update pdf documentation, including vignettes if found in `inst/doc`.
-* `"readme":` Generate initial `README.md` file (optionally including a Flattr button and GitHub URL).
-* `"log":` Generate initial `ChangeLog` or update a present `ChangeLog` file.
-* `"cl2news":` Look for a `ChangeLog` file in the package root directory, and translate it into an `inst/NEWS.Rd` file.
-* `"news2rss":` Look for an `inst/NEWS.Rd` file and translate it into an RSS feed for the repository; you need to provide a value for the `URL` parameter for this to work, where the URL should point to the root location where your repository is available.
-* `"html":` Generate updated HTML index files^[for a practical example, see <https://reaktanz.de/R/pckg/index.html>] throughout the repository, very similar to the HTML pages CRAN provides for its packages; will also include links to the RSS feed and provide HTML versions of the citation info and news/changelog.
-* `"win":` Build a Windows binary package (only works for pure R packages).
-* `"macosx":` Build a Mac OS X binary package (only works for pure R packages).
-* `"deb":` Build Debian source and/or binary packages (only works on Debian based operating systems); this will also set up a Debian package repository inside the defined repository directory and generate the documentation^[for a practical example, see <https://reaktanz.de/R/pckg/roxyPackage/deb\_repo.html>] on how to use it, and also needs the `URL` parameter to work, as well as probably additional configuration via the `deb.options` parameter.
-* `"check":` Run `R CMD check` on the package.
+* `"cite"`: Use the data from `pck.description` to write a proper CITATION file.
+* `"license"`: Try to detect the software license of this package from the "License" info in `pck.description`, and add a copy as the LICENSE file; will let you know if it doesn't know the license you specified.
+* `"doc"`: Update pdf documentation, including vignettes if found in `inst/doc`.
+* `"buildVignettes"`: If you've added vignettes in RMarkdown format and want the vignette index to be updated, use this action. Have a look at `rnw2rmd()` if you want to translate older SWeave vignettes into RMarkdown.
+* `"cleanRd"`: If some lines in the generated `*.Rd` files torn out to be too long, this action reformats the file properly.
+* `"readme"`: Generate initial `README.md` file (optionally including a GitHub URL).
+* `"log"`: Generate initial `ChangeLog` or update a present `ChangeLog` file.
+* `"cl2news"`: Look for a `ChangeLog` file in the package root directory, and translate it into an `inst/NEWS.Rd` file.
+* `"news2rss"`: Look for an `inst/NEWS.Rd` file and translate it into an RSS feed for the repository; you need to provide a value for the `URL` parameter for this to work, where the URL should point to the root location where your repository is available.
+* `"html"`: Generate updated HTML index files^[for a practical example, see <https://reaktanz.de/R/pckg/index.html>] throughout the repository, very similar to the HTML pages CRAN provides for its packages; will also include links to the RSS feed and provide HTML versions of the citation info and news/changelog.
+* `"win"`: Build a Windows binary package (only works for pure R packages).
+* `"macosx"`: Build a macOS binary package (only works for pure R packages).
+* `"deb"`: Build Debian source and/or binary packages (only works on Debian based operating systems); this will also set up a Debian package repository inside the defined repository directory and generate the documentation^[for a practical example, see <https://reaktanz.de/R/pckg/roxyPackage/deb_repo.html>] on how to use it, and also needs the `URL` parameter to work, as well as probably additional configuration via the `deb.options` parameter.
+* `"check"`: Run `R CMD check` on the package.
+* `"binonly"`: (Re-)build & install the package, binaries only. Useful if you need to repackage your Windows, macOS or Debian packages but don't want to touch the sources.
 
 So, let's re-run `roxy.package()`, to get a copy of the GPL into our sources, HTML index files for the repository and information on how to cite the package properly:
 
@@ -167,12 +168,10 @@ roxy.package(
     Package="examplePackage",
     Type="Package",
     Title="An R Example Package",
-    Author="Ernst A. Dölle <e.a.doelle@example.com>",
     AuthorsR="c(person(given=\"Ernst\", family=\"Dölle\",
       email=\"e.a.doelle@example.com\",
       role=c(\"aut\", \"cre\")))",
-    Maintainer="Ernst A. Dölle <e.a.doelle@example.com>",
-    Depends="R (>= 2.10.0)",
+    Depends="R (>= 3.0.0)",
     Description="Provides a great function to produce NULL results.",
     License="GPL (>= 3)",
     Encoding="UTF-8",
@@ -227,12 +226,11 @@ html: updated global index ~/myRcode/repo/index.html
 
 ## Handling ChangeLogs
 
-`roxyPackage` will try its best to be of help when it comes to handling the `ChangeLog` of your package. The `"log"` action can generate an initial log file in a valid format that the other actions can parse (see \@ref(CLFormat)). It can also update log entries and add new ones (see \@ref(CLMaintenance)).
+`roxyPackage` will try its best to be of help when it comes to handling the `ChangeLog` of your package. The `"log"` action can generate an initial log file in a valid format that the other actions can parse (see [ChangeLog format](#changelog-format)). It can also update log entries and add new ones (see [Maintaining a ChangeLog](#maintaining-a-changelog)).
 
 ### ChangeLog format
- {#CLFormat}
 
-It's a good idea to document the changes you make to your packages from one version to another, i.e., keeping a `ChangeLog`. R packages can have this information in Rd markup format as well, usually in `NEWS.Rd`. `roxyPackage` can translate `ChangeLog`s to `NEWS.Rd`s for you, if the structure of your changelog is understood. A working format is to start each new entry with "Changes in version <version number>", optionally followed by a date string in the format "(YYYY-MM-DD)". After that, each log item needs to be indented with spaces and itemized, e.g., by a dash or asterisk. You can categorize log items by writing the category name with a colon at the beginning of a line. This is what the inital changelog of our example package could look like:
+It's a good idea to document the changes you make to your packages from one version to another, i.e., keeping a `ChangeLog`. R packages can have this information in Rd markup format as well, usually in `NEWS.Rd`. `roxyPackage` can translate `ChangeLog`s to `NEWS.Rd`s for you, if the structure of your changelog is understood. A working format is to start each new entry with "Changes in version &lt;version number&gt;", optionally followed by a date string in the format "(YYYY-MM-DD)". After that, each log item needs to be indented with spaces and itemized, e.g., by a dash or asterisk. You can categorize log items by writing the category name with a colon at the beginning of a line. This is what the inital changelog of our example package could look like:
 
 ```
 ChangeLog for package examplePackage
@@ -247,7 +245,6 @@ changed:
 You might also look at the function `initChangeLog()` to get started with a valid file.
 
 ### Maintaining a ChangeLog
- {#CLMaintenance}
 
 It's OK to maintain your ChangeLog manually with an editor of your choice, as long as you stick to a valid format. To make this even easier, `roxyPackage` has some dedicated functions and methods to deal with ChangeLogs ^[have a look at the documentation for `readChangeLog()`]. Typically, you want to add entries to the package version you are currently working on, to document what has been changed, added or fixed. You can do this directly within a `roxy.package()` call, using the `"log"` action in combination with a list of items given to the `ChangeLog` argument:
 
@@ -262,12 +259,10 @@ roxy.package(
     Package="examplePackage",
     Type="Package",
     Title="An R Example Package",
-    Author="Ernst A. Dölle <e.a.doelle@example.com>",
     AuthorsR="c(person(given=\"Ernst\", family=\"Dölle\",
       email=\"e.a.doelle@example.com\",
       role=c(\"aut\", \"cre\")))",
-    Maintainer="Ernst A. Dölle <e.a.doelle@example.com>",
-    Depends="R (>= 2.10.0)",
+    Depends="R (>= 3.0.0)",
     Description="Provides a great function to produce NULL results.",
     License="GPL (>= 3)",
     Encoding="UTF-8",

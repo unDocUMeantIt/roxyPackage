@@ -1,4 +1,4 @@
-# Copyright 2017 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2017-2018 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -101,7 +101,7 @@ templateFile <- function(
     } else if(type %in% "S4class"){
       paste(
         paste0("@name ", name, ",-class"),
-        paste0("@aliases ", name, ",-class ", name, "-class"),
+        paste0("@aliases ", name, "-class"),
         "@import methods",
         sep="\n#' "
       )

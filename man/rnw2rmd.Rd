@@ -43,9 +43,6 @@ the same directory as the input \code{file}, but with *.Rmd file ending. Default
 
 \item{overwrite}{Logical,
       whether existing files should be overwritten if \code{write_file=TRUE}.}
-
-\item{value}{A character string with the converted text. No file will be written by default,
-unless you set \code{write_file=TRUE}.}
 }
 \description{
 This is a much enhanced R port of Perl code gists from GitHub [1, 2].

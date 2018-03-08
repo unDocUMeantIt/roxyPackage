@@ -1,15 +1,65 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
-\section{Changes in roxyPackage version 0.05-4 (2017-06-11)}{
-  \subsection{unreleased}{
+\section{Changes in roxyPackage version 0.06-1 (2018-03-08)}{
+  \subsection{fixed}{
     \itemize{
-      \item this release is under development
+      \item \code{debianize()}: worked around a bug in \code{utils::tar()} rendering it almost
+        useless
+      \item fixed a really dumb bug in \code{archive.packages()} setting the PGP key to 2 by
+        default for \code{"deb"} archives
     }
   }
   \subsection{changed}{
     \itemize{
+      \item the package now needs at least R >= 3.0.0, all code fragments which tried
+        to keep supporting R 2.14 and even earlier were removed. no-one should
+        use that any longer
+      \item the arguments 'html.index' and 'html.title' were moved to 'index' and
+        'title' of a new option list called 'html.options' for more consistency; old
+        code should still work for the time being, but trigger a warning -- please
+        update your scripts!
       \item cleaned up dependencies, now using mostly imports instead
+      \item set debhelper default dependency to >> 9.0.0 (instead of >> 7.0.0)
+      \item worked around the news2Rd issue by copying the function to the internal
+        namespace
+      \item there's also no longer a need to call private functions from the XiMpLe
+        package
+      \item replaced private function \code{last.dir.name()} with base function \code{basename()}
+      \item repo: changed the way symlinks are set for macOS; we're now creating the
+        top level directory and link to ../contrib, to work around issues with
+        infinite link loops; this does not affect existing repos, only new ones
+      \item since Flattr totally changed its API and stuff, the Flattr integration
+        was updated. no more buttons will be generated, instead a meta tag is added
+        to HTML and/or markdown documents. this also means you need to remove the
+        'flattrUser' value from 'readme.options' and add your meta tag ID to the
+        new 'html.options' for this to work correctly
+      \item vignette is now in RMarkdown/HTML format; the SWeave/PDF version was
+        dropped
+    }
+  }
+  \subsection{added}{
+    \itemize{
+      \item \code{rnw2rmd()}: new function that tries to convert Sweave vignettes into R
+        markdown
+      \item \code{package_description()}: new function to make it easier to generate proper
+        package description objects (prevent typos, demand mandatory fields, value
+        checks)
+      \item \code{debianize()}: explain in the docs that setting a package in
+        \code{"depends.origin.alt"} to NULL will enable you to provide the full R debian package name
+      \item \code{roxy.html()}: URLs in the form of "(... <...>)" are now automatically
+        turned into <a href> nodes; i hope the parser doesn't introduce new issues
+      \item \code{roxy.html()}: fields \code{"Additional_repositories"} and \code{"NeedsCompilation"} are
+        now also evaluated
+      \item \code{roxy.package()}: vignette generation now takes an existing .install_extras
+        file into account when moving/copying files
+      \item \code{roxy.package()}: new action \code{"vignette"} can be used to generate an initial
+        vignette stub file
+      \item \code{roxy.package()}: new action \code{"buildVignettes"} forces rebuilding all
+        vignettes during the \code{"package"} action, to make sure a proper vignette index is
+        present in the source tarball; this was made configurable via its own action
+        because it is a bit time consuming during builds and usually only
+        neccessary for actual releases
     }
   }
 }

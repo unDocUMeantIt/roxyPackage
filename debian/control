@@ -2,7 +2,7 @@ Source: r-other-reaktanz-roxypackage
 Section: gnu-r
 Priority: optional
 Maintainer: m.eik michalke <meik.michalke@hhu.de>
-Build-Depends-Indep: debhelper (>> 7.0.0), r-base-dev (>= 2.9.0), cdbs,
+Build-Depends-Indep: debhelper (>> 9.0.0), r-base-dev (>= 3.0.0), cdbs,
  r-cran-roxygen2, r-cran-ximple (>= 0.03-20) | r-other-reaktanz-ximple
  (>= 0.03-20) | r-other-rkward-ximple (>= 0.03-20)
 Standards-Version: 3.9.3.1
@@ -29,6 +29,6 @@ Description: GNU R package "Utilities to Automate Package Builds"
  the ChangeLog. Please read the vignette for a more detailed
  explanation by example.
 Homepage: https://reaktanz.de/?c=hacking&s=roxyPackage
-Suggests: r-cran-testthat, dpkg-dev, fakeroot, tar, apt-utils,
- devscripts
+Suggests: r-cran-testthat, r-cran-knitr, r-cran-rmarkdown, dpkg-dev,
+ fakeroot, tar, apt-utils, devscripts
 Conflicts: r-cran-roxypackage

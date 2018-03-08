@@ -20,12 +20,10 @@ close(header_con)
 #      Package="examplePackage",
 #      Type="Package",
 #      Title="An R Example Package",
-#      Author="Ernst A. Dölle <e.a.doelle@example.com>",
 #      AuthorsR="c(person(given=\"Ernst\", family=\"Dölle\",
 #        email=\"e.a.doelle@example.com\",
 #        role=c(\"aut\", \"cre\")))",
-#      Maintainer="Ernst A. Dölle <e.a.doelle@example.com>",
-#      Depends="R (>= 2.10.0)",
+#      Depends="R (>= 3.0.0)",
 #      Description="Provides a great function to produce NULL results.",
 #      License="GPL (>= 3)",
 #      Encoding="UTF-8",
@@ -35,7 +33,7 @@ close(header_con)
 #  )
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  > install.packages("examplePackage", repos="https://myRepoURL.example.com")
+#  install.packages("examplePackage", repos="https://myRepoURL.example.com")
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  roxy.package(
@@ -47,12 +45,10 @@ close(header_con)
 #      Package="examplePackage",
 #      Type="Package",
 #      Title="An R Example Package",
-#      Author="Ernst A. Dölle <e.a.doelle@example.com>",
 #      AuthorsR="c(person(given=\"Ernst\", family=\"Dölle\",
 #        email=\"e.a.doelle@example.com\",
 #        role=c(\"aut\", \"cre\")))",
-#      Maintainer="Ernst A. Dölle <e.a.doelle@example.com>",
-#      Depends="R (>= 2.10.0)",
+#      Depends="R (>= 3.0.0)",
 #      Description="Provides a great function to produce NULL results.",
 #      License="GPL (>= 3)",
 #      Encoding="UTF-8",
@@ -77,12 +73,10 @@ close(header_con)
 #      Package="examplePackage",
 #      Type="Package",
 #      Title="An R Example Package",
-#      Author="Ernst A. Dölle <e.a.doelle@example.com>",
 #      AuthorsR="c(person(given=\"Ernst\", family=\"Dölle\",
 #        email=\"e.a.doelle@example.com\",
 #        role=c(\"aut\", \"cre\")))",
-#      Maintainer="Ernst A. Dölle <e.a.doelle@example.com>",
-#      Depends="R (>= 2.10.0)",
+#      Depends="R (>= 3.0.0)",
 #      Description="Provides a great function to produce NULL results.",
 #      License="GPL (>= 3)",
 #      Encoding="UTF-8",
