@@ -76,7 +76,9 @@
 #' @param pck.source.dir Character string, path pointing to the root directory of your package sources.
 #' @param pck.version Character string, defining the designated version number. Can be omitted if actions don't
 #'    include \code{"roxy"}, then this information is read from the present DESCRIPTION file.
-#' @param pck.description Data frame holding the package description (see Examples section).
+#' @param pck.description Data.frame holding the package description (see Examples section). Any data.frame with valid fields
+#'    will do, but you should use \code{\link[roxyPackage:package_description]{package_description}} if possible because it does
+#'    some basic validity checks.
 #' @param R.libs Character string, valid path to the R library where the package should be installed to.
 #' @param repo.root Character string, valid path to a directory where to build/update a local package repository.
 #' @param pck.date Date class object or character string of the release date in YYYY-MM-DD format. Defaults to \code{Sys.Date()}.
@@ -169,13 +171,15 @@
 #' @param ... Additional options passed through to \code{roxygenize}.
 #' @references
 #' [1] \url{https://CRAN.R-project.org/package=roxygen2}
-#' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run roxy.package() in a sandbox.
+#' @seealso
+#'    \code{\link[roxyPackage:package_description]{package_description}} for proper package description, and
+#'    \code{\link[roxyPackage:sandbox]{sandbox}} to run roxy.package() in a sandbox.
 #' @importFrom roxygen2 roxygenize
 #' @export
 #' @examples
 #' \dontrun{
 #' ## package description as data.frame:
-#' pckg.dscrptn <- data.frame(
+#' pckg.dscrptn <- package_description(
 #'   Package="SquareTheCircle",
 #'   Type="Package",
 #'   Title="Squaring the circle using Heisenberg compensation",
@@ -197,8 +201,8 @@
 #'   License="GPL (>= 3)",
 #'   Encoding="UTF-8",
 #'   LazyLoad="yes",
-#'   URL="http://eternalwondermaths.example.org",
-#'   stringsAsFactors=FALSE)
+#'   URL="http://eternalwondermaths.example.org"
+#' )
 #' # hint no. 1: you *don't* specify version number and release date here,
 #' #   but all other valid fields for DESCRIPTION files must/can be defined
 #' # hint no. 2: most of this rarely changes, so you can add this to the

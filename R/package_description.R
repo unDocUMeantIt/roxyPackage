@@ -47,7 +47,7 @@
 #' @param License "GPL (>= 3)" Optional: License information.
 #' @param Encoding "UTF-8" Optional: Default character encoding.
 #' @param LazyLoad "yes" Optional: Should lazy loading be supported?
-#' @param extra A named character vector with additional extra fields not explicitly defined above, will be added as-is.
+#' @param extra A named list of character strings with additional extra fields not explicitly defined above, will be added as-is.
 #' @return A data.frame.
 #' @export
 #' @examples
@@ -94,12 +94,8 @@ package_description <- function(
   License="GPL (>= 3)",
   Encoding="UTF-8",
   LazyLoad="yes",
-  extra=c()
+  extra=list()
 ){
-  all_args <- as.list(match.call()[-1])
-  all_args_extra <- as.list(all_args[["extra"]])[-1]
-  all_args[["extra"]] <- NULL
-
   result <- data.frame(
     Package=Package,
     Type=Type,
@@ -108,18 +104,34 @@ package_description <- function(
     AuthorsR=AuthorsR,
     stringsAsFactors=FALSE
   )
+  optional_args <- list(
+    Author=Author,
+    Maintainer=Maintainer,
+    Depends=Depends,
+    Imports=Imports,
+    Enhances=Enhances,
+    Suggests=Suggests,
+    VignetteBuilder=VignetteBuilder,
+    URL=URL,
+    BugReports=BugReports,
+    Additional_repositories=Additional_repositories,
+    License=License,
+    Encoding=Encoding,
+    LazyLoad=LazyLoad
+  )
+  extra_args <- as.list(extra)
 
-  # we'll do this separately for all_args and all_args_extra for easier checking
-  for (this_arg in names(all_args)){
-    if(is.null(all_args[[this_arg]])){
+  # we'll do this separately for optional_args and extra_args for easier checking
+  for (this_arg in names(optional_args)){
+    if(is.null(optional_args[[this_arg]])){
       next
-    } else if(is.character(all_args[[this_arg]])){
-      result[[this_arg]] <- all_args[[this_arg]]
+    } else if(is.character(optional_args[[this_arg]])){
+      result[[this_arg]] <- optional_args[[this_arg]]
     } else if(all(
       this_arg %in% c("LazyLoad"),
-      is.logical(all_args[[this_arg]])
+      is.logical(optional_args[[this_arg]])
     )){
-      result[[this_arg]] <- ifelse(isTRUE(all_args[[this_arg]]), "yes", "no")
+      result[[this_arg]] <- ifelse(isTRUE(optional_args[[this_arg]]), "yes", "no")
     } else {
       stop(simpleError(
         paste0(
@@ -128,13 +140,13 @@ package_description <- function(
       ))
     }
   }
-  for (this_arg in names(all_args_extra)){
-    if(is.null(all_args_extra[[this_arg]])){
+  for (this_arg in names(extra_args)){
+    if(is.null(extra_args[[this_arg]])){
       next
-    } else if(is.character(all_args_extra[[this_arg]])){
-      result[[this_arg]] <- all_args_extra[[this_arg]]
-    } else if(is.logical(all_args_extra[[this_arg]])){
-      result[[this_arg]] <- ifelse(isTRUE(all_args_extra[[this_arg]]), "yes", "no")
+    } else if(is.character(extra_args[[this_arg]])){
+      result[[this_arg]] <- extra_args[[this_arg]]
+    } else if(is.logical(extra_args[[this_arg]])){
+      result[[this_arg]] <- ifelse(isTRUE(extra_args[[this_arg]]), "yes", "no")
     } else {
       stop(simpleError(
         paste0(

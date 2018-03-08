@@ -22,7 +22,10 @@ roxy.package(pck.source.dir, pck.version, pck.description, R.libs, repo.root,
       defining the designated version number. Can be omitted if actions don't
 include \code{"roxy"}, then this information is read from the present DESCRIPTION file.}
 
-\item{pck.description}{Data frame holding the package description (see Examples section).}
+\item{pck.description}{Data.frame holding the package description (see Examples section). Any data.frame with valid fields
+will do,
+      but you should use \code{\link[roxyPackage:package_description]{package_description}} if possible because it does
+some basic validity checks.}
 
 \item{R.libs}{Character string,
       valid path to the R library where the package should be installed to.}
@@ -266,7 +269,7 @@ in a source package, nor a \code{debian} folder. Therefore,
 \examples{
 \dontrun{
 ## package description as data.frame:
-pckg.dscrptn <- data.frame(
+pckg.dscrptn <- package_description(
   Package="SquareTheCircle",
   Type="Package",
   Title="Squaring the circle using Heisenberg compensation",
@@ -289,8 +292,8 @@ pckg.dscrptn <- data.frame(
   License="GPL (>= 3)",
   Encoding="UTF-8",
   LazyLoad="yes",
-  URL="http://eternalwondermaths.example.org",
-  stringsAsFactors=FALSE)
+  URL="http://eternalwondermaths.example.org"
+)
 # hint no. 1: you *don't* specify version number and release date here,
 #   but all other valid fields for DESCRIPTION files must/can be defined
 # hint no. 2: most of this rarely changes, so you can add this to the
@@ -311,5 +314,7 @@ roxy.package(pck.source.dir="~/my_R_stuff/SquareTheCircle",
 [1] \url{https://CRAN.R-project.org/package=roxygen2}
 }
 \seealso{
-\code{\link[roxyPackage:sandbox]{sandbox}} to run roxy.package() in a sandbox.
+\code{\link[roxyPackage:package_description]{package_description}} for proper package description,
+      and
+   \code{\link[roxyPackage:sandbox]{sandbox}} to run roxy.package() in a sandbox.
 }

@@ -9,7 +9,7 @@ package_description(Package, Title, Description, AuthorsR, Author = NULL,
   Suggests = NULL, VignetteBuilder = NULL, URL = NULL,
   BugReports = NULL, Additional_repositories = NULL, Type = "Package",
   License = "GPL (>= 3)", Encoding = "UTF-8", LazyLoad = "yes",
-  extra = c())
+  extra = list())
 }
 \arguments{
 \item{Package}{Mandatory: Name of the package.}
@@ -52,7 +52,7 @@ All authors, maintainers and significant comtributors must be given.}
 
 \item{LazyLoad}{"yes" Optional: Should lazy loading be supported?}
 
-\item{extra}{A named character vector with additional extra fields not explicitly defined above,
+\item{extra}{A named list of character strings with additional extra fields not explicitly defined above,
       will be added as-is.}
 }
 \value{

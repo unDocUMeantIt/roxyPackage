@@ -27,6 +27,8 @@ changed:
     to HTML and/or markdown documents. this also means you need to remove the
     'flattrUser' value from 'readme.options' and add your meta tag ID to the new
     'html.options' for this to work correctly
+  - vignette is now in RMarkdown/HTML format; the SWeave/PDF version was
+    dropped
 added:
   - rnw2rmd(): new function that tries to convert Sweave vignettes into R markdown
   - package_description(): new function to make it easier to generate proper package
