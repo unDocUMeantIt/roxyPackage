@@ -1,5 +1,9 @@
 ChangeLog for package roxyPackage
 
+changes in version 0.06-2 (2018-03-08)
+unreleased:
+  - this release is under development
+
 changes in version 0.06-1 (2018-03-08)
 fixed:
   - debianize(): worked around a bug in utils::tar() rendering it almost
