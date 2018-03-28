@@ -165,7 +165,7 @@
 #' @param Rinstignore A character vector to be used as lines of an \code{.Rinstignore} file. If set, this will replace an existing \code{.Rinstignore}
 #'    file. Setting it to an empty string (\code{""}) will remove the file, the default value \code{NULL} will simply keep the file, if one is present.
 #' @param OSX.repo A named list of character vectors, one named \code{"main"} defines the main directory below \code{./bin/macosx/} where packages for
-#'    Mac OS X should be copied, and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="mavericks"}
+#'    Mac OS X should be copied, and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="el-capitan"}
 #'    would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
 #'    make sure they're correctly transferred to your server, where applicable.
 #' @param ... Additional options passed through to \code{roxygenize}.
@@ -242,7 +242,7 @@ roxy.package <- function(
   ChangeLog=list(changed=c("initial release"), fixed=c("missing ChangeLog")),
   Rbuildignore=NULL,
   Rinstignore=NULL,
-  OSX.repo=list(main="contrib", symlinks="mavericks"),
+  OSX.repo=list(main="contrib", symlinks="el-capitan"),
   ...){
   
   # ensure backwards compatibility
