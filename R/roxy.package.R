@@ -154,6 +154,8 @@
 #'      \item{\code{title}}{A character string for the title tag prefix of the package index HTML file; if missing, "R package" will be used as default}
 #'      \item{\code{flattr.id}}{A Flattr meta ID, will be added to the headers of package specific HTML files, and to a vignette stub if the \code{"vignette"} action is active}
 #'      \item{\code{repo.flattr.id}}{A Flattr meta ID, will be added to the headers of all global HTML files of the repository}
+#'      \item{\code{imprint}}{A named character string used as a URL to link to an imprint page; he name is used as the link text}
+#'      \item{\code{privacy.policy}}{A named character string used as a URL to link to a privacy policy statement in accordance with GDPR; the name is used as the link text}
 #'    }
 #' @param ChangeLog A named list of character vectors with log entry items. The element names will be used as section names in the ChangeLog entry,
 #'    and each character string in a vector will be pasted as a log item. The news you provide here will be appended to probably present news, while
@@ -484,7 +486,7 @@ roxy.package <- function(
 
   # ensure we have at least 'index' and 'title' set to defaults
   html.options <- mergeOptions(
-    someFunction=function(index, title, flattr.id=NULL, repo.flattr.id=NULL){},
+    someFunction=function(index, title, flattr.id=NULL, repo.flattr.id=NULL, imprint=NULL, privacy.policy=NULL){},
     customOptions=html.options,
     newDefaults=list(
       index="Available R Packages",
@@ -601,7 +603,13 @@ roxy.package <- function(
     cat(cite.obj, file=pckg.cite.file)
     message(paste0("cite: updated ", pckg.cite.file, "."))
     if("html" %in% actions){
-      cite.obj.html <- roxy.html.cite(cite.obj=eval(parse(text=cite.obj)), page.css="../web.css", package=pck.package)
+      cite.obj.html <- roxy.html.cite(
+        cite.obj=eval(parse(text=cite.obj)),
+        page.css="../web.css",
+        package=pck.package,
+        imprint=html.options[["imprint"]],
+        privacy.policy=html.options[["privacy.policy"]]
+      )
       cat(cite.obj.html, file=pckg.cite.file.html)
       message(paste0("cite: updated ", pckg.cite.file.html, "."))
     } else {}
@@ -963,7 +971,9 @@ roxy.package <- function(
           package=pckg.name.deb.part,
           keyring.options=deb.defaults[["keyring.options"]],
           page.css="../web.css",
-          package.full=pckg.name.deb
+          package.full=pckg.name.deb,
+          imprint=html.options[["imprint"]],
+          privacy.policy=html.options[["privacy.policy"]]
         ),
         file=url.debRepo.info)
         message(paste0("html: updated ", url.debRepo.info))
@@ -1018,12 +1028,28 @@ roxy.package <- function(
     if(!file_test("-f", pckg.NEWS.rss)){
       RSS.file.name <- NULL
     } else {}
-    package.html <- roxy.html(pckg.dscrptn, index=FALSE, css="web.css", R.version=R.Version.win,
-      url.src=url.src, url.win=url.win, url.mac=url.mac, url.doc=url.doc, url.vgn=url.vgn, title.vgn=title.vgn,
-      url.deb.repo=url.deb.repo, main.path.mac=OSX.repo[["main"]],
-      title=html.options[["title"]], cite=pckg.cite.file.html, news=url.NEWS,
-      changelog=pckg.changelog, rss.file=RSS.file.name,
-      flattr.id=html.options[["flattr.id"]], URL=getURL(URL, purpose="default")
+    package.html <- roxy.html(
+      pckg.dscrptn,
+      index=FALSE,
+      css="web.css",
+      R.version=R.Version.win,
+      url.src=url.src,
+      url.win=url.win,
+      url.mac=url.mac,
+      url.doc=url.doc,
+      url.vgn=url.vgn,
+      title.vgn=title.vgn,
+      url.deb.repo=url.deb.repo,
+      main.path.mac=OSX.repo[["main"]],
+      title=html.options[["title"]],
+      cite=pckg.cite.file.html,
+      news=url.NEWS,
+      changelog=pckg.changelog,
+      rss.file=RSS.file.name,
+      flattr.id=html.options[["flattr.id"]],
+      URL=getURL(URL, purpose="default"),
+      imprint=html.options[["imprint"]],
+      privacy.policy=html.options[["privacy.policy"]]
     )
     target.file.pckg <- file.path(repo.pckg.info, "index.html")
     cat(package.html, file=target.file.pckg)
@@ -1038,11 +1064,28 @@ roxy.package <- function(
         } else {}
       }
     target.file.pckg <- file.path(repo.pckg.info.main, "index.html")
-    pckg.index.html <- roxy.html(all.descs, index=TRUE, css="web.css", title=html.options[["index"]], flattr.id=html.options[["repo.flattr.id"]])
+    pckg.index.html <- roxy.html(
+      all.descs,
+      index=TRUE,
+      css="web.css",
+      title=html.options[["index"]],
+      flattr.id=html.options[["repo.flattr.id"]],
+      imprint=html.options[["imprint"]],
+      privacy.policy=html.options[["privacy.policy"]]
+    )
     cat(pckg.index.html, file=target.file.pckg)
     message(paste0("html: updated pckg index ", target.file.pckg))
     target.file.glob <- file.path(repo.root, "index.html")
-    global.html <- roxy.html(all.descs, index=TRUE, css="web.css", title=html.options[["index"]], redirect="pckg/", flattr.id=html.options[["repo.flattr.id"]])
+    global.html <- roxy.html(
+      all.descs,
+      index=TRUE,
+      css="web.css",
+      title=html.options[["index"]],
+      redirect="pckg/",
+      flattr.id=html.options[["repo.flattr.id"]],
+      imprint=html.options[["imprint"]],
+      privacy.policy=html.options[["privacy.policy"]]
+    )
     cat(global.html, file=target.file.glob)
     message(paste0("html: updated global index ", target.file.glob))
   } else {}

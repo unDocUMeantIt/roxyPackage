@@ -1,4 +1,4 @@
-# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -14,6 +14,34 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with roxyPackage.  If not, see <http://www.gnu.org/licenses/>.
+
+
+## function imprint_node()
+imprint_node <- function(imprint=NULL, privacy.policy=NULL){
+  if(any(!is.null(imprint), !is.null(privacy.policy))){
+    result <- XMLNode("span",
+      if(!is.null(imprint)){
+        XMLNode("a",
+                "Imprint",
+                attrs=list(href=imprint, target="_blank")
+        )
+      },
+    if(all(!is.null(imprint), !is.null(privacy.policy))){
+      XMLNode("span", "&nbsp;&#183;&nbsp;", attrs=list(class="dot"))
+    },
+      if(!is.null(privacy.policy)){
+        XMLNode("a",
+                "Privacy policy",
+                attrs=list(href=privacy.policy, target="_blank")
+        )
+      },
+      attrs=list(class="imprint")
+    )
+  } else {
+    result <- NULL
+  }
+  return(result)
+} ## end function imprint_node()
 
 
 ## function rx.tr()
@@ -114,7 +142,7 @@ rx.html.switch <- function(desc, field){
 # generates HTML code with info how to install packages from the deb repository
 #' @import XiMpLe
 debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, repo, repo.name, repo.root,
-  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL){
+  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL, imprint=NULL, privacy.policy=NULL){
   mirror.list <- getURL(URL, purpose="mirror.list")
   debian.path <- getURL(URL, purpose="debian.path")
   deb.URL <- getURL(URL, purpose="debian")
@@ -208,7 +236,8 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
           XMLNode("li", XMLNode("a", src.orig, attrs=list(href=paste0(repo.path.src, "/", src.orig)))),
           XMLNode("li", XMLNode("a", src.debian, attrs=list(href=paste0(repo.path.src, "/", src.debian)))),
           XMLNode("li", XMLNode("a", src.dsc, attrs=list(href=paste0(repo.path.src, "/", src.dsc))))
-        )
+        ),
+        imprint_node(imprint=imprint, privacy.policy=privacy.policy)
       ))
   } else {}
 
@@ -295,7 +324,7 @@ URLs_in_DESCRIPTION <- function(desc, result_node="p"){
 #' @import XiMpLe
 roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
   url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, title.vgn=NULL, url.deb.repo=NULL, main.path.mac=NULL, title=NULL,
-  cite="", news="", changelog="", redirect="", rss.file=NULL, flattr.id=NULL, URL=NULL) {
+  cite="", news="", changelog="", redirect="", rss.file=NULL, flattr.id=NULL, URL=NULL, imprint=NULL, privacy.policy=NULL) {
 
   rss.header <- rss.feed <- NULL
 
@@ -317,6 +346,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     html.body <- XMLNode("body",
       XMLNode("h1", title),
       XMLNode("table", .children=html.body.table, attrs=list(summary=title)),
+      imprint_node(imprint=imprint, privacy.policy=privacy.policy),
       attrs=list(lang="en"))
   } else {
     got.fields <- dimnames(pckg)[[2]]
@@ -441,6 +471,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
           } else {}
         },
         attrs=list(summary=paste0("Package ", pckg.name, " downloads."))),
+        imprint_node(imprint=imprint, privacy.policy=privacy.policy),
       attrs=list(lang="en"))
   }
 
@@ -479,7 +510,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
 # tries to create a HTML version of the citation file
 # 'cite.obj' must be a citation object (i.e., inherit from class "bibentry")
 #' @import XiMpLe
-roxy.html.cite <- function(cite.obj, page.css="web.css", package=""){
+roxy.html.cite <- function(cite.obj, page.css="web.css", package="", imprint=NULL, privacy.policy=NULL){
   cite.mheader <- attr(cite.obj, "mheader")
   cite.text <- gsub("&", "&amp;", cite.obj$textVersion)
   cite.bibtex <- paste(paste0("\t\t\t", gsub("&", "&amp;", gsub("^  ", "\t", toBibtex(cite.obj)))), collapse="\n")
@@ -506,6 +537,7 @@ roxy.html.cite <- function(cite.obj, page.css="web.css", package=""){
       if(!is.null(cite.bibtex)){
         XMLNode("p", "Corresponding BibTeX entry:")
         XMLNode("pre", cite.bibtex)},
+        imprint_node(imprint=imprint, privacy.policy=privacy.policy),
         attrs=list(lang="en")),
       attrs=list(xmlns="http://www.w3.org/1999/xhtml")),
     dtd=list(
@@ -616,6 +648,15 @@ pre.repo {
   white-space: -o-pre-wrap; /* Opera 7 */
   white-space: pre-wrap; /* CSS3 - Text module (Candidate Recommendation) http://www.w3.org/TR/css3-text/#white-space */
   word-wrap: break-word; /* IE 5.5+ */
+}
+span.imprint {
+  float: right;
+  font-size: small;
+  padding-top: 75px;
+  padding-right: 10px;
+}
+span.dot{
+  font-weight: bold;
 }
 ")
 } ## end function rx.css()

@@ -5,6 +5,9 @@ unreleased:
   - this release is under development
 fixed:
   - roxy.package(): use "el-capitan" as the default symlink for macOS repos
+added:
+  - roxy.package(): new html.options "imprint" and "privacy.policy" to add
+    links to respective pages from your repo
 
 changes in version 0.06-1 (2018-03-08)
 fixed:
