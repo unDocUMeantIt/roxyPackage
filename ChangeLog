@@ -1,8 +1,9 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-3 (2018-05-06)
-unreleased:
-  - this release is under development
+changes in version 0.06-3 (2018-05-07)
+fixed:
+  - roxy.package(): fixed a HTML issue introduced with the html.options
+    "imprint" and "privacy.policy"
 
 changes in version 0.06-2 (2018-05-06)
 fixed:

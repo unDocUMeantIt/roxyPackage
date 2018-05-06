@@ -11,8 +11,8 @@ Utilities to Automate Package Builds.
 \tabular{ll}{
 Package: \tab roxyPackage\cr
 Type: \tab Package\cr
-Version: \tab 0.06-2\cr
-Date: \tab 2018-05-06\cr
+Version: \tab 0.06-3\cr
+Date: \tab 2018-05-07\cr
 Depends: \tab R (>= 3.0.0)\cr
 Encoding: \tab UTF-8\cr
 License: \tab GPL (>= 3)\cr

@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
+\section{Changes in roxyPackage version 0.06-3 (2018-05-07)}{
+  \subsection{fixed}{
+    \itemize{
+      \item \code{roxy.package()}: fixed a HTML issue introduced with the html.options
+        \code{"imprint"} and \code{"privacy.policy"}
+    }
+  }
+}
 \section{Changes in roxyPackage version 0.06-2 (2018-05-06)}{
   \subsection{fixed}{
     \itemize{

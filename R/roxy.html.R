@@ -259,7 +259,7 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
           name="generator",
           content="roxyPackage"))
       ),
-      XMLNode("body", xml.obj.list, attrs=list(lang="en")),
+      XMLNode("body", attrs=list(lang="en"), .children=xml.obj.list),
       attrs=list(xmlns="http://www.w3.org/1999/xhtml")),
     dtd=list(
       doctype="html PUBLIC",
