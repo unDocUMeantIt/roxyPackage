@@ -453,6 +453,8 @@ roxy.package <- function(
   pckg.pdf.doc <- paste0(pck.package, ".pdf")
   pckg.vign.dir <- file.path(pck.source.dir, "vignettes")
   pckg.vign.file <- file.path(pckg.vign.dir, paste0(pck.package, "_vignette.Rmd"))
+  clean.env.unix <- "unset R_LIBS_USER R_BINARY R_CMD ; "
+  clean.env.win  <- "SET R_LIBS_USER=\"\" & SET R_BINARY=\"\" & SET R_CMD=\"\" & "
   
   # take care of .Rbuildignore and .Rinstignore
   pckg.Rbuildignore <- configFile(root=pck.source.dir, type="build", content=Rbuildignore)
@@ -727,10 +729,10 @@ roxy.package <- function(
     pdf.docs <- file.path(repo.pckg.info, pckg.pdf.doc)
     removeIfExists(filePath=pdf.docs)
     if(isTRUE(unix.OS)){
-      r.cmd.doc.call <- paste0(R.bin, " CMD ", Rcmd.cmd.Rd2pdf, " ", Rcmd.opt.Rd2pdf, "--output=", pdf.docs, " ", pck.source.dir)
+      r.cmd.doc.call <- paste0(clean.env.unix, R.bin, " CMD ", Rcmd.cmd.Rd2pdf, " ", Rcmd.opt.Rd2pdf, "--output=", pdf.docs, " ", pck.source.dir)
       system(r.cmd.doc.call, ignore.stdout=TRUE, ignore.stderr=TRUE, intern=FALSE)
     } else {
-      r.cmd.doc.call <- paste0(R.bin, " CMD ", Rcmd.cmd.Rd2pdf, " ", Rcmd.opt.Rd2pdf, "--output=", shQuote(pdf.docs, type="cmd"), " ", shQuote(pck.source.dir, type="cmd"))
+      r.cmd.doc.call <- paste0(clean.env.win, R.bin, " CMD ", Rcmd.cmd.Rd2pdf, " ", Rcmd.opt.Rd2pdf, "--output=", shQuote(pdf.docs, type="cmd"), " ", shQuote(pck.source.dir, type="cmd"))
       shell(r.cmd.doc.call, translate=TRUE, ignore.stderr=TRUE, intern=FALSE)
     }
     message("build: created PDF docs")
@@ -761,10 +763,10 @@ roxy.package <- function(
     pck.source.dir.parent <- dirname(file.path(pck.source.dir))
     setwd(pck.source.dir.parent)
     if(isTRUE(unix.OS)){
-      r.cmd.build.call <- paste0(R.bin, " CMD build ", Rcmd.opt.build, pck.source.dir)
+      r.cmd.build.call <- paste0(clean.env.unix, R.bin, " CMD build ", Rcmd.opt.build, pck.source.dir)
       system(r.cmd.build.call, intern=TRUE)
     } else {
-      r.cmd.build.call <- paste0(R.bin, " CMD build ", Rcmd.opt.build, shQuote(pck.source.dir, type="cmd"))
+      r.cmd.build.call <- paste0(clean.env.win, R.bin, " CMD build ", Rcmd.opt.build, shQuote(pck.source.dir, type="cmd"))
       shell(r.cmd.build.call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
     }
     if(!"binonly" %in% actions){
@@ -775,11 +777,11 @@ roxy.package <- function(
     # install.packages() doesn't work if we want to build for/with other R installations than
     # the actual running one, so we'll use  R CMD INSTALL instead
     if(isTRUE(unix.OS)){
-      r.cmd.install.call <- paste0(R.bin, " CMD INSTALL -l ", R.libs, " ",
+      r.cmd.install.call <- paste0(clean.env.unix, R.bin, " CMD INSTALL -l ", R.libs, " ",
         Rcmd.opt.install, pck.source.dir)
       system(r.cmd.install.call, intern=TRUE)
     } else {
-      r.cmd.install.call <- paste0(R.bin, " CMD INSTALL -l ", shQuote(R.libs, type="cmd"), " ",
+      r.cmd.install.call <- paste0(clean.env.win, R.bin, " CMD INSTALL -l ", shQuote(R.libs, type="cmd"), " ",
         Rcmd.opt.install, shQuote(pck.source.dir, type="cmd"))
       shell(r.cmd.install.call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
     }

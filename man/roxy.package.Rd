@@ -12,7 +12,7 @@ roxy.package(pck.source.dir, pck.version, pck.description, R.libs, repo.root,
   deb.options = NULL, readme.options = NULL, html.options = NULL,
   ChangeLog = list(changed = c("initial release"), fixed =
   c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
-  OSX.repo = list(main = "contrib", symlinks = "mavericks"), ...)
+  OSX.repo = list(main = "contrib", symlinks = "el-capitan"), ...)
 }
 \arguments{
 \item{pck.source.dir}{Character string,
@@ -149,6 +149,8 @@ All other missing values are then guessed from the other package information. It
       will be added to the headers of package specific HTML files, and to a vignette stub if the \code{"vignette"} action is active}
   \item{\code{repo.flattr.id}}{A Flattr meta ID,
       will be added to the headers of all global HTML files of the repository}
+  \item{\code{imprint}}{A named character string used as a URL to link to an imprint page; he name is used as the link text}
+  \item{\code{privacy.policy}}{A named character string used as a URL to link to a privacy policy statement in accordance with GDPR; the name is used as the link text}
 }}
 
 \item{ChangeLog}{A named list of character vectors with log entry items. The element names will be used as section names in the ChangeLog entry,
@@ -173,7 +175,7 @@ file. Setting it to an empty string (\code{""}) will remove the file,
 \item{OSX.repo}{A named list of character vectors,
       one named \code{"main"} defines the main directory below \code{./bin/macosx/} where packages for
 Mac OS X should be copied,
-      and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="mavericks"}
+      and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="el-capitan"}
 would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
 make sure they're correctly transferred to your server, where applicable.}
 

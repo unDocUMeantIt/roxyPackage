@@ -1,6 +1,21 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
+\section{Changes in roxyPackage version 0.06-2 (2018-05-06)}{
+  \subsection{fixed}{
+    \itemize{
+      \item \code{roxy.package()}: use "el-capitan" as the default symlink for macOS repos
+      \item \code{roxy.package()}: unset some environment variables that might cause trouble
+        if building for multiple R versions
+    }
+  }
+  \subsection{added}{
+    \itemize{
+      \item \code{roxy.package()}: new html.options \code{"imprint"} and \code{"privacy.policy"} to add
+        links to respective pages from your repo
+    }
+  }
+}
 \section{Changes in roxyPackage version 0.06-1 (2018-03-08)}{
   \subsection{fixed}{
     \itemize{

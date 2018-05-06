@@ -1,10 +1,10 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-2 (2018-03-08)
-unreleased:
-  - this release is under development
+changes in version 0.06-2 (2018-05-06)
 fixed:
   - roxy.package(): use "el-capitan" as the default symlink for macOS repos
+  - roxy.package(): unset some environment variables that might cause trouble
+    if building for multiple R versions
 added:
   - roxy.package(): new html.options "imprint" and "privacy.policy" to add
     links to respective pages from your repo
