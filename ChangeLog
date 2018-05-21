@@ -1,8 +1,14 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-4 (2018-05-07)
+changes in version 0.06-4 (2018-05-21)
 unreleased:
   - this release is under development
+changed:
+  - roxy.description(): updated internal function responsible for setting
+    up the *-package.R file to use more macros (\packageTitle{},
+    \packageDescription{}, \packageAuthor{}, and \packageMaintainer{});
+    didn't yet get \packageDESCRIPTION{} or \packageIndices{} to generate
+    useful info, so that's still done the old way
 
 changes in version 0.06-3 (2018-05-07)
 fixed:

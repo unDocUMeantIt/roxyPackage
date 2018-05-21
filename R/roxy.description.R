@@ -1,4 +1,4 @@
-# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -27,12 +27,12 @@ roxy.description <- function(val, description, version=NULL, date=NULL){
     description[["Date"]] <- date
   } else {}
 
-  # prefer Author@R/Authors@R over Author/Maintainer
-  pck.authors <- get.authors(description, maintainer=TRUE, contributor=TRUE)
-  pck.author <- pck.authors[["aut"]]
-  pck.maintainer <- pck.authors[["cre"]]
-  pck.contributor <- pck.authors[["ctb"]]
-  pck.maintainer.clean <- pck.authors[["cre.clean"]]
+#   # prefer Author@R/Authors@R over Author/Maintainer
+#   pck.authors <- get.authors(description, maintainer=TRUE, contributor=TRUE)
+#   pck.author <- pck.authors[["aut"]]
+#   pck.maintainer <- pck.authors[["cre"]]
+#   pck.contributor <- pck.authors[["ctb"]]
+#   pck.maintainer.clean <- pck.authors[["cre.clean"]]
 
   ## basic package info
   if(identical(val, "package")){
@@ -66,19 +66,26 @@ roxy.description <- function(val, description, version=NULL, date=NULL){
   }
 
   pckg.package.v <- paste0(
-      "#' ",description[["Title"]],".\n#'\n#' \\tabular{ll}{",
+#       "#' \\packageDescription{",description[["Package"]],"}\n#'",
+      "#' \\packageDescription{",description[["Package"]],"}\n#'\n#' The DESCRIPTION file:\n#' \\tabular{ll}{",
+      ## unfortunately, this leads to useless "This package was not yet installed at build time." messages in the doc file:
+      #"\n#' The DESCRIPTION file:",
+      #"\n#' \\packageDESCRIPTION{",description[["Package"]],"}",
+      #"\n#' \\packageIndices{",description[["Package"]],"}\n#'",
       "\n#' Package: \\tab ",description[["Package"]],"\\cr",
       "\n#' Type: \\tab ",pck.type,"\\cr",
       paste(desc.parts, collapse=""),
       "\n#' }\n#'",
-      "\n#' ",gsub("\n#' #'\n#'","\n#'\n#'", autoLineBreak(text=description[["Description"]], lineEnd=90, breakBy="\n#' ")),"\n#'",
-      "\n#' @aliases ",description[["Package"]],"-package",
-      "\n#' @name ",description[["Package"]],"-package",
-      "\n#' @docType package",
-      "\n#' @title The ",description[["Package"]]," Package",
-      "\n#' @author ",pck.author,
-      "\n#' @keywords package",
-      "\nNULL\n")
+      "\n#' @title\n#' \\packageTitle{",description[["Package"]],"}",
+      "\n#' @author\n#' \\packageAuthor{",description[["Package"]],"}\n#'",
+      "\n#' Maintainer: \\packageMaintainer{",description[["Package"]],"}",
+      ## TODO:
+      #"\n#' @references",
+      #"\n#' @seealso",
+      #"\n#' @examples",
+      #"\n#' @keywords package",
+      "\n\"_PACKAGE\"\n"
+  )
   if(identical(val, "pckg.description")){
     return(pckg.package.v)
   } else {}
