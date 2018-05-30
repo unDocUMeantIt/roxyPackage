@@ -542,7 +542,7 @@ JS.preprocess <- rk.paste.JS(
   echo("\npackageVersion <- \"", pckgVersion, "\"\n"),
   echo("packageName <- \"", pckgName, "\"\n"),
   echo("packageRoot <- \"", envPckgRoot, "\"\n\n"),
-  echo("packageDescription <- data.frame(\n",
+  echo("packageDescription <- package_description(\n",
     "\tPackage=packageName,\n", 
     "\tType=\"Package\",\n"
   ),
@@ -659,7 +659,7 @@ JS.preprocess <- rk.paste.JS(
     if(pckgLicense){
       echo("\tLicense=\"", pckgLicense, "\",\n")
     } else {},
-    echo("\tstringsAsFactors=FALSE\n)\n\n"),
+    echo("\n)\n\n"),
     ## multiple R homes
     if(frameRhomes && envRhomesVarslot != ""){
       echo(
