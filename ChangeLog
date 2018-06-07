@@ -1,9 +1,17 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-4 (2018-05-21)
+changes in version 0.06-4 (2018-06-07)
 unreleased:
   - this release is under development
+added:
+  - debianize(): new argument "deb.dir" to use a custom debian main directory
+    for the package repository, mainly to make it possible to have separate
+    repos for incompatible R versions
+  - debianizeKeyring() also gained the new "deb.dir" argument
 changed:
+  - roxy.package(): if R >= 3.5 is detected, the default directory for debian
+    package files will be set to "debR35" instead of "deb"
+  - archive.packages(): "deb.dir" must now also be set explicitly in the "deb.options"
   - roxy.description(): updated internal function responsible for setting
     up the *-package.R file to use more macros (\packageTitle{},
     \packageDescription{}, \packageAuthor{}, and \packageMaintainer{});

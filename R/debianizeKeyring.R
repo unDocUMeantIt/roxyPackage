@@ -69,6 +69,8 @@
 #'    are supported.
 #' @param keep.build Logical. If \code{build.dir} is not \code{pck.source.dir}, work is done in generated folder with a random name. Usually it
 #'    is removed afterwards, unless you set this option to \code{TRUE}.
+#' @param deb.dir Character string, name to use for the root directory of the debian repository. See \code{\link[roxyPackage:debianize]{debianize}}
+#'    for details.
 #' @seealso \code{\link[roxyPackage:debianize]{debianize}}.
 #' @export
 #' @examples
@@ -107,7 +109,8 @@ debianizeKeyring <- function(
   gpg.version=2,
   sign.key=gpg.key,
   compression="xz",
-  keep.build=FALSE
+  keep.build=FALSE,
+  deb.dir="deb"
 ){
 
   # anything to do at all?
@@ -150,7 +153,9 @@ debianizeKeyring <- function(
     neededTools=neededTools,
     renameTools=c(gpg=gpg),
     repo.name=repo.name,
-    msg.action="deb-key")
+    msg.action="deb-key",
+    deb.dir=deb.dir
+  )
 
   build.dir <- debChecked[["build.dir"]]
   if(all(!isTRUE(keep.build), !identical(build.dir, pck.source.dir))){

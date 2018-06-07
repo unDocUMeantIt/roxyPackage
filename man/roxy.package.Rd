@@ -123,9 +123,10 @@ if \code{flattr.id} is also set in \code{html.options},
 
 \item{deb.options}{A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default,
       \code{pck.source.dir}
-and \code{repo.root} are set to the values given to the parameters above. As for the other options,
-      if not set, the defaults of \code{debianize}
-will be used.}
+and \code{repo.root} are set to the values given to the parameters above,
+      and if packages are being build for R 3.5, the default \code{deb.dir} changes
+from \code{"deb"} to \code{"debR35"}. As for the other options, if not set,
+      the defaults of \code{debianize} will be used.}
 
 \item{readme.options}{A named list with parameters that add optional extra information to an initial README.md file,
       namely instructions to install the package

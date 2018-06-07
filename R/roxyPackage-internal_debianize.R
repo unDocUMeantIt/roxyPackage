@@ -584,9 +584,10 @@ deb.basic.checks <- function(
     "apt-ftparchive", "tar", "dch", "dpkg-parsechangelog"),
   renameTools=NULL,
   repo.name=NULL,
+  deb.dir="deb",
   msg.action="deb"){
   buildTools <- NULL
-  repo.deb.path <- file.path(repo.root, "deb")
+  repo.deb.path <- file.path(repo.root, deb.dir)
   if(any(c("bin","src") %in% actions)){
     # basic checks
     # can this be a debian system at all?
@@ -1268,7 +1269,7 @@ GPGsign <- function(key, fileToSign, signatureFile, gpg=Sys.which("gpg"), keyrin
 
 ## function deb.keyring.in.repo()
 deb.keyring.in.repo <- function(repo.root, gpg.key=NULL, keyring.options=NULL,
-  gpg=Sys.which("gpg"), overwrite=FALSE, keyring=NULL, action="deb-key"){
+  gpg=Sys.which("gpg"), overwrite=FALSE, keyring=NULL, action="deb-key", deb.dir="deb"){
     if(!is.null(keyring.options)){
       writeKey <- FALSE
       if(isTRUE(overwrite)){
@@ -1281,7 +1282,7 @@ deb.keyring.in.repo <- function(repo.root, gpg.key=NULL, keyring.options=NULL,
         message(paste0(action, ": look for OpenPGP key in Debian repository."))
           keyInRepo <- deb.search.repo(
             pckg=keyname,
-            repo=file.path(repo.root, "deb"),
+            repo=file.path(repo.root, deb.dir),
             distribution=keyring.options[["distribution"]],
             component=keyring.options[["component"]],
             arch="all",
@@ -1322,7 +1323,7 @@ deb.keyring.in.repo <- function(repo.root, gpg.key=NULL, keyring.options=NULL,
 
 
 ## function deb.update.release()
-deb.update.release <- function(repo.root, repo=file.path(repo.root, "deb"), gpg.key=NULL,
+deb.update.release <- function(repo.root, deb.dir="deb", repo=file.path(repo.root, deb.dir), gpg.key=NULL,
   distribution="unstable", component="main", arch=c("i386", "amd64", "source"),
   apt.ftparchive=Sys.which("apt-ftparchive"), gpg=Sys.which("gpg"), keyring=NULL, action="deb"){
   repo.release.path <- file.path(repo, "dists", distribution)
@@ -1512,14 +1513,14 @@ deb.search.repo <- function(pckg=NULL, repo, distribution="unstable", component=
 # is outsourced to a function of its own.
 # return value is logical to indicate if any packages were moved/deleted
 deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, keep.revisions=2, package=NULL,
-  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE, justDelete=FALSE, graceful=FALSE){
+  archive.root=repo.root, overwrite=FALSE, reallyDoIt=FALSE, justDelete=FALSE, graceful=FALSE, deb.dir="deb"){
   didArchiveSomething <- FALSE
   # a specialty is that we need to take care of revisions: there might be several revisions,
   # but only *one* source.orig tarball!
   # also, we must check *everything* below the "dists" directory
 
-  # append "deb" directory to archive path
-  to.dir <- file.path(to.dir, "deb")
+  # append deb.dir directory to archive path
+  to.dir <- file.path(to.dir, deb.dir)
   
   # plan: run deb.list.packages.dirs() to discover dirs containig "Packages*" or "Sources*" files
   packageDirsBin <- deb.list.packages.dirs(repo=repo.root, binary=TRUE)
@@ -1642,21 +1643,21 @@ deb.archive.packages <- function(repo.root, to.dir="Archive", keep.versions=1, k
 
 ## function debRepoPath()
 # leave URL=NULL to get default local paths
-debRepoPath <- function(dist=NULL, comp=NULL, arch=NULL, part=FALSE, URL=NULL, source=FALSE){
+debRepoPath <- function(dist=NULL, comp=NULL, arch=NULL, part=FALSE, URL=NULL, source=FALSE, deb.dir="deb"){
   if(isTRUE(source)){
     path.dir <- file.path("source", dist)
   } else {
     path.dir <- file.path("dists", dist, comp, arch)
   }
-  if(any(is.null(URL), identical(getURL(URL, purpose="default"), getURL(URL, purpose="debian")))){
-    deb.repo.path.part <- file.path("deb", path.dir)
+  if(any(is.null(URL), identical(getURL(URL, purpose="default", deb.dir=deb.dir), getURL(URL, purpose="debian", deb.dir=deb.dir)))){
+    deb.repo.path.part <- file.path(deb.dir, path.dir)
     if(isTRUE(part)){
       result <- deb.repo.path.part
     } else {
       result <- file.path("..", "..", deb.repo.path.part)
     }
   } else {
-    result <- file.path(getURL(URL, purpose="debian"), gsub("^/", "", getURL(URL, purpose="debian.path")), path.dir)
+    result <- file.path(getURL(URL, purpose="debian", deb.dir=deb.dir), gsub("^/", "", getURL(URL, purpose="debian.path", deb.dir=deb.dir)), path.dir)
   }
   return(result)
 } ## end function debRepoPath()

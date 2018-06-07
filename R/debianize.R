@@ -155,6 +155,8 @@
 #'    (symptoms include a failing .deb build because the directory \code{build/<package name>} doesn't exist), try turning this switch. If \code{TRUE}
 #'    dots will be replaced by hyphens in both source and binary package names. Note that building a package by calling this function should always
 #'    work, because it will automatically create a symlink in the build directory if needed.
+#' @param deb.dir Character string, name to use for the root directory of the debian repository. Defaults to \code{"deb"}, which is obviously a good choice,
+#'    but you might want to use different directories for different builds, e.g., a separate one for R 3.5 packages.
 #' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run debianize() in a sandbox.
 #' @references
 #' Eddelbuettel, D. & Bates, D. (2003). \emph{Debian R Policy -- Draft Proposal v 0.1.3}.
@@ -212,7 +214,9 @@ debianize <- function(
   compression="xz",
   keep.build=FALSE,
   keep.existing.orig=FALSE,
-  replace.dots=FALSE){
+  replace.dots=FALSE,
+  deb.dir="deb"
+){
 
   # anything to do at all?
   if(!any(c("deb", "bin", "src") %in% actions)){
@@ -254,7 +258,8 @@ debianize <- function(
     actions=actions,
     neededTools=neededTools,
     renameTools=c(gpg=gpg),
-    repo.name=repo.name
+    repo.name=repo.name,
+    deb.dir=deb.dir
   )
 
   build.dir <- debChecked[["build.dir"]]
@@ -427,7 +432,8 @@ debianize <- function(
         compression=compression,
         urgency=urgency,
         keyring=keyring,
-        gpg.version=gpg.version
+        gpg.version=gpg.version,
+        deb.dir=deb.dir
       )
     )
     # check for debian keyring in repo
@@ -437,7 +443,9 @@ debianize <- function(
       keyring.options=keyring.options,
       gpg=buildTools[["gpg"]],
       overwrite="gpg.key" %in% overwrite,
-      keyring=keyring)
+      keyring=keyring,
+      deb.dir=deb.dir
+    )
 
     deb.update.release(
       repo.root=repo.root,

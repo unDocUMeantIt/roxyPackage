@@ -13,7 +13,7 @@ debianize(pck.source.dir, repo.root, build.dir = tempdir(), revision = 1,
   "compat"), bin.opts = "-rfakeroot -b -uc", arch = "all", compat = 9,
   epoch = NULL, gpg.key = NULL, keyring = NULL, gpg.version = 2,
   deb.keyring.options = NULL, compression = "xz", keep.build = FALSE,
-  keep.existing.orig = FALSE, replace.dots = FALSE)
+  keep.existing.orig = FALSE, replace.dots = FALSE, deb.dir = "deb")
 }
 \arguments{
 \item{pck.source.dir}{Character string,
@@ -154,6 +154,11 @@ in package names,
       try turning this switch. If \code{TRUE}
 dots will be replaced by hyphens in both source and binary package names. Note that building a package by calling this function should always
 work, because it will automatically create a symlink in the build directory if needed.}
+
+\item{deb.dir}{Character string,
+      name to use for the root directory of the debian repository. Defaults to \code{"deb"}, which is obviously a good choice,
+but you might want to use different directories for different builds, e.g.,
+      a separate one for R 3.5 packages.}
 }
 \description{
 This function attempts to 'debianize' your R source package. This means,

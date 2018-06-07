@@ -139,8 +139,8 @@
 #'    via internet. This option is necessary for (and only interpreted by) the actions \code{"news2rss"}, \code{"deb"}, and possibly \code{"html"} --
 #'    if \code{flattr.id} is also set in \code{html.options}, a Flattr meta tag be added to the HTML page.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
-#'    and \code{repo.root} are set to the values given to the parameters above. As for the other options, if not set, the defaults of \code{debianize}
-#'    will be used.
+#'    and \code{repo.root} are set to the values given to the parameters above, and if packages are being build for R 3.5, the default \code{deb.dir} changes
+#'    from \code{"deb"} to \code{"debR35"}. As for the other options, if not set, the defaults of \code{debianize} will be used.
 #' @param readme.options A named list with parameters that add optional extra information to an initial README.md file, namely instructions to install the package
 #'    directly from a GitHub repository. Ignore this if you don't use GitHub. Theoretically, you can overwrite all values of the internal
 #'    function \code{readme_text} (e.g., try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
@@ -361,6 +361,17 @@ roxy.package <- function(
     stop(simpleError("Sorry, but support for R < 3.0.0 was dropped with roxyPackage 0.06-1!"))
   } else {}
 
+  # adjust the default repo directory if we're building against R 3.5, as those packages
+  # can't be installed with previous R versions
+  if(all(
+    "deb" %in% actions,
+    isTRUE(R_system_version(R.Version.full) >= "3.5"),
+    is.null(deb.options[["deb.dir"]])
+  )){
+    message("deb: R >= 3.5 detected, using \"debR35\" as the default directory for debian package files")
+    deb.options[["deb.dir"]] <- "debR35"
+  } else {}
+
   # special cases: if actions do not include "roxy",
   # take infos from the DESCRIPTION file
   if(!"roxy" %in% actions | is.null(pck.description)){
@@ -474,7 +485,13 @@ roxy.package <- function(
   # try to set pckg.name.deb and deb.repo.path.part
   # this will only work if repo.root is unchanged, the rest is too messy now...
   # don't ry to replace this without checking the outcome in the HTML file!
-  deb.repo.path.part <- debRepoPath(dist=deb.defaults[["distribution"]], comp=deb.defaults[["component"]], arch=deb.defaults[["arch"]], part=TRUE)
+  deb.repo.path.part <- debRepoPath(
+    dist=deb.defaults[["distribution"]],
+    comp=deb.defaults[["component"]],
+    arch=deb.defaults[["arch"]],
+    part=TRUE,
+    deb.dir=deb.defaults[["deb.dir"]]
+  )
   # need to get repo.name to be able to call eval() on deb.defaults[["origin"]], because that pastes repo.name
   repo.name <- deb.defaults[["repo.name"]]
   deb.defaults[["origin"]] <- eval(deb.defaults[["origin"]])
@@ -975,7 +992,8 @@ roxy.package <- function(
           page.css="../web.css",
           package.full=pckg.name.deb,
           imprint=html.options[["imprint"]],
-          privacy.policy=html.options[["privacy.policy"]]
+          privacy.policy=html.options[["privacy.policy"]],
+          deb.dir=deb.defaults[["deb.dir"]]
         ),
         file=url.debRepo.info)
         message(paste0("html: updated ", url.debRepo.info))

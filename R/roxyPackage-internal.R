@@ -673,7 +673,7 @@ excludeVCSDirs <- function(src, exclude.dirs=c(".svn", "CVS", ".git", "_darcs", 
 ## function getURL()
 # takes the value of the URL argument and returns either NULL, if no value was set,
 # or the URL to use for the given purpose, in case multiple URLs were defined
-getURL <- function(URL=NULL, purpose="default"){
+getURL <- function(URL=NULL, purpose="default", deb.dir="deb"){
   URLnames <- names(URL)
   validPurposes <- c("default", "debian", "mirror.list", "debian.path")
   stopifnot(purpose %in% validPurposes)
@@ -682,7 +682,7 @@ getURL <- function(URL=NULL, purpose="default"){
     if(identical(purpose, "mirror.list")){
       result <- NULL
     } else if(identical(purpose, "debian.path")){
-      result <- "/deb"
+      result <- paste0("/", deb.dir)
     } else {
       if(any(is.null(URLnames), identical(URLnames, "default"))){
         result <- as.character(URL)
@@ -713,7 +713,7 @@ getURL <- function(URL=NULL, purpose="default"){
         if(identical(purpose, "mirror.list")){
           result <- NULL
         } else if(identical(purpose, "debian.path")){
-          result <- "/deb"
+          result <- paste0("/", deb.dir)
         } else {
           result <- URL[["default"]]
         }

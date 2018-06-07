@@ -142,11 +142,11 @@ rx.html.switch <- function(desc, field){
 # generates HTML code with info how to install packages from the deb repository
 #' @import XiMpLe
 debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, repo, repo.name, repo.root,
-  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL, imprint=NULL, privacy.policy=NULL){
-  mirror.list <- getURL(URL, purpose="mirror.list")
-  debian.path <- getURL(URL, purpose="debian.path")
-  deb.URL <- getURL(URL, purpose="debian")
-  repo.path <- debRepoPath(dist=dist, comp=comp, arch=arch, URL=URL)
+  package=NULL, keyring.options=NULL, page.css="web.css", package.full=NULL, imprint=NULL, privacy.policy=NULL, deb.dir="deb"){
+  mirror.list <- getURL(URL, purpose="mirror.list", deb.dir=deb.dir)
+  debian.path <- getURL(URL, purpose="debian.path", deb.dir=deb.dir)
+  deb.URL <- getURL(URL, purpose="debian", deb.dir=deb.dir)
+  repo.path <- debRepoPath(dist=dist, comp=comp, arch=arch, URL=URL, deb.dir=deb.dir)
   # check if URL points to a list of mirrors
   if(!is.null(mirror.list)){
     apt.base.txt <- paste(paste0("[ftp|http]://<mirror>", debian.path), dist, comp, sep=" ")
@@ -192,7 +192,7 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
   if(!is.null(keyname)){
     keyInRepo <- deb.search.repo(
       pckg=keyname,
-      repo=file.path(keyring.options[["repo.root"]], "deb"),
+      repo=file.path(keyring.options[["repo.root"]], deb.dir),
       distribution=keyring.options[["distribution"]],
       component=keyring.options[["component"]],
       arch="all",
@@ -225,7 +225,7 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
     src.orig   <- debSrcFilename(pck=package, version=version, revision=revision, compression=compression, file="orig")
     src.debian <- debSrcFilename(pck=package, version=version, revision=revision, compression=compression, file="debian")
     src.dsc    <- debSrcFilename(pck=package, version=version, revision=revision, compression=compression, file="dsc")
-    repo.path.src <- debRepoPath(dist=dist, URL=URL, source=TRUE)
+    repo.path.src <- debRepoPath(dist=dist, URL=URL, source=TRUE, deb.dir=deb.dir)
     xml.obj.list <- append(xml.obj.list,
       list(
         XMLNode("h3", "Manual download"),

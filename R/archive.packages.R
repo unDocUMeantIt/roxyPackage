@@ -47,8 +47,8 @@
 #'    for instance if you deleted files from the repo but did not update the package indices.
 #' @param deb.options A named list of options that must be properly set if you want to archive Debian packages. After packages were
 #'    removed from the repo, all Packages, Sources and Release files must be re-written and signed, and all of the following
-#'    information is required: \code{distribution}, \code{component}, \code{gpg.key}, and \code{keyring}
-#'    (which might be \code{NULL}). If you omit \code{gpg.version}, version 2 is assumed by default.
+#'    information is required: \code{distribution}, \code{component}, \code{gpg.key}, \code{keyring} (which might be \code{NULL}),
+#'    and \code{deb.dir}. If you omit \code{gpg.version}, version 2 is assumed by default.
 #'    See \code{\link[roxyPackage:debianize]{debianize}} for details.
 #' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run archive.packages() in a sandbox.
 #' @export
@@ -77,7 +77,8 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
     component="main",
     gpg.version=2,
     gpg.key=NULL,
-    keyring=NULL
+    keyring=NULL,
+    deb.dir="deb"
   )){
 
   old.opts <- getOption("available_packages_filters")
@@ -154,23 +155,28 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
     if(identical(this.type, "deb") & "deb" %in% type){
       # remove "file://" from path
       deb.repo <- gsub("^file:(/)+", "/", clean.repo.root)
-      if(dir.exists(file.path(deb.repo, "deb"))){
+      if(is.null(deb.options[["deb.dir"]])){
+        stop(simpleError("archive: \"deb.dir\" is not set in \"deb.options\"!"))
+      } else {
+        deb.dir <- deb.options[["deb.dir"]]
+      }
+      if(dir.exists(file.path(deb.repo, deb.dir))){
         # archiving Debian packages is done by a specialised internal function,
         # see roxyPackage-internal_debianize.R
-        didArchiveSomething <- deb.archive.packages(repo.root=file.path(deb.repo, "deb"), to.dir=to.dir,
+        didArchiveSomething <- deb.archive.packages(repo.root=file.path(deb.repo, deb.dir), to.dir=to.dir,
           keep.versions=keep, keep.revisions=keep.revisions, package=package,
-          archive.root=clean.archive.root, overwrite=overwrite, reallyDoIt=reallyDoIt
+          archive.root=clean.archive.root, overwrite=overwrite, reallyDoIt=reallyDoIt, deb.dir=deb.dir
         )
         # update Packages, Sources & Release files
         if(isTRUE(didArchiveSomething)){
           if(isTRUE(reallyDoIt)){
             # update package information
             deb.gen.package.index(
-              repo=file.path(deb.repo, "deb"), binary=TRUE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
+              repo=file.path(deb.repo, deb.dir), binary=TRUE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
             )
             # update sources information
             deb.gen.package.index(
-              repo=file.path(deb.repo, "deb"), binary=FALSE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
+              repo=file.path(deb.repo, deb.dir), binary=FALSE, distribution=deb.options[["distribution"]], component=deb.options[["component"]]
             )
             # default to gpg2 if no info given
             if(is.null(deb.options[["gpg.version"]])){
@@ -178,6 +184,7 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
             } else {}
             deb.update.release(
               repo.root=deb.repo,
+              repo=file.path(deb.repo, deb.dir),
               gpg.key=deb.options[["gpg.key"]],
               keyring=deb.options[["keyring"]],
               gpg=Sys.which(GPGversion(key=deb.options[["gpg.key"]], version=deb.options[["gpg.version"]])),
