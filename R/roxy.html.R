@@ -174,7 +174,7 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
 
   # if we do the update call before installing the OpenPGP package, we don't need to
   # call it again when installing the package.
-  stillNeedsUpdate <- "sudo aptitude update\n"
+  stillNeedsUpdate <- "sudo apt update\n"
 
   # check for OpenPGP key info
   keyring.options <- mergeOptions(
@@ -198,7 +198,7 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
       arch="all",
       boolean=TRUE)
     if(isTRUE(keyInRepo)){
-      gpg.txt <- paste0(stillNeedsUpdate, "sudo aptitude install ", keyname)
+      gpg.txt <- paste0(stillNeedsUpdate, "sudo apt install ", keyname)
       stillNeedsUpdate <- ""
       xml.obj.list <- append(xml.obj.list,
         list(
@@ -212,7 +212,7 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
   } else {}
 
   if(!is.null(package)){
-    pkg.txt <- paste0(stillNeedsUpdate, "sudo aptitude install ", package)
+    pkg.txt <- paste0(stillNeedsUpdate, "sudo apt install ", package)
     xml.obj.list <- append(xml.obj.list,
       list(
         XMLNode("h4", "Install packages"),
