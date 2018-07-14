@@ -15,7 +15,7 @@ debianizeKeyring(gpg.key, repo.name, repo.root, maintainer,
   "copyright", "postinst", "prerm", "rules", "compat"),
   bin.opts = "-rfakeroot -b -uc", compat = 9, epoch = NULL,
   keyring = NULL, gpg.version = 2, sign.key = gpg.key,
-  compression = "xz", keep.build = FALSE)
+  compression = "xz", keep.build = FALSE, deb.dir = "deb")
 }
 \arguments{
 \item{gpg.key}{Character string,
@@ -107,6 +107,10 @@ are supported.}
 \item{keep.build}{Logical. If \code{build.dir} is not \code{pck.source.dir},
       work is done in generated folder with a random name. Usually it
 is removed afterwards, unless you set this option to \code{TRUE}.}
+
+\item{deb.dir}{Character string,
+      name to use for the root directory of the debian repository. See \code{\link[roxyPackage:debianize]{debianize}}
+for details.}
 }
 \description{
 Similar to \code{\link[roxyPackage:debianize]{debianize}},

@@ -29,6 +29,12 @@
 #' With this function, you can turn sandboxing on and off. This setting has effects
 #' only in the currently running R session. By default, sandboxing is off.
 #' 
+#' @note When using sandboxing for your source code, be aware that changes to the original code
+#' will not be updated in the sandbox automatically. For example, if you run \code{roxy.package}
+#' to check your package, fix an issue in the original source location and run \code{roxy.package}
+#' again, your changes will not have affected the code in the sandbox directory. For those cases,
+#' it might be advisable to use the \code{clean=TRUE} option.
+#' 
 #' @param active Logical, whether sandboxing should be active or not
 #' @param sandbox.dir Character string, full path to the sandbox root directory to use.
 #'    Will be created if necessary (at first use, not when setting this here!).
@@ -43,6 +49,9 @@
 #'    set up in \code{file.path(sandbox.dir, "repo")} (at first use, not when setting this here!).
 #' @param archive Logical, whether to sandbox the repository archive. The archive will be
 #'    set up in \code{file.path(sandbox.dir, "repo_archive")} (at first use, not when setting this here!).
+#' @param clean Logical, whether to always clean the defined \code{sandbox.dir} completely before
+#'    any other action is taken. Be aware that this will wipe everything that resides in the current sandbox!
+#'    Ignored if \code{active=FALSE}.
 #' @return Settings are stored in an internal environment, so there is no actual return value.
 #' @seealso \code{\link[roxyPackage:sandbox.status]{sandbox.status}} to see the current settings.
 #' @export
@@ -53,7 +62,7 @@
 #' }
 sandbox <- function(active=FALSE,
   sandbox.dir=file.path(tempdir(),"roxyPackge","sandbox"),
-  pck.source.dir=TRUE, R.libs=TRUE, repo.root=TRUE, archive=repo.root){
+  pck.source.dir=TRUE, R.libs=TRUE, repo.root=TRUE, archive=repo.root, clean=FALSE){
 
   if(isTRUE(active)){
     if(!is.character(sandbox.dir)){
@@ -62,10 +71,17 @@ sandbox <- function(active=FALSE,
       # normalize root path
       sandbox.dir <- normalizePathByOS(path=sandbox.dir, is.unix=isUNIX(), mustWork=FALSE)
     }
+    if(all(isTRUE(clean), dir.exists(sandbox.dir))){
+      message(paste0("cleaning up: wiping old sandbox dir ", sandbox.dir))
+      clean_status <- unlink(sandbox.dir, recursive=TRUE)
+      if(clean_status > 0){
+        stop(simpleError("failed to clean sandbox dir!"))
+      } else {}
+    } else {}
   } else {
     sandbox.dir <- ""
   }
-
+  
   if(isTRUE(pck.source.dir) && isTRUE(active)){
     set.pck.source.dir <- file.path(sandbox.dir, "src")
   } else {

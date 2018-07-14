@@ -8,7 +8,7 @@ archive.packages(repo.root, to.dir = "Archive", keep = 1,
   keep.revisions = 2, package = NULL, type = "source",
   archive.root = repo.root, overwrite = FALSE, reallyDoIt = FALSE,
   graceful = FALSE, deb.options = list(distribution = "unstable", component
-  = "main", gpg.version = 2, gpg.key = NULL, keyring = NULL))
+  = "main", gpg.version = 2, gpg.key = NULL, keyring = NULL, deb.dir = "deb"))
 }
 \arguments{
 \item{repo.root}{Path to the repository root, i.e.,
@@ -57,9 +57,8 @@ for instance if you deleted files from the repo but did not update the package i
 removed from the repo, all Packages,
       Sources and Release files must be re-written and signed, and all of the following
 information is required: \code{distribution}, \code{component}, \code{gpg.key},
-      and \code{keyring}
-(which might be \code{NULL}). If you omit \code{gpg.version},
-      version 2 is assumed by default.
+      \code{keyring} (which might be \code{NULL}),
+and \code{deb.dir}. If you omit \code{gpg.version}, version 2 is assumed by default.
 See \code{\link[roxyPackage:debianize]{debianize}} for details.}
 }
 \description{

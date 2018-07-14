@@ -6,7 +6,7 @@
 \usage{
 sandbox(active = FALSE, sandbox.dir = file.path(tempdir(), "roxyPackge",
   "sandbox"), pck.source.dir = TRUE, R.libs = TRUE, repo.root = TRUE,
-  archive = repo.root)
+  archive = repo.root, clean = FALSE)
 }
 \arguments{
 \item{active}{Logical, whether sandboxing should be active or not}
@@ -30,6 +30,11 @@ set up in \code{file.path(sandbox.dir, "repo")} (at first use,
 \item{archive}{Logical, whether to sandbox the repository archive. The archive will be
 set up in \code{file.path(sandbox.dir, "repo_archive")} (at first use,
       not when setting this here!).}
+
+\item{clean}{Logical,
+      whether to always clean the defined \code{sandbox.dir} completely before
+any other action is taken. Be aware that this will wipe everything that resides in the current sandbox!
+Ignored if \code{active=FALSE}.}
 }
 \value{
 Settings are stored in an internal environment, so there is no actual return value.
@@ -46,6 +51,16 @@ to make changes to your actual package code, but inspect the result first.
 
 With this function, you can turn sandboxing on and off. This setting has effects
 only in the currently running R session. By default, sandboxing is off.
+}
+\note{
+When using sandboxing for your source code, be aware that changes to the original code
+will not be updated in the sandbox automatically. For example,
+      if you run \code{roxy.package}
+to check your package,
+      fix an issue in the original source location and run \code{roxy.package}
+again,
+      your changes will not have affected the code in the sandbox directory. For those cases,
+it might be advisable to use the \code{clean=TRUE} option.
 }
 \examples{
 \dontrun{
