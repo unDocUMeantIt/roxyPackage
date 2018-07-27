@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -98,7 +98,8 @@
 #'    \describe{
 #'      \item{Build.Depends.Indep}{\code{"debhelper (>> 9.0.0), r-base-dev (>= <R.vers>), cdbs"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format;
 #'        if \code{arch} is not set to \code{"all"}, the field \code{Build.Depends} is used instead}
-#'      \item{Depends}{\code{"r-base-core (>= <R vers>)"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format}
+#'      \item{Depends}{\code{"r-base-core (>= <R vers>)"}, plus Depends/Imports in \code{DESCRIPTION} in debianized format.
+#'        Packages build for R 3.5 will depened on \code{"r-api-3.5"}, for R 3.4 on \code{"r-api-3.4"}, and since R 3.2 on \code{"r-api-3"}, too.}
 #'      \item{Suggests}{Suggests in \code{DESCRIPTION} in debianized format}
 #'      \item{Maintainer}{generated from \code{\link[base:Sys.info]{Sys.info}} (\code{user <login@@nodename>}), with a warning.}
 #'      \item{Section}{\code{"gnu-r"}}
@@ -173,7 +174,7 @@
 #'   revision=4,
 #'   changelog=c("re-compiled docs"),
 #'   deb.description=list(
-#'     Depends=c("r-base-dev (>> 2.12.0), r-cran-foreign"),
+#'     Depends=c("r-base-dev (>= 3.5.0), r-api-3.5, r-cran-foreign"),
 #'     Maintainer="A. Sistent <sistent@@eternalwondermaths.example.org>"),
 #'   actions=c("deb"))
 #'

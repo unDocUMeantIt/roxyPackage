@@ -1,12 +1,14 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-4 (2018-07-14)
+changes in version 0.06-4 (2018-07-27)
 unreleased:
   - this release is under development
 added:
   - debianize(): new argument "deb.dir" to use a custom debian main directory
     for the package repository, mainly to make it possible to have separate
     repos for incompatible R versions
+  - debianize(): now tries to add proper r-api-* package dependencies if R >= 3.2
+    is detected
   - debianizeKeyring() also gained the new "deb.dir" argument
   - sandbox(): new argument "clean" to wipe an existing sandbox before setting
     up a new vanilla one

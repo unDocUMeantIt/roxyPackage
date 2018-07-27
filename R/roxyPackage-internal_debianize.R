@@ -1,4 +1,4 @@
-# Copyright 2011-2016 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -90,6 +90,31 @@ splitDepends <- function(dep){
 } ## end function splitDepends()
 
 
+## function R_API_dependency()
+# check for API dependencies
+# R >= 3.2 should depend on r-api-3,
+# R >= 3.4 on r-api-3.4, and
+# R >= 3.5 on r-api-3.5
+R_API_dependency <- function(dep.list){
+  if(all(
+    !is.null(dep.list[["R"]]),
+    is.null(dep.list[["r-api-3"]]),
+    is.null(dep.list[["r-api-3.4"]]),
+    is.null(dep.list[["r-api-3.5"]]))
+  ){
+    R_version <- package_version(gsub("[^0-9.]", "", dep.list[["R"]][["version"]]))
+    if(R_version >= "3.5"){
+      dep.list[["r-api-3.5"]] <- list(package="r-api-3.5", version=NULL, origin=NULL)
+    } else if(R_version >= "3.4"){
+      dep.list[["r-api-3.4"]] <- list(package="r-api-3.4", version=NULL, origin=NULL)
+    } else if(R_version >= "3.2"){
+      dep.list[["r-api-3"]] <- list(package="r-api-3", version=NULL, origin=NULL)
+    } else {}
+  } else {}
+  return(dep.list)
+} ## end function R_API_dependency()
+
+
 ## function debianizeDepends()
 # origin: string or vector
 # origin.alt: *named* list(pckgname=c("origin.string")); if string is empty, returns the name as-is
@@ -112,10 +137,15 @@ debianizeDepends <- function(dep, origin="cran", origin.alt=list(), R="r-base-co
 
   base.packages <- tolower(base)
 
+  # see if any "r-api-*" dependency wah manually defined,
+  # otherwise we'll add it right after "R"
+  R_API_in_dep <- any(grepl("r-api-*", tolower(dep.split[, "package"])))
+  
   dep.list <- list()
   # minimum requirements?
   if(!is.null(forceRVersion) && !is.null(R)){
     dep.list[["R"]] <- list(package=R, version=paste0("(>= ", forceRVersion, ")"), origin=NULL)
+    dep.list <- R_API_dependency(dep.list=dep.list)
   } else {}
 
   for (thisDep in 1:nrow(dep.split)){
@@ -141,6 +171,7 @@ debianizeDepends <- function(dep, origin="cran", origin.alt=list(), R="r-base-co
       } else {
         dep.lst.package <- R
         dep.list[["R"]] <- list(package=R, version=dep.lst.version, origin=NULL)
+        dep.list <- R_API_dependency(dep.list=dep.list)
         next
       }
     } else {}
@@ -152,7 +183,7 @@ debianizeDepends <- function(dep, origin="cran", origin.alt=list(), R="r-base-co
     } else {}
     dep.list[[dep.lst.key]] <- list(package=dep.lst.package, version=dep.lst.version, origin=dep.lst.origin)
   }
-  
+ 
   # re-combine to <origin>-<name> (<version>)
   results <- sapply(dep.list, function(thisDep){
       debianPkgName(package=thisDep[["package"]], origin=thisDep[["origin"]], version=thisDep[["version"]], replace.dots=replace.dots)
@@ -524,6 +555,7 @@ deb.prepare.description <- function(deb.description=NULL, R.description=NULL, or
     if(is.null(deb.description[[build.dep.field]]) | check.append(queryDescription(deb.description, dep=build.dep.field, collapse=FALSE))){
       build.depends <- paste0("debhelper (>> 9.0.0), r-base-dev (>= ", buildDepRVers, "), cdbs")
       r.base.core <- gsub("r-base-core[^,]*[[:space:]]*[,]*[[:space:]]*", "", deb.description[["Depends"]])
+      r.base.core <- gsub("r-api-[^,]*[[:space:]]*[,]*[[:space:]]*", "", r.base.core)
       if(!identical(r.base.core, "")){
         build.depends <- paste(build.depends, r.base.core, sep=", ")
       } else {}
