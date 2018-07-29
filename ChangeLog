@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-4 (2018-07-27)
+changes in version 0.06-4 (2018-07-29)
 unreleased:
   - this release is under development
 added:
@@ -15,6 +15,8 @@ added:
 changed:
   - roxy.package(): if R >= 3.5 is detected, the default directory for debian
     package files will be set to "debR35" instead of "deb"
+  - roxy.package(): added "buildVignettes" to the actions only performed only during
+    first run if building for multiple R versions
   - archive.packages(): "deb.dir" must now also be set explicitly in the "deb.options"
   - roxy.description(): updated internal function responsible for setting
     up the *-package.R file to use more macros (\packageTitle{},

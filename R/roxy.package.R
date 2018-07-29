@@ -295,7 +295,18 @@ roxy.package <- function(
       if(this.R > 1){
         # well, the same is true for some other actions
         # we'll only perform them during the *first* run
-        this.actions <- actions[!actions %in% c("roxy", "cite", "license", "doc", "cl2news", "news2rss", "cleanRd", "readme", "vignette")]
+        this.actions <- actions[!actions %in% c(
+          "roxy",
+          "cite",
+          "license",
+          "doc",
+          "cl2news",
+          "news2rss",
+          "cleanRd",
+          "readme",
+          "vignette",
+          "buildVignettes"
+        )]
         # we also don't need to repeat handling of .Rbuildignore and .Rinstignore
         Rbuildignore <- Rinstignore <- NULL
       } else {}
