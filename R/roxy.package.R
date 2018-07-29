@@ -477,6 +477,8 @@ roxy.package <- function(
   pckg.vign.file <- file.path(pckg.vign.dir, paste0(pck.package, "_vignette.Rmd"))
   clean.env.unix <- "unset R_LIBS_USER R_BINARY R_CMD ; "
   clean.env.win  <- "SET R_LIBS_USER=\"\" & SET R_BINARY=\"\" & SET R_CMD=\"\" & "
+  set.env.unix <- paste0("export R_LIBS_USER=\"", R.libs, "\" ; ")
+  set.env.win <- paste0("SET R_LIBS_USER=\"", R.libs, "\" & ")
   
   # take care of .Rbuildignore and .Rinstignore
   pckg.Rbuildignore <- configFile(root=pck.source.dir, type="build", content=Rbuildignore)
@@ -791,10 +793,10 @@ roxy.package <- function(
     pck.source.dir.parent <- dirname(file.path(pck.source.dir))
     setwd(pck.source.dir.parent)
     if(isTRUE(unix.OS)){
-      r.cmd.build.call <- paste0(clean.env.unix, R.bin, " CMD build ", Rcmd.opt.build, pck.source.dir)
+      r.cmd.build.call <- paste0(clean.env.unix, set.env.unix, R.bin, " CMD build ", Rcmd.opt.build, pck.source.dir)
       system(r.cmd.build.call, intern=TRUE)
     } else {
-      r.cmd.build.call <- paste0(clean.env.win, R.bin, " CMD build ", Rcmd.opt.build, shQuote(pck.source.dir, type="cmd"))
+      r.cmd.build.call <- paste0(clean.env.win, set.env.win, R.bin, " CMD build ", Rcmd.opt.build, shQuote(pck.source.dir, type="cmd"))
       shell(r.cmd.build.call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
     }
     if(!"binonly" %in% actions){
