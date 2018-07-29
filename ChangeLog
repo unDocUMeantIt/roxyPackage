@@ -1,5 +1,9 @@
 ChangeLog for package roxyPackage
 
+changes in version 0.06-5 (2018-07-29)
+unreleased:
+  - this release is under development
+
 changes in version 0.06-4 (2018-07-29)
 fixed:
   - roxy.package(): explicitly set the R library for multiple R builds
