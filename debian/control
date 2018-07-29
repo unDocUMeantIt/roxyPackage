@@ -11,8 +11,8 @@ Homepage: https://reaktanz.de/?c=hacking&s=roxyPackage
 Package: r-other-reaktanz-roxypackage
 Architecture: all
 Section: gnu-r
-Depends: r-base-core (>= 3.5.0), r-cran-roxygen2, r-cran-ximple (>=
- 0.03-20) | r-other-reaktanz-ximple (>= 0.03-20) |
+Depends: r-base-core (>= 3.5.0), r-api-3.5, r-cran-roxygen2,
+ r-cran-ximple (>= 0.03-20) | r-other-reaktanz-ximple (>= 0.03-20) |
  r-other-rkward-ximple (>= 0.03-20)
 Description: GNU R package "Utilities to Automate Package Builds"
  .

@@ -1,6 +1,39 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
+\section{Changes in roxyPackage version 0.06-4 (2018-07-29)}{
+  \subsection{fixed}{
+    \itemize{
+      \item \code{roxy.package()}: explicitly set the R library for multiple R builds
+    }
+  }
+  \subsection{added}{
+    \itemize{
+      \item \code{debianize()}: new argument \code{"deb.dir"} to use a custom debian main directory
+        for the package repository, mainly to make it possible to have separate
+        repos for incompatible R versions
+      \item \code{debianize()}: now tries to add proper r-api-* package dependencies if R >= 3.2
+        is detected
+      \item \code{debianizeKeyring()} also gained the new \code{"deb.dir"} argument
+      \item \code{sandbox()}: new argument \code{"clean"} to wipe an existing sandbox before setting
+        up a new vanilla one
+    }
+  }
+  \subsection{changed}{
+    \itemize{
+      \item \code{roxy.package()}: if R >= 3.5 is detected, the default directory for debian
+        package files will be set to \code{"debR35"} instead of \code{"deb"}
+      \item \code{roxy.package()}: added \code{"buildVignettes"} to the actions only performed only during
+        first run if building for multiple R versions
+      \item \code{archive.packages()}: \code{"deb.dir"} must now also be set explicitly in the \code{"deb.options"}
+      \item \code{roxy.description()}: updated internal function responsible for setting
+        up the *-package.R file to use more macros (\\packageTitle\{\},
+        \\packageDescription\{\}, \\packageAuthor\{\}, and \\packageMaintainer\{\});
+        didn't yet get \\packageDESCRIPTION\{\} or \\packageIndices\{\} to generate
+        useful info, so that's still done the old way
+    }
+  }
+}
 \section{Changes in roxyPackage version 0.06-3 (2018-05-07)}{
   \subsection{fixed}{
     \itemize{
