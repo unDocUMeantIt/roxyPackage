@@ -5,11 +5,11 @@
 \title{Generate a valid package description}
 \usage{
 package_description(Package, Title, Description, AuthorsR, Author = NULL,
-  Maintainer = NULL, Depends = NULL, Imports = NULL, Enhances = NULL,
-  Suggests = NULL, VignetteBuilder = NULL, URL = NULL,
-  BugReports = NULL, Additional_repositories = NULL, Type = "Package",
-  License = "GPL (>= 3)", Encoding = "UTF-8", LazyLoad = "yes",
-  extra = list())
+  Maintainer = NULL, Depends = NULL, Imports = NULL,
+  Enhances = NULL, Suggests = NULL, VignetteBuilder = NULL,
+  URL = NULL, BugReports = NULL, Additional_repositories = NULL,
+  Type = "Package", License = "GPL (>= 3)", Encoding = "UTF-8",
+  LazyLoad = "yes", extra = list())
 }
 \arguments{
 \item{Package}{Mandatory: Name of the package.}

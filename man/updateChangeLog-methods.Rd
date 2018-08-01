@@ -10,8 +10,8 @@
 \usage{
 updateChangeLog(log, entry, version, date = Sys.Date(), append = TRUE)
 
-\S4method{updateChangeLog}{ChangeLog}(log, entry, version, date = Sys.Date(),
-  append = TRUE)
+\S4method{updateChangeLog}{ChangeLog}(log, entry, version,
+  date = Sys.Date(), append = TRUE)
 }
 \arguments{
 \item{log}{An object of class \code{ChangeLog}.}

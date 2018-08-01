@@ -1,8 +1,11 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2018-07-29)
+changes in version 0.06-5 (2018-08-01)
 unreleased:
   - this release is under development
+added:
+  - roxy.package(): new action "buildEmAll" to trigger builds for multiple
+    versions of R (if more than one was provided also)
 
 changes in version 0.06-4 (2018-07-29)
 fixed:

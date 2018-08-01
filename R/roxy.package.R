@@ -47,16 +47,23 @@
 #' @section Converting ChangeLogs into NEWS:
 #' See \code{\link[roxyPackage:cl2news]{cl2news}} for details.
 #' 
-#' @section Build for several R versions:
-#' The options \code{R.libs} and \code{R.homes} can actually take more than one string, i.e., a vector of strings. This can be used
-#' to build packages for different R versions, provided you installed them on your system. If you're running GNU/Linux, an easy way
-#' of doing so is to fetch the R sources from CRAN, calling \code{"./configure"} with something like \code{"--prefix=$HOME/R/<R version>"},
-#' so that \code{"make install"} installs to that path. Let's assume you did that with R 3.2.2 and 3.1.3, you could then call \code{roxy.package}
-#' with options like \code{R.homes=c("home/user/R/R-3.2.2", "home/user/R/R-3.1.3")} and \code{R.libs=c("home/user/R/R-3.2.2/lib64/R/library",}
-#' \code{"home/user/R/R-3.1.3/lib64/R/library")}. \code{roxy.package} will then call itself recursively for each given R installation.
+#' @section Build for multiple R versions:
+#' The options \code{R.libs} and \code{R.homes} can take a vector of strings. This can be used to build packages for multiple R versions,
+#' provided you installed them on your system. By default, \code{roxy.package} will only use the first entry of both and ignore the rest,
+#' except if you use the \code{"buildEmAll"} action. This makes it easy to use \code{roxy.package} in a script, as you can turn multiple builds
+#' on and off with one action, and leave the rest untouched.
+#' 
+#' If you're running GNU/Linux, an easy way of preparing for multiple builds is to fetch the R sources from CRAN, calling
+#' \code{"./configure"} with something like \code{"--prefix=$HOME/R/<R version>"}, so that \code{"make install"} installs to that path.
+#' Let's assume you did that with R 3.4.4 and 3.3.3, you could then call \code{roxy.package} with options like
+#' \code{R.homes=c("home/user/R/R-3.4.4", "home/user/R/R-3.3.3")} and \code{R.libs=c("home/user/R/R-3.4.4/lib64/R/library",}
+#' \code{"home/user/R/R-3.3.3/lib64/R/library")}. If you add \code{"buildEmAll"} to the actions to perform, \code{roxy.package} will then
+#' call itself recursively for each given R installation; if you omit \code{"buildEmAll"}, it will only build packages for R 3.4.4, as that
+#' is the first configured version.
 #'
 #' One thing you should be aware of is that \code{roxy.package} will not perform all actions each time. That is because some of them, namely
-#' \code{"roxy"}, \code{"cite"}, \code{"license"}, \code{"doc"}, \code{"cl2news"}, \code{"news2rss"}, \code{"cleanRd"}, and \code{"readme"},
+#' \code{"roxy"}, \code{"cite"}, \code{"license"}, \code{"doc"}, \code{"cl2news"}, \code{"news2rss"}, \code{"cleanRd"}, \code{"readme"},
+#' \code{"buildVignettes"}, and \code{"vignette"},
 #' would overwrite previous results anyway, so they are only considered during the first run. Therefore, you should always place the R version which
 #' should be used for these actions first in line. The \code{"html"} action will list all Windows and OS X binary packages. The \code{"deb"}
 #' action will only actually debianize and build a binary package during the first run, too.
@@ -107,6 +114,7 @@
 #'      \item{"vignette"}{Generate initial vignette stub in directory \code{vignettes}; if \code{html.options} has a \code{flattr.id}, it will be included}
 #'      \item{"buildVignettes"}{Re-build all vignettes during the \code{"package"} action, to force generation of a vignette index in
 #'        the source package (recommended if \code{VignetteBuilder} is set in the package description)}
+#'      \item{"buildEmAll"}{Build binary packages for all configured R versions, not just the first. Only effective if multiple versions of R are actually provided (see above)}
 #'    }
 #'    Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources, which will overwrite
 #'    an existing file with the same name! Also note that if both a \code{NEWS/NEWS.Rd} and \code{ChangeLog} file are found, only
@@ -269,70 +277,76 @@ roxy.package <- function(
   # check the OS first
   unix.OS <- isUNIX()
 
-  # let's check if packages are to be build for several R versions
+  # do we need to worry about multiple R versions?
   R.versions <- length(R.homes)
   R.libraries <- length(R.libs)
   if(R.versions > 1){
     if(R.libraries != R.versions){
       stop(simpleError("If you specify more than one R.home, you must also define as many R.libs!"))
     } else {}
-    # if so, iterate recursively through it and then end
-    for (this.R in seq_along(R.homes)){
-      this.home <- R.homes[this.R]
-      this.libs <- R.libs[this.R]
-      this.actions <- actions
-      this.deb.options <- deb.options
-      if("deb" %in% actions){
-        if(this.R == 1){
-          # for the time being, debianizing the package once is enough
-          # we'll only do it the *first* run
-          this.deb.options[["actions"]] <- deb.options[["actions"]][deb.options[["actions"]] %in% c("deb", "bin", "src")]
-        } else {
-          # all other cases: no debianizing
-          this.deb.options[["actions"]] <- ""
-        }
-      } else {}
-      if(this.R > 1){
-        # well, the same is true for some other actions
-        # we'll only perform them during the *first* run
-        this.actions <- actions[!actions %in% c(
-          "roxy",
-          "cite",
-          "license",
-          "doc",
-          "cl2news",
-          "news2rss",
-          "cleanRd",
-          "readme",
-          "vignette",
-          "buildVignettes"
-        )]
-        # we also don't need to repeat handling of .Rbuildignore and .Rinstignore
-        Rbuildignore <- Rinstignore <- NULL
-      } else {}
-      roxy.package(
-        pck.source.dir=pck.source.dir,
-        pck.version=pck.version,
-        pck.description=pck.description,
-        R.libs=this.libs,
-        repo.root=repo.root,
-        pck.date=pck.date,
-        actions=this.actions,
-        cleanup=cleanup,
-        rm.vignette=rm.vignette,
-        R.homes=this.home,
-        Rcmd.options=Rcmd.options,
-        URL=URL,
-        deb.options=this.deb.options,
-        readme.options=readme.options,
-        html.options=html.options,
-        ChangeLog=ChangeLog,
-        Rbuildignore=Rbuildignore,
-        Rinstignore=Rinstignore,
-        OSX.repo=OSX.repo,
-        ...)
+    if("buildEmAll" %in% actions){
+      # if so, iterate recursively through it and then end
+      for (this.R in seq_along(R.homes)){
+        this.home <- R.homes[this.R]
+        this.libs <- R.libs[this.R]
+        this.actions <- actions
+        this.deb.options <- deb.options
+        if("deb" %in% actions){
+          if(this.R == 1){
+            # for the time being, debianizing the package once is enough
+            # we'll only do it the *first* run
+            this.deb.options[["actions"]] <- deb.options[["actions"]][deb.options[["actions"]] %in% c("deb", "bin", "src")]
+          } else {
+            # all other cases: no debianizing
+            this.deb.options[["actions"]] <- ""
+          }
+        } else {}
+        if(this.R > 1){
+          # well, the same is true for some other actions
+          # we'll only perform them during the *first* run
+          this.actions <- actions[!actions %in% c(
+            "roxy",
+            "cite",
+            "license",
+            "doc",
+            "cl2news",
+            "news2rss",
+            "cleanRd",
+            "readme",
+            "vignette",
+            "buildVignettes"
+          )]
+          # we also don't need to repeat handling of .Rbuildignore and .Rinstignore
+          Rbuildignore <- Rinstignore <- NULL
+        } else {}
+        roxy.package(
+          pck.source.dir=pck.source.dir,
+          pck.version=pck.version,
+          pck.description=pck.description,
+          R.libs=this.libs,
+          repo.root=repo.root,
+          pck.date=pck.date,
+          actions=this.actions,
+          cleanup=cleanup,
+          rm.vignette=rm.vignette,
+          R.homes=this.home,
+          Rcmd.options=Rcmd.options,
+          URL=URL,
+          deb.options=this.deb.options,
+          readme.options=readme.options,
+          html.options=html.options,
+          ChangeLog=ChangeLog,
+          Rbuildignore=Rbuildignore,
+          Rinstignore=Rinstignore,
+          OSX.repo=OSX.repo,
+          ...)
+      }
+      return(invisible(NULL))
+    } else {
+      R.homes <- R.homes[1]
+      R.libraries <- R.libraries[1]
+      R.versions <- R.libraries <- 1
     }
-    return(invisible(NULL))
   } else {}
 
   old.dir <- getwd()

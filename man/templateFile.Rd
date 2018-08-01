@@ -4,12 +4,12 @@
 \alias{templateFile}
 \title{Create template file for new function/class/method}
 \usage{
-templateFile(name, path = getwd(), pck.description = data.frame(Package =
-  "", Author = "", License = "GPL (>= 3)", stringsAsFactors = FALSE),
-  year = format(Sys.time(), "\%Y"), params = list(obj = "someClass", ... =
-  "\\\\code{\\\\link[somepackage]{somefunction}}"), seealso = list(aPackage =
-  "aFunction"), return = list(aPackage = "aFunction"), type = "function",
-  write = FALSE, overwrite = FALSE)
+templateFile(name, path = getwd(), pck.description = data.frame(Package
+  = "", Author = "", License = "GPL (>= 3)", stringsAsFactors = FALSE),
+  year = format(Sys.time(), "\%Y"), params = list(obj = "someClass",
+  ... = "\\\\code{\\\\link[somepackage]{somefunction}}"),
+  seealso = list(aPackage = "aFunction"), return = list(aPackage =
+  "aFunction"), type = "function", write = FALSE, overwrite = FALSE)
 }
 \arguments{
 \item{name}{Character string, name of the function/method/class.}

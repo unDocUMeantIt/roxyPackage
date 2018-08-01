@@ -29,8 +29,8 @@ Authors@R: c(person(given="m.eik", family="michalke",
         email="meik.michalke@hhu.de", role=c("aut", "cre")),
         person(given="Robert", family="Nuske", role=c("ctb")))
 Version: 0.06-5
-Date: 2018-07-29
-RoxygenNote: 6.0.1
+Date: 2018-08-01
+RoxygenNote: 6.1.0
 Collate: 
     '00_classes_01_ChangeLog_internal.R'
     '00_classes_02_sandbox_internal.R'

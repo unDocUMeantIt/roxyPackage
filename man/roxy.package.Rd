@@ -4,12 +4,13 @@
 \alias{roxy.package}
 \title{Automatic doc creation, package building and repository update}
 \usage{
-roxy.package(pck.source.dir, pck.version, pck.description, R.libs, repo.root,
-  pck.date = Sys.Date(), actions = c("roxy", "package"), cleanup = FALSE,
-  rm.vignette = FALSE, R.homes = R.home(), Rcmd.options = c(install =
-  "--install-tests", build = "--no-manual --no-build-vignettes --md5", check =
-  "--as-cran", Rd2pdf = "--pdf --no-preview"), URL = NULL,
-  deb.options = NULL, readme.options = NULL, html.options = NULL,
+roxy.package(pck.source.dir, pck.version, pck.description, R.libs,
+  repo.root, pck.date = Sys.Date(), actions = c("roxy", "package"),
+  cleanup = FALSE, rm.vignette = FALSE, R.homes = R.home(),
+  Rcmd.options = c(install = "--install-tests", build =
+  "--no-manual --no-build-vignettes --md5", check = "--as-cran", Rd2pdf =
+  "--pdf --no-preview"), URL = NULL, deb.options = NULL,
+  readme.options = NULL, html.options = NULL,
   ChangeLog = list(changed = c("initial release"), fixed =
   c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
   OSX.repo = list(main = "contrib", symlinks = "el-capitan"), ...)
@@ -68,6 +69,8 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
   \item{"buildVignettes"}{Re-build all vignettes during the \code{"package"} action,
       to force generation of a vignette index in
     the source package (recommended if \code{VignetteBuilder} is set in the package description)}
+  \item{"buildEmAll"}{Build binary packages for all configured R versions,
+      not just the first. Only effective if multiple versions of R are actually provided (see above)}
 }
 Note that \code{"cl2news"} will write the \code{NEWS.Rd} file to the \code{inst} directory of your sources,
       which will overwrite
@@ -230,24 +233,34 @@ The repository will have this directory structure, that is,
 See \code{\link[roxyPackage:cl2news]{cl2news}} for details.
 }
 
-\section{Build for several R versions}{
+\section{Build for multiple R versions}{
 
-The options \code{R.libs} and \code{R.homes} can actually take more than one string, i.e.,
-      a vector of strings. This can be used
-to build packages for different R versions,
-      provided you installed them on your system. If you're running GNU/Linux, an easy way
-of doing so is to fetch the R sources from CRAN,
-      calling \code{"./configure"} with something like \code{"--prefix=$HOME/R/<R version>"},
-so that \code{"make install"} installs to that path. Let's assume you did that with R 3.2.2 and 3.1.3,
-      you could then call \code{roxy.package}
-with options like \code{R.homes=c("home/user/R/R-3.2.2",
-      "home/user/R/R-3.1.3")} and \code{R.libs=c("home/user/R/R-3.2.2/lib64/R/library",}
-\code{"home/user/R/R-3.1.3/lib64/R/library")}. \code{roxy.package} will then call itself recursively for each given R installation.
+The options \code{R.libs} and \code{R.homes} can take a vector of strings. This can be used to build packages for multiple R versions,
+provided you installed them on your system. By default,
+      \code{roxy.package} will only use the first entry of both and ignore the rest,
+except if you use the \code{"buildEmAll"} action. This makes it easy to use \code{roxy.package} in a script,
+      as you can turn multiple builds
+on and off with one action, and leave the rest untouched.
+
+If you're running GNU/Linux,
+      an easy way of preparing for multiple builds is to fetch the R sources from CRAN, calling
+\code{"./configure"} with something like \code{"--prefix=$HOME/R/<R version>"},
+      so that \code{"make install"} installs to that path.
+Let's assume you did that with R 3.4.4 and 3.3.3,
+      you could then call \code{roxy.package} with options like
+\code{R.homes=c("home/user/R/R-3.4.4",
+      "home/user/R/R-3.3.3")} and \code{R.libs=c("home/user/R/R-3.4.4/lib64/R/library",}
+\code{"home/user/R/R-3.3.3/lib64/R/library")}. If you add \code{"buildEmAll"} to the actions to perform,
+      \code{roxy.package} will then
+call itself recursively for each given R installation; if you omit \code{"buildEmAll"},
+      it will only build packages for R 3.4.4, as that
+is the first configured version.
 
 One thing you should be aware of is that \code{roxy.package} will not perform all actions each time. That is because some of them,
       namely
 \code{"roxy"}, \code{"cite"}, \code{"license"}, \code{"doc"}, \code{"cl2news"},
-      \code{"news2rss"}, \code{"cleanRd"}, and \code{"readme"},
+      \code{"news2rss"}, \code{"cleanRd"}, \code{"readme"},
+\code{"buildVignettes"}, and \code{"vignette"},
 would overwrite previous results anyway,
       so they are only considered during the first run. Therefore, you should always place the R version which
 should be used for these actions first in line. The \code{"html"} action will list all Windows and OS X binary packages. The \code{"deb"}

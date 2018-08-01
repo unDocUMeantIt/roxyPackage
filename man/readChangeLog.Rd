@@ -4,8 +4,6 @@
 \alias{readChangeLog}
 \alias{writeChangeLog}
 \alias{initChangeLog}
-\alias{writeChangeLog}
-\alias{initChangeLog}
 \title{Read/write ChangeLog files}
 \usage{
 readChangeLog(file, head = "ChangeLog for package",
