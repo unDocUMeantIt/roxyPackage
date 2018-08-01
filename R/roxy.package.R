@@ -354,7 +354,7 @@ roxy.package <- function(
       return(invisible(NULL))
     } else {
       R.homes <- R.homes[1]
-      R.libraries <- R.libraries[1]
+      R.libs <- R.libs[1]
       R.versions <- R.libraries <- 1
     }
   } else {}
