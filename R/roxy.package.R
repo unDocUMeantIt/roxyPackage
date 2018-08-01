@@ -418,23 +418,24 @@ roxy.package <- function(
       if("" %in% git_cmd){
         stop(simpleError("git: command 'git' is not available in system search path! you can't use the \"gitCheckout\" action :-("))
       } else {
-        git_dir <- file.path(pck.source.dir, ".git")
         all_branches <- system(
-          paste0(git_cmd, " --git-dir \"", git_dir, "\" branch"),
+          paste0(git_cmd, " -c \"", pck.source.dir, "\" --git-dir=.git branch"),
           intern=TRUE
         )
         current_branch <- gsub("\\*[[:space:]]+", "", all_branches[which(grepl("^[[:space:]]*\\*[[:space:]]+", all_branches))])
         if("" %in% current_branch){
           stop(simpleError("git: sorry, unable to fetch the current branch name in your git repository!"))
         } else {}
+        message(paste0("git: found git repository \"", file.path(pck.source.dir, ".git"), "\""))
+        message(paste0("git: current branch is \"", current_branch, "\", checking out \"", pck.version, "\""))
         successful_checkout <- system(
-          paste0(git_cmd, " --git-dir \"", git_dir, "\" checkout ", pck.version),
+          paste0(git_cmd, " -c \"", pck.source.dir, "\" --git-dir=.git checkout ", pck.version),
           intern=FALSE
         )
         if(successful_checkout == 0){
           on.exit(
             system(
-              paste0(git_cmd, " --git-dir \"", git_dir, "\" checkout ", current_branch)
+              paste0(git_cmd, " -c \"", pck.source.dir, "\" --git-dir=.git checkout ", current_branch)
             ),
             add=TRUE
           )
