@@ -116,7 +116,11 @@ archive.packages <- function(repo.root, to.dir="Archive", keep=1, keep.revisions
   in.repo <- list()
   repo.src <- file.path(clean.repo.root, "src", "contrib")
   archive.src <- ifelse(isTRUE(archInRepo), repo.src, file.path(clean.archive.root, "src", "contrib"))
-  in.repo[["source"]] <- filter.repo.packages(available.packages(repo.src, type="source"), packages=package)
+  if(file.exists(file.path(repo.src,"PACKAGES"))){
+    in.repo[["source"]] <- filter.repo.packages(available.packages(repo.src, type="source"), packages=package)
+  } else {
+    in.repo[["source"]] <- list()
+  }
 
   repo.win <- listRDirs(file.path(clean.repo.root,  "bin", "windows", "contrib"), full.path=TRUE)
   if(isTRUE(archInRepo)){

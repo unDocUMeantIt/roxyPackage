@@ -123,8 +123,9 @@ prep.sndbx.repo.root <- function(snd.repo.root, repo.root){
 ## function prepare.sandbox()
 # option "initSuggests" will only fetch suggested packages for the initial package
 # and then drop the level to not run into a recursive loop
+# - gitCheckout: if TRUE, the pck.source.dir has already been adjusted during git checkout
 prepare.sandbox <- function(package, description, pck.source.dir, R.libs, R.version, repo.root,
-  depLevel=c("Depends", "Imports"), initSuggests=FALSE){
+  depLevel=c("Depends", "Imports"), initSuggests=FALSE, gitCheckout=FALSE){
   snd.config <- get.roxyEnv("sandbox")
   if(!inherits(snd.config, "roxySandbox")){
     stop(simpleError("got strange readings for sandbox settings, please check!"))
@@ -137,11 +138,16 @@ prepare.sandbox <- function(package, description, pck.source.dir, R.libs, R.vers
   #  - try to create the necessary directories
   #  - return the new directories as the ones to use
 
-  result[["pck.source.dir"]] <- prep.sndbx.source.dir(
-    snd.pck.source.dir=snd.pck.source.dir,
-    pck.source.dir=pck.source.dir,
-    package=package)
-
+  if(isTRUE(gitCheckout)){
+    result[["pck.source.dir"]] <- pck.source.dir
+  } else {
+    result[["pck.source.dir"]] <- prep.sndbx.source.dir(
+      snd.pck.source.dir=snd.pck.source.dir,
+      pck.source.dir=pck.source.dir,
+      package=package
+    )
+  }
+  
   if(!identical(snd.R.libs, R.libs) && !identical(snd.R.libs, "")){
     # the new sandbox R root will get different folders for different R versions
     snd.R.libs.Rver <- file.path(snd.R.libs, R.version)

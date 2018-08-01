@@ -411,40 +411,45 @@ roxy.package <- function(
   } else {}
 
   # should we try to checkout a certain git tag?
-  if(all(c("gitCheckout", "binonly") %in% actions)){
-    if(isTRUE(unix.OS)){
-      # make sure git is available
-      git_cmd <- Sys.which("git")
-      if("" %in% git_cmd){
-        stop(simpleError("git: command 'git' is not available in system search path! you can't use the \"gitCheckout\" action :-("))
-      } else {
-        all_branches <- system(
-          paste0(git_cmd, " -c \"", pck.source.dir, "\" --git-dir=.git branch"),
-          intern=TRUE
-        )
-        current_branch <- gsub("\\*[[:space:]]+", "", all_branches[which(grepl("^[[:space:]]*\\*[[:space:]]+", all_branches))])
-        if("" %in% current_branch){
-          stop(simpleError("git: sorry, unable to fetch the current branch name in your git repository!"))
-        } else {}
-        message(paste0("git: found git repository \"", file.path(pck.source.dir, ".git"), "\""))
-        message(paste0("git: current branch is \"", current_branch, "\", checking out \"", pck.version, "\""))
-        successful_checkout <- system(
-          paste0(git_cmd, " -c \"", pck.source.dir, "\" --git-dir=.git checkout ", pck.version),
-          intern=FALSE
-        )
-        if(successful_checkout == 0){
-          on.exit(
-            system(
-              paste0(git_cmd, " -c \"", pck.source.dir, "\" --git-dir=.git checkout ", current_branch)
-            ),
-            add=TRUE
-          )
-        } else {
-          stop(simpleError(paste0("git: unable to checkout branch/tag \"", pck.version, "\", are you sure it exists?")))
-        }
-      }
+  do_gitCheckout <- all(c("gitCheckout", "binonly") %in% actions)
+  if(do_gitCheckout){
+    if(!"roxy" %in% actions | is.null(pck.description)){
+      # we'll repeat this step later on, after the checkout finished
+      pck.dscrptn <- as.data.frame(read.dcf(file=file.path(pck.source.dir, "DESCRIPTION")), stringsAsFactors=FALSE)
+      pck.package <- getDescField(pck.dscrptn, field="Package")
     } else {
-      stop(simpleError("git: sorry, \"gitCheckout\" is currently only supported on unix systems!"))
+      pck.package <- roxy.description("package", description=pck.description)
+    }
+    # if we're sandboxing, prepare the source dir before we do anything
+    # this step will then be omitted by the further sandboxing steps,
+    # like finding package dependencies etc., which could be different
+    # for versions checked out here
+    if(isTRUE(check.sandbox())){
+      pck.source.dir <- prep.sndbx.source.dir(
+        snd.pck.source.dir=slot(get.roxyEnv("sandbox"), "pck.source.dir"),
+        pck.source.dir=pck.source.dir,
+        package=pck.package
+      )
+    } else {}
+
+    current_branch <- git_branch(src_dir=pck.source.dir)
+    message(paste0("git: found git repository \"", pck.source.dir, "\""))
+    message(paste0("git: current branch is \"", current_branch, "\", checking out \"", pck.version, "\""))
+    successful_checkout <- git_checkout(src_dir=pck.source.dir, ref=pck.version)
+    if(isTRUE(successful_checkout)){
+      message(paste0("git: successfully checked out \"", pck.version, "\""))
+      on.exit(
+        {
+          message(paste0("git: checking out \"", current_branch, "\""))
+          successful_checkout <- git_checkout(src_dir=pck.source.dir, ref=current_branch)
+          if(isTRUE(successful_checkout)){
+            message(paste0("git: successfully checked out \"", current_branch, "\""))
+          } else {}
+        },
+        add=TRUE
+      )
+    } else {
+      stop(simpleError(paste0("git: unable to checkout branch/tag \"", pck.version, "\", are you sure it exists?")))
     }
   } else {}
 
@@ -495,7 +500,9 @@ roxy.package <- function(
       R.version=R.Version.full,
       repo.root=repo.root,
       depLevel=c("Depends", "Imports"),
-      initSuggests=initSuggests)
+      initSuggests=initSuggests,
+      gitCheckout=do_gitCheckout
+    )
     # replace paths with sandbox
     pck.source.dir <- adjust.paths[["pck.source.dir"]]
     R.libs <- adjust.paths[["R.libs"]]
