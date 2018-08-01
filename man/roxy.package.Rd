@@ -52,6 +52,8 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
       calling \code{R CMD build} and \code{R CMD INSTALL}}
   \item{"binonly"}{Like \code{"package"},
       but doesn't copy the source package to the repository, to enable binary-only rebuilds}
+  \item{"gitCheckout"}{Treats \code{pck.source.dir} as a git repository and \code{pck.version} as a branch or tag to checkout temporarily;
+    only valid in combination with \code{"binonly"}}
   \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
   \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
     \code{URL} accordingly}
@@ -280,6 +282,21 @@ for release on CRAN. But some steps have to be taken care of by yourself. For in
 in a source package, nor a \code{debian} folder. Therefore,
       if your package is supposed to be released on CRAN, you should include
 \code{Rbuildignore=c("debian", "LICENSE")} to the function call.
+}
+
+\section{Temporary git checkouts}{
+ If you want to rebuild binaries of something that was already released,
+      i.e. by using the \code{"binonly"} action,
+and if your source directory is a git repository,
+      then the action \code{"gitCheckout"} can temporarily checkout the source version to build
+and switch back to the status quo afterwards again. This might or might not work as you expect,
+      depending on whether you organize your code like
+it is expected here. That is, each release must be tagged properly,
+      with the exact version number as the tag name. You should also commit all
+current changes to the code before you use this. Internally,
+      \code{roxy.package} will try to find out the current branch of the git repository,
+then checkout the version number you provided as the new branch or tag,
+      do all the packaging, and checkout bach to the previous branch.
 }
 
 \examples{

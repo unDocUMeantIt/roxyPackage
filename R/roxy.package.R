@@ -75,6 +75,13 @@
 #' for release on CRAN. But some steps have to be taken care of by yourself. For instance, CRAN does currently not allow copies of common licenses
 #' in a source package, nor a \code{debian} folder. Therefore, if your package is supposed to be released on CRAN, you should include
 #' \code{Rbuildignore=c("debian", "LICENSE")} to the function call.
+#' 
+#' @section Temporary git checkouts: If you want to rebuild binaries of something that was already released, i.e. by using the \code{"binonly"} action,
+#' and if your source directory is a git repository, then the action \code{"gitCheckout"} can temporarily checkout the source version to build
+#' and switch back to the status quo afterwards again. This might or might not work as you expect, depending on whether you organize your code like
+#' it is expected here. That is, each release must be tagged properly, with the exact version number as the tag name. You should also commit all
+#' current changes to the code before you use this. Internally, \code{roxy.package} will try to find out the current branch of the git repository,
+#' then checkout the version number you provided as the new branch or tag, do all the packaging, and checkout bach to the previous branch.
 #'
 #' @note The binary packaging is done simply by zipping (Windows) or targzipping (Mac OS X) the built and installed package. This should
 #' do the trick as long as your package is written in pure R code. It will most likely not produce usable packages if it contains
@@ -100,6 +107,8 @@
 #'      \item{"check"}{Do a full package check, calling \code{R CMD check}. Combine with \code{"package"} to do the check on the tarball, not the source directory.}
 #'      \item{"package"}{Build & install the package, update source repository, calling \code{R CMD build} and \code{R CMD INSTALL}}
 #'      \item{"binonly"}{Like \code{"package"}, but doesn't copy the source package to the repository, to enable binary-only rebuilds}
+#'      \item{"gitCheckout"}{Treats \code{pck.source.dir} as a git repository and \code{pck.version} as a branch or tag to checkout temporarily;
+#'        only valid in combination with \code{"binonly"}}
 #'      \item{"cl2news"}{Try to convert a ChangeLog file into an NEWS.Rd file}
 #'      \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
 #'        \code{URL} accordingly}
@@ -274,9 +283,9 @@ roxy.package <- function(
   # avoid some NOTEs from R CMD check
   AuthorR <- AuthorsR <- Author.R <- Authors.R <- NULL
 
-  # check the OS first
+  # check the OS
   unix.OS <- isUNIX()
-
+  
   # do we need to worry about multiple R versions?
   R.versions <- length(R.homes)
   R.libraries <- length(R.libs)
@@ -314,7 +323,8 @@ roxy.package <- function(
             "cleanRd",
             "readme",
             "vignette",
-            "buildVignettes"
+            "buildVignettes",
+            "gitCheckout"
           )]
           # we also don't need to repeat handling of .Rbuildignore and .Rinstignore
           Rbuildignore <- Rinstignore <- NULL
@@ -350,7 +360,10 @@ roxy.package <- function(
   } else {}
 
   old.dir <- getwd()
-  on.exit(setwd(old.dir))
+  on.exit(
+    setwd(old.dir),
+    add=TRUE
+  )
 
   # fist see if we need to rename an "AuthorR" field. data.frame definitions tend to
   # replace the "@" with a dot
@@ -395,6 +408,43 @@ roxy.package <- function(
   )){
     message("deb: R >= 3.5 detected, using \"debR35\" as the default directory for debian package files")
     deb.options[["deb.dir"]] <- "debR35"
+  } else {}
+
+  # should we try to checkout a certain git tag?
+  if(all(c("gitCheckout", "binonly") %in% actions)){
+    if(isTRUE(unix.OS)){
+      # make sure git is available
+      git_cmd <- Sys.which("git")
+      if("" %in% git_cmd){
+        stop(simpleError("git: command 'git' is not available in system search path! you can't use the \"gitCheckout\" action :-("))
+      } else {
+        git_dir <- file.path(pck.source.dir, ".git")
+        all_branches <- system(
+          paste0(git_cmd, " --git-dir \"", git_dir, "\" branch"),
+          intern=TRUE
+        )
+        current_branch <- gsub("\\*[[:space:]]+", "", all_branches[which(grepl("^[[:space:]]*\\*[[:space:]]+", all_branches))])
+        if("" %in% current_branch){
+          stop(simpleError("git: sorry, unable to fetch the current branch name in your git repository!"))
+        } else {}
+        successful_checkout <- system(
+          paste0(git_cmd, " --git-dir \"", git_dir, "\" checkout ", pck.version),
+          intern=FALSE
+        )
+        if(x == 0){
+          on.exit(
+            system(
+              paste0(git_cmd, " --git-dir \"", git_dir, "\" checkout ", current_branch)
+            ),
+            add=TRUE
+          )
+        } else {
+          stop(simpleError(paste0("git: unable to checkout branch/tag \"", pck.version, "\", are you sure it exists?")))
+        }
+      }
+    } else {
+      stop(simpleError("git: sorry, \"gitCheckout\" is currently only supported on unix systems!"))
+    }
   } else {}
 
   # special cases: if actions do not include "roxy",
@@ -1165,7 +1215,10 @@ roxy.package <- function(
         R.bin, " CMD check --output=", chk.out.dir, " ", Rcmd.opt.check, shQuote(pck.check.target, type="cmd"))
       print(shell(r.cmd.check.call, translate=TRUE, intern=TRUE))
     }
-    on.exit(message(paste0("check: saved results to ", chk.out.dir, "/", pck.package, ".Rcheck")), add=TRUE)
+    on.exit(
+      message(paste0("check: saved results to ", chk.out.dir, "/", pck.package, ".Rcheck")),
+      add=TRUE
+    )
     # need to clean up?
     if(!isTRUE(chk.ex.file.present) & file_test("-f", chk.ex.file)){
       # there's an example file which wasn't here before
