@@ -431,7 +431,7 @@ roxy.package <- function(
           paste0(git_cmd, " --git-dir \"", git_dir, "\" checkout ", pck.version),
           intern=FALSE
         )
-        if(x == 0){
+        if(successful_checkout == 0){
           on.exit(
             system(
               paste0(git_cmd, " --git-dir \"", git_dir, "\" checkout ", current_branch)
