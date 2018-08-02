@@ -427,12 +427,12 @@ tabEnvironment <- rk.XML.row(
 #       Rbuildignore=pckg.Rbuildignore,
 #       Rinstignore=c("inst/doc/koRpus_lit.bib", "inst/doc/ttr.pdf")
 
-#         echo("\t\tchangelog=deb.changelog,\n")
-#         echo("\t\tdeb.description=list(\n")
-#         echo("\t\t\tBuild.Depends.Indep=\"debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs\",\n")
-#         echo("\t\t\tDepends=\"r-base (>= 3.0.0)\",\n")
-#         echo("\t\tbin.opts=\"-rfakeroot -b -uc\",\n")
-#         echo("\t\tkeep.build=FALSE\n")
+#         echo("    changelog=deb.changelog,\n")
+#         echo("    deb.description=list(\n")
+#         echo("      Build.Depends.Indep=\"debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs\",\n")
+#         echo("      Depends=\"r-base (>= 3.0.0)\",\n")
+#         echo("    bin.opts=\"-rfakeroot -b -uc\",\n")
+#         echo("    keep.build=FALSE\n")
 
 
 tabDebianize <- rk.XML.col(
@@ -580,24 +580,24 @@ JS.preprocess <- rk.paste.JS(
     modifiers="checked",
     guess.getter=guess.getter
   ),
-  rk.JS.vars(envRhomesVarslot, join="\\\",\\n\\t\\\""),
+  rk.JS.vars(envRhomesVarslot, join="\\\",\\n  \\\""),
   echo("\npackageVersion <- \"", pckgVersion, "\"\n"),
   echo("packageName <- \"", pckgName, "\"\n"),
   echo("packageRoot <- \"", envPckgRoot, "\"\n\n"),
   echo("packageDescription <- package_description(\n",
-    "\tPackage=packageName,\n", 
-    "\tType=\"Package\",\n"
+    "  Package=packageName,\n", 
+    "  Type=\"Package\",\n"
   ),
   js(
     if(pckgShortDescription){
-      echo("\tTitle=\"", pckgShortDescription, "\",\n")
+      echo("  Title=\"", pckgShortDescription, "\",\n")
     } else {},
     if(pckgLongDescription){
-      echo("\tDescription=\"", pckgLongDescription, "\",\n")
+      echo("  Description=\"", pckgLongDescription, "\",\n")
     } else {},
     rk.JS.optionset(optionsetAuthors, vars=TRUE, guess.getter=guess.getter),
     if(ocolAuthGivenName != ""){
-      echo("\tAuthorsR=\"c(\n\t\t\t")
+      echo("  AuthorsR=\"c(\n      ")
       rk.JS.optionset(optionsetAuthors,
         js.optionsetAuthors.role <- rk.JS.options("optAuthorRole",
           .ite=js(
@@ -631,13 +631,13 @@ JS.preprocess <- rk.paste.JS(
           level=4
         ),
         echo(")"),
-        collapse=",\\n\\t\\t\\t"
+        collapse=",\\n      "
       )
-      echo("\n\t\t)\",\n")
+      echo("\n    )\",\n")
     } else {},
     rk.JS.optionset(optionsetDepends, vars=TRUE, guess.getter=guess.getter),
     if(ocolDependPackage != ""){
-      echo("\tDepends=\"")
+      echo("  Depends=\"")
       rk.JS.optionset(optionsetDepends,
         echo(ocolDependPackage),
         js(
@@ -652,7 +652,7 @@ JS.preprocess <- rk.paste.JS(
     } else {},
     rk.JS.optionset(optionsetImports, vars=TRUE, guess.getter=guess.getter),
     if(ocolImportPackage != ""){
-      echo("\tImports=\"")
+      echo("  Imports=\"")
       rk.JS.optionset(optionsetImports,
         echo(ocolImportPackage),
         js(
@@ -667,7 +667,7 @@ JS.preprocess <- rk.paste.JS(
     } else {},
     rk.JS.optionset(optionsetSuggests, vars=TRUE, guess.getter=guess.getter),
     if(ocolSuggestPackage != ""){
-      echo("\tSuggests=\"")
+      echo("  Suggests=\"")
       rk.JS.optionset(optionsetSuggests,
         echo(ocolSuggestPackage),
         js(
@@ -682,7 +682,7 @@ JS.preprocess <- rk.paste.JS(
     } else {},
     rk.JS.optionset(optionsetEnhances, vars=TRUE, guess.getter=guess.getter),
     if(ocolEnhancePackage != ""){
-      echo("\tEnhances=\"")
+      echo("  Enhances=\"")
       rk.JS.optionset(optionsetEnhances,
         echo(ocolEnhancePackage),
         js(
@@ -696,16 +696,16 @@ JS.preprocess <- rk.paste.JS(
       echo("\",\n")
     } else {},
     if(pckgHomepage){
-      echo("\tURL=\"", pckgHomepage, "\",\n")
+      echo("  URL=\"", pckgHomepage, "\",\n")
     } else {},
     if(pckgLicense){
-      echo("\tLicense=\"", pckgLicense, "\",\n")
+      echo("  License=\"", pckgLicense, "\",\n")
     } else {},
     echo("\n)\n\n"),
     ## multiple R homes
     if(frameRhomes && envRhomesVarslot != ""){
       echo(
-        "R.homes <- c(\n\t\"", envRhomesVarslot, "\"\n)\n",
+        "R.homes <- c(\n  \"", envRhomesVarslot, "\"\n)\n",
         "all.homes <- c(R.home(), R.homes)\n",
         "all.libs <- c(file.path(all.homes,\"lib64\",\"R\",\"library\"))\n\n"
       )
@@ -719,7 +719,7 @@ JS.preprocess <- rk.paste.JS(
     if(frameSandbox){
       echo("sandbox(TRUE")
       if(sandboxDir != ""){
-        echo(",\n\tsandbox.dir=\"", sandboxDir, "\"")
+        echo(",\n  sandbox.dir=\"", sandboxDir, "\"")
       } else {}
       tf(sandboxSource, opt="pck.source.dir", ifelse=TRUE, level=2)
       tf(sandboxRLibs, opt="R.libs", ifelse=TRUE, level=2)
@@ -738,148 +738,148 @@ JS.preprocess <- rk.paste.JS(
 rxp.opt.actions <- rk.JS.options("actions",
   .ite=js(
     if(actionRoxy){
-      qp("\n\t\t\"roxy\"")
+      qp("\n    \"roxy\"")
     } else {
-      qp("\n\t\t# \"roxy\"")
+      qp("\n    # \"roxy\"")
     },
     if(actionDoc){
-      qp("\n\t\t\"doc\"")
+      qp("\n    \"doc\"")
     } else {
-      qp("\n\t\t# \"doc\"")
+      qp("\n    # \"doc\"")
     },
     if(actionLog){
-      qp("\n\t\t\"log\"")
+      qp("\n    \"log\"")
     } else {
-      qp("\n\t\t# \"log\"")
+      qp("\n    # \"log\"")
     },
     if(actionCl2news){
-      qp("\n\t\t\"cl2news\"")
+      qp("\n    \"cl2news\"")
     } else {
-      qp("\n\t\t# \"cl2news\"")
+      qp("\n    # \"cl2news\"")
     },
     if(actionNews2rss){
-      qp("\n\t\t\"news2rss\"")
+      qp("\n    \"news2rss\"")
     } else {
-      qp("\n\t\t# \"news2rss\"")
+      qp("\n    # \"news2rss\"")
     },
     if(actionHtml){
-      qp("\n\t\t\"html\"")
+      qp("\n    \"html\"")
     } else {
-      qp("\n\t\t# \"html\"")
+      qp("\n    # \"html\"")
     },
     if(actionWin){
-      qp("\n\t\t\"win\"")
+      qp("\n    \"win\"")
     } else {
-      qp("\n\t\t# \"win\"")
+      qp("\n    # \"win\"")
     },
     if(actionMacosx){
-      qp("\n\t\t\"macosx\"")
+      qp("\n    \"macosx\"")
     } else {
-      qp("\n\t\t# \"macosx\"")
+      qp("\n    # \"macosx\"")
     },
     if(frameDeb){
-      qp("\n\t\t\"deb\"")
+      qp("\n    \"deb\"")
     } else {
-      qp("\n\t\t# \"deb\"")
+      qp("\n    # \"deb\"")
     },
     if(actionCheck){
-      qp("\n\t\t\"check\"")
+      qp("\n    \"check\"")
     } else {
-      qp("\n\t\t# \"check\"")
+      qp("\n    # \"check\"")
     },
     if(actionCleanRd){
-      qp("\n\t\t\"cleanRd\"")
+      qp("\n    \"cleanRd\"")
     } else {
-      qp("\n\t\t# \"cleanRd\"")
+      qp("\n    # \"cleanRd\"")
     },
     if(actionCite){
-      qp("\n\t\t\"cite\"")
+      qp("\n    \"cite\"")
     } else {
-      qp("\n\t\t# \"cite\"")
+      qp("\n    # \"cite\"")
     },
     if(actionLicense){
-      qp("\n\t\t\"license\"")
+      qp("\n    \"license\"")
     } else {
-      qp("\n\t\t# \"license\"")
+      qp("\n    # \"license\"")
     },
     if(actionReadme){
-      qp("\n\t\t\"readme\"")
+      qp("\n    \"readme\"")
     } else {
-      qp("\n\t\t# \"readme\"")
+      qp("\n    # \"readme\"")
     },
     if(actionVignette){
-      qp("\n\t\t\"vignette\"")
+      qp("\n    \"vignette\"")
     } else {
-      qp("\n\t\t# \"vignette\"")
+      qp("\n    # \"vignette\"")
     },
     if(actionBuildEmAll){
-      qp("\n\t\t\"buildEmAll\"")
+      qp("\n    \"buildEmAll\"")
     } else {
-      qp("\n\t\t# \"buildEmAll\"")
+      qp("\n    # \"buildEmAll\"")
     },
     if(actionBuildVignettes){
-      qp("\n\t\t\"buildVignettes\"")
+      qp("\n    \"buildVignettes\"")
     } else {
-      qp("\n\t\t# \"buildVignettes\"")
+      qp("\n    # \"buildVignettes\"")
     },
     if(actionPackage){
-      qp("\n\t\t\"package\"")
+      qp("\n    \"package\"")
     } else {
-      qp("\n\t\t# \"package\"")
+      qp("\n    # \"package\"")
     },
     keep.ite=TRUE
   ),
   collapse="",
   option="actions",
   funct="c",
-  opt.sep=",\\n\\t"
+  opt.sep=",\\n  "
 )
 
 rxp.opt.debActions <- rk.JS.options("debActions",
   .ite=js(
     if(debActionDeb){
-      qp("\n\t\t\t\"deb\"")
+      qp("\n      \"deb\"")
     } else {},
     if(debActionBin){
-      qp("\n\t\t\t\"bin\"")
+      qp("\n      \"bin\"")
     } else {},
     if(debActionSrc){
-      qp("\n\t\t\t\"src\"")
+      qp("\n      \"src\"")
     } else {},
     keep.ite=TRUE
   ),
   collapse="",
   option="actions",
   funct="c",
-  opt.sep="\\t\\t"
+  opt.sep="    "
 )
 
 rxp.opt.debOverwrite <- rk.JS.options("debOverwrite",
   .ite=js(
     if(debOverwriteChangelog){
-      qp("\n\t\t\t\"changelog\"")
+      qp("\n      \"changelog\"")
     } else {},
     if(debOverwriteControl){
-      qp("\n\t\t\t\"control\"")
+      qp("\n      \"control\"")
     } else {},
     if(debOverwriteCopyright){
-      qp("\n\t\t\t\"copyright\"")
+      qp("\n      \"copyright\"")
     } else {},
     if(debOverwriteRules){
-      qp("\n\t\t\t\"rules\"")
+      qp("\n      \"rules\"")
     } else {},
     if(debOverwriteCompat){
-      qp("\n\t\t\t\"compat\"")
+      qp("\n      \"compat\"")
     } else {},
     if(debOverwritePGP){
-      qp("\n\t\t\t\"gpg.key\"")
+      qp("\n      \"gpg.key\"")
     } else {},
     keep.ite=TRUE
   ),
   collapse="",
   option="overwrite",
   funct="c",
-  opt.sep="\\t\\t"
+  opt.sep="    "
 )
 
 JS.calculate <- rk.paste.JS(
@@ -888,68 +888,68 @@ JS.calculate <- rk.paste.JS(
   rxp.opt.debActions,
   rxp.opt.debOverwrite,
   echo("roxy.package(", rxp.opt.actions, ",\n"),
-    echo("\tpck.description=packageDescription,\n"),
-    echo("\tpck.source.dir=packageRoot,\n"),
-    echo("\tpck.version=packageVersion,\n"),
-    echo("\tR.homes=all.homes,\n"),
-    echo("\tR.libs=all.libs,\n"),
+    echo("  pck.description=packageDescription,\n"),
+    echo("  pck.source.dir=packageRoot,\n"),
+    echo("  pck.version=packageVersion,\n"),
+    echo("  R.homes=all.homes,\n"),
+    echo("  R.libs=all.libs,\n"),
     js(
       if(envRepoRoot){
-        echo("\trepo.root=\"", envRepoRoot, "\",\n")
+        echo("  repo.root=\"", envRepoRoot, "\",\n")
       } else {},
 # #   pck.date="2014-01-22","),
-      echo("\tcleanup=TRUE,\n"),
+      echo("  cleanup=TRUE,\n"),
       if(debRepoURL){
-        echo("\tURL=\"", debRepoURL, "\",\n")
+        echo("  URL=\"", debRepoURL, "\",\n")
       } else {},
       if(frameDeb){
-        echo("\tdeb.options=list(\n")
-        echo("\t\tbuild.dir=file.path(main.root,pck.name),\n")
-        echo("\t\trevision=deb.revision,\n")
+        echo("  deb.options=list(\n")
+        echo("    build.dir=file.path(main.root,pck.name),\n")
+        echo("    revision=deb.revision,\n")
         if(debOrigin){
-          echo("\t\torigin=\"", debOrigin, "\",\n")
+          echo("    origin=\"", debOrigin, "\",\n")
         } else {}
         if(debDistribution){
-          echo("\t\tdistribution=\"", debDistribution, "\",\n")
+          echo("    distribution=\"", debDistribution, "\",\n")
         } else {}
         if(debComponent){
-          echo("\t\tcomponent=\"", debComponent, "\",\n")
+          echo("    component=\"", debComponent, "\",\n")
         } else {}
         if(debUrgency){
-          echo("\t\turgency=\"", debUrgency, "\",\n")
+          echo("    urgency=\"", debUrgency, "\",\n")
         } else {}
-        echo("\t\tchangelog=deb.changelog,\n")
-        echo("\t\tdeb.description=list(\n")
-        echo("\t\t\tBuild.Depends.Indep=\"debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs\",\n")
-        echo("\t\t\tDepends=\"r-base (>= 3.0.0)\",\n")
+        echo("    changelog=deb.changelog,\n")
+        echo("    deb.description=list(\n")
+        echo("      Build.Depends.Indep=\"debhelper (>> 7.0.0), r-base-dev (>= 3.0.0), cdbs\",\n")
+        echo("      Depends=\"r-base (>= 3.0.0)\",\n")
         if(debMaintainerGivenName){
-          echo("\t\t\tMaintainer=\"", debMaintainerGivenName, " ", debMaintainerFamilyName, " <", debMaintainerEMail, ">\"\n")
+          echo("      Maintainer=\"", debMaintainerGivenName, " ", debMaintainerFamilyName, " <", debMaintainerEMail, ">\"\n")
         } else {}
-        echo("\t\t),\n")
-        echo("\t\tSection=\"math\",\n")
+        echo("    ),\n")
+        echo("    Section=\"math\",\n")
         if(debPriority){
-          echo("\t\tPriority=\"", debPriority, "\",\n")
+          echo("    Priority=\"", debPriority, "\",\n")
         } else {}
         echo(rxp.opt.debActions, ",\n")
         echo(rxp.opt.debOverwrite, ",\n")
-        echo("\t\tbin.opts=\"-rfakeroot -b -uc\",\n")
-        echo("\t\tarch=\"all\",\n")
+        echo("    bin.opts=\"-rfakeroot -b -uc\",\n")
+        echo("    arch=\"all\",\n")
         if(debMaintainerPGP){
-          echo("\t\tgpg.key=\"", debMaintainerPGP, "\",\n")
+          echo("    gpg.key=\"", debMaintainerPGP, "\",\n")
         } else {}
         if(debKeepBuild){
-          echo("\t\tkeep.build=TRUE\n")
+          echo("    keep.build=TRUE\n")
         } else {
-          echo("\t\tkeep.build=FALSE\n")
+          echo("    keep.build=FALSE\n")
         }
-        echo("\t)\n")
+        echo("  )\n")
       } else {
-        echo("\tdeb.options=list()\n")
+        echo("  deb.options=list()\n")
       }
     ),
-    echo("\tChangeLog=ChangeLog.entry,\n"),
-    echo("\tRbuildignore=pckg.Rbuildignore,\n"),
-    echo("\tRinstignore=c(\"inst/doc/koRpus_lit.bib\", \"inst/doc/ttr.pdf\")\n"),
+    echo("  ChangeLog=ChangeLog.entry,\n"),
+    echo("  Rbuildignore=pckg.Rbuildignore,\n"),
+    echo("  Rinstignore=c(\"inst/doc/koRpus_lit.bib\", \"inst/doc/ttr.pdf\")\n"),
   echo(")\n\n")
 )
 #   ChangeLog.entry <- list(
