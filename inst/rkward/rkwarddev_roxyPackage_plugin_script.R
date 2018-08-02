@@ -1,6 +1,26 @@
 require(rkwarddev)
 rkwarddev.required("0.08-1")
 
+# TODO:
+#        deb.options=list(
+#          repo.name="...",
+#          depends.origin.alt=list(
+#            aPackage=c("cran","other-reaktanz","other-rkward")
+#          )
+#        ),
+#        readme.options=list(
+#          githubUser="..."
+#        ),
+#         html.options=list(
+#           flattr.id="...",
+#           repo.flattr.id="...",
+#           imprint="https://...",
+#           privacy.policy="https://..."
+#         ),
+#         Rbuildignore=NULL,
+#         Rinstignore=NULL,
+#         OSX.repo=list(main="contrib", symlinks=c("leopard","mavericks"))
+
 rk.local({
 # define where the plugin should write its files
 output.dir <- tempdir()
@@ -19,12 +39,12 @@ about.plugin <- rk.XML.about(
     desc="RKWard GUI dialogs to create and maintain your own R packages",
     version="0.01-0",
     license="GPL (>= 3)",
-    url="http://reaktanz.de/?c=hacking&s=roxyPackage"
+    url="https://reaktanz.de/?c=hacking&s=roxyPackage"
   )
 )
 
 plugin.dependencies <- rk.XML.dependencies(
-  dependencies=list(rkward.min="0.6.0"),
+  dependencies=list(rkward.min="0.7.0"),
   package=list(
     c(name="rkwarddev")
   )
@@ -54,6 +74,9 @@ tabAbout <- rk.XML.col(
           help="Define the license for the package. A short form should be sufficient.")
       ),
       label="About the package"
+      # TODO: VignetteBuilder="knitr" // VignetteBuilder="knitr,rmarkdown"
+      # TODO: BugReports="https:..."
+      # TODO: custom fields
     )
   ),
   rk.XML.stretch(),
@@ -261,6 +284,7 @@ tabDepends <- rk.XML.row(
 #     URL="http://example.com/foo/stuff",
 #     stringsAsFactors=FALSE)
 
+
 tabCreate <- rk.XML.col(
   rk.XML.row(
     rk.XML.frame(
@@ -270,6 +294,10 @@ tabCreate <- rk.XML.col(
             help="If this is checked, the roxygenize() function of the roxygen package is called to rebuild the documentation."),
           actionPackage <- rk.XML.cbox("Build & install the package", chk=TRUE, id.name="actionPackage",
             help="If this is checked, the main package will be built and installed to the specified R library location."),
+          actionBuildEmAll <- rk.XML.cbox("Build for all configured R versions", chk=FALSE, id.name="actionBuildEmAll",
+            help="If this is checked and multiple versions of R are specified, binary packages for all are being built."),
+          actionBuildVignettes <- rk.XML.cbox("Re-build vignettes with index file", chk=TRUE, id.name="actionBuildVignettes",
+            help="If this is checked, the index file of all included vignettes also gets updated. This is especially useful if you're using RMarkdown for vignettes."),
           actionDoc <- rk.XML.cbox("Update PDF documentation", chk=TRUE, id.name="actionDoc",
             help="If this is checked, all PDF documentation (manual and vignettes) will be re-created."),
           actionLog <- rk.XML.cbox("Update the ChangeLog file", chk=TRUE, id.name="actionLog",
@@ -295,35 +323,48 @@ tabCreate <- rk.XML.col(
             help="If this is checked, the CITATION file will be re-written."),
           actionLicense <- rk.XML.cbox("Update the LICENSE file", chk=FALSE, id.name="actionLicense",
             help="If this is checked, the LICENSE file will be re-written."),
+          actionReadme <- rk.XML.cbox("Add an intial README.md file", chk=FALSE, id.name="actionReadme",
+            help="If this is checked, an intial README.md file will be created in the package root directory."),
+          actionVignette <- rk.XML.cbox("Add an intial RMarkdown vignette stub", chk=FALSE, id.name="actionVignette",
+            help="If this is checked, an intial RMarkdown vignette stub will be created in the vignettes directory of the package."),
           rk.XML.stretch()
         )
       ),
       label="Packaging actions"
     )
   ),
+  rk.XML.stretch(),
   rk.XML.row(
     frameSandbox <- rk.XML.frame(
       rk.XML.row(
-        sandboxSource <- rk.XML.cbox("Source directory", chk=TRUE, id.name="sandboxSource",
-          help="If this is checked, a copy of the package sources will be made below the sandbox directory and all
-            changes will be applied to this copy. This means, running roxy.package() will not change your actual
-            sources, unless you turn sandboxing off."
+        rk.XML.col(
+          sandboxSource <- rk.XML.cbox("Source directory", chk=TRUE, id.name="sandboxSource",
+            help="If this is checked, a copy of the package sources will be made below the sandbox directory and all
+              changes will be applied to this copy. This means, running roxy.package() will not change your actual
+              sources, unless you turn sandboxing off."
+          ),
+          sandboxRLibs <- rk.XML.cbox("R library", chk=TRUE, id.name="sandboxRLibs",
+            help="If this is checked, the resulting package will not be installed to your pre-defined R library,
+              but a new R library below the sandbox directory, unless you turn sandboxing off."
+          ),
+          sandboxRepo <- rk.XML.cbox("Repository", chk=TRUE, id.name="sandboxRepo",
+            help="If this is checked, built packages (be it R source packages or binary packages) will not be
+              copied to the defiend repository, but a new repository below the sandboxing directory, unless you turn sandboxing off. 
+              In addition, all other repository files, like HTML files, vignettes, RSS feeds etc., are also only copied to the sandboxed
+              repositry."
+          ),
+          rk.XML.stretch()
         ),
-        sandboxRLibs <- rk.XML.cbox("R library", chk=TRUE, id.name="sandboxRLibs",
-          help="If this is checked, the resulting package will not be installed to your pre-defined R library,
-            but a new R library below the sandbox directory, unless you turn sandboxing off."
-        )
-      ),
-      rk.XML.row(
-        sandboxRepo <- rk.XML.cbox("Repository", chk=TRUE, id.name="sandboxRepo",
-          help="If this is checked, built packages (be it R source packages or binary packages) will not be
-            copied to the defiend repository, but a new repository below the sandboxing directory, unless you turn sandboxing off. 
-            In addition, all other repository files, like HTML files, vignettes, RSS feeds etc., are also only copied to the sandboxed
-            repositry."
-        ),
-        sandboxArchive <- rk.XML.cbox("Repository archive", chk=TRUE, id.name="sandboxArchive",
-          help="If this is checked, archiving of ord packages will not be done in the defined archive directory, but a new archive
-            below the sandbox directory, unless you turn sandboxing off. It is recommended to keep this in sync with the repository setting."
+        rk.XML.col(
+          sandboxArchive <- rk.XML.cbox("Repository archive", chk=TRUE, id.name="sandboxArchive",
+            help="If this is checked, archiving of ord packages will not be done in the defined archive directory, but a new archive
+              below the sandbox directory, unless you turn sandboxing off. It is recommended to keep this in sync with the repository setting."
+          ),
+          sandboxClean <- rk.XML.cbox("Clean sandbox", chk=TRUE, id.name="sandboxClean",
+            help="If this is checked, The sandbox directory will be wiped every time you call roxy.package(). This is helpful e.g. if you're working
+            on a package and re-build it repeatedly, to not get into trouble with leftovers from previous builds."
+          ),
+          rk.XML.stretch()
         )
       ),
       rk.XML.row(
@@ -418,7 +459,7 @@ tabDebianize <- rk.XML.col(
       rk.XML.frame(
         rk.XML.col(
           rk.XML.row(
-            debRepoURL <- rk.XML.input("Repository URL", initial="http://R.reaktanz.de", required=TRUE,
+            debRepoURL <- rk.XML.input("Repository URL", initial="https://R.reaktanz.de", required=TRUE,
               help="Provide an URL for the Debian package repository.", id.name="debRepoURL"),
             debOrigin <- rk.XML.input("Package origin", initial="other-reaktanz", required=TRUE, id.name="debOrigin",
               help="The package origin becomes part of the file name. It's custom to start with \"other-\" followed by
@@ -528,6 +569,7 @@ JS.preprocess <- rk.paste.JS(
     sandboxRLibs,
     sandboxRepo,
     sandboxArchive,
+    sandboxClean,
     sandboxDir,
     guess.getter=guess.getter
   ),
@@ -664,8 +706,8 @@ JS.preprocess <- rk.paste.JS(
     if(frameRhomes && envRhomesVarslot != ""){
       echo(
         "R.homes <- c(\n\t\"", envRhomesVarslot, "\"\n)\n",
-        "all.homes <- c(R.homes, R.home())\n",
-        "all.libs <- c(file.path(R.homes,\"lib64\",\"R\",\"library\"))\n\n"
+        "all.homes <- c(R.home(), R.homes)\n",
+        "all.libs <- c(file.path(all.homes,\"lib64\",\"R\",\"library\"))\n\n"
       )
     } else {
       echo(
@@ -685,6 +727,7 @@ JS.preprocess <- rk.paste.JS(
       if(sandboxArchive != sandboxRepo){
         tf(sandboxArchive, opt="archive", ifelse=TRUE, level=2)
       } else {}
+      tf(sandboxClean, opt="clean", ifelse=TRUE, level=2)
       echo("\n)\n\n")
     } else {
       echo("sandbox(FALSE)\n\n")
@@ -696,46 +739,94 @@ rxp.opt.actions <- rk.JS.options("actions",
   .ite=js(
     if(actionRoxy){
       qp("\n\t\t\"roxy\"")
-    } else {},
-    if(actionPackage){
-      qp("\n\t\t\"package\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"roxy\"")
+    },
     if(actionDoc){
       qp("\n\t\t\"doc\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"doc\"")
+    },
     if(actionLog){
       qp("\n\t\t\"log\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"log\"")
+    },
     if(actionCl2news){
       qp("\n\t\t\"cl2news\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"cl2news\"")
+    },
     if(actionNews2rss){
       qp("\n\t\t\"news2rss\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"news2rss\"")
+    },
     if(actionHtml){
       qp("\n\t\t\"html\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"html\"")
+    },
     if(actionWin){
       qp("\n\t\t\"win\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"win\"")
+    },
     if(actionMacosx){
       qp("\n\t\t\"macosx\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"macosx\"")
+    },
     if(frameDeb){
       qp("\n\t\t\"deb\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"deb\"")
+    },
     if(actionCheck){
       qp("\n\t\t\"check\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"check\"")
+    },
     if(actionCleanRd){
       qp("\n\t\t\"cleanRd\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"cleanRd\"")
+    },
     if(actionCite){
       qp("\n\t\t\"cite\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"cite\"")
+    },
     if(actionLicense){
       qp("\n\t\t\"license\"")
-    } else {},
+    } else {
+      qp("\n\t\t# \"license\"")
+    },
+    if(actionReadme){
+      qp("\n\t\t\"readme\"")
+    } else {
+      qp("\n\t\t# \"readme\"")
+    },
+    if(actionVignette){
+      qp("\n\t\t\"vignette\"")
+    } else {
+      qp("\n\t\t# \"vignette\"")
+    },
+    if(actionBuildEmAll){
+      qp("\n\t\t\"buildEmAll\"")
+    } else {
+      qp("\n\t\t# \"buildEmAll\"")
+    },
+    if(actionBuildVignettes){
+      qp("\n\t\t\"buildVignettes\"")
+    } else {
+      qp("\n\t\t# \"buildVignettes\"")
+    },
+    if(actionPackage){
+      qp("\n\t\t\"package\"")
+    } else {
+      qp("\n\t\t# \"package\"")
+    },
     keep.ite=TRUE
   ),
   collapse="",
