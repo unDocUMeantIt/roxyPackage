@@ -68,14 +68,52 @@ tabAbout <- rk.XML.col(
         help="Give a summary of the package, to be used as the \"Description:\" field of the DESCRIPTION file.", id.name="pckgLongDescription")
       ),
       rk.XML.row(
-        pckgHomepage <- rk.XML.input("Package homepage", required=TRUE,
-          help="Provide an URL for the package homepage, to be used as the \"URL:\" field of the DESCRIPTION file.", id.name="pckgHomepage"),
-        pckgLicense <- rk.XML.input("License", initial="GPL (>= 3)", required=TRUE, id.name="pckgLicense",
-          help="Define the license for the package. A short form should be sufficient.")
+        rk.XML.col(
+          pckgLicense <- rk.XML.input("License", initial="GPL (>= 3)", required=TRUE, id.name="pckgLicense",
+            help="Define the license for the package. A short form should be sufficient."),
+          pckgHomepage <- rk.XML.input("Package homepage", required=TRUE,
+            help="Provide an URL for the package homepage, to be used as the \"URL:\" field of the DESCRIPTION file.", id.name="pckgHomepage"),
+          pckgBugReports <- rk.XML.input("Bug reports",
+            help="A URL or similar to use for bug reports, feature requests etc. E.g., the issue tracker of your preferred source code hosting platform.", id.name="pckgBugReports"),
+          rk.XML.stretch()
+        ),
+        rk.XML.col(
+          rk.XML.frame(
+            optionsetVignBuilder <- rk.XML.optionset(
+              content=rk.XML.col(rk.XML.stretch(before=list(
+                rk.XML.row(
+                  rowVignBuilder <- rk.XML.row(
+                    rk.XML.col(
+                      packageVignBuilder <- rk.XML.input("Package name", required=TRUE,
+                        help="A list of packages needed to build the vignette. If you're using RMarkdown for the vignette, this could for example be \"knitr\" and/or \"rmarkdown\". Make sure you also add these Packages to \"Depends\", \"Suggests\", or \"Imports\" in the dependecies tab.", id.name="packageVignBuilder"),
+  # TODO:
+  #                     dropVignBuilderDep <- rk.XML.dropdown("Dependency", options=list(
+  #                         "Depends on"=c(val="Depends"),
+  #                         "Suggests"=c(val="Suggests", chk=TRUE),
+  #                         "Imports from"=c(val="Imports")
+  #                       ),
+  #                       help="Chose how this package should be added to the dependencies.", id.name="dropVignBuilderDep"),
+                      rk.XML.stretch(),
+                      id.name="colVignBuilder"
+                    ),
+                    id.name="rowVignBuilder"
+                  )
+                )
+              )),
+              id.name="col_opsVignBuilder"),
+              optioncolumn=list(
+                ocolVignBuilder <- rk.XML.optioncolumn(connect=packageVignBuilder, modifier="text", id.name="ocolVignBuilder")#,
+  #               ocolDropVignBuilder <- rk.XML.optioncolumn(connect=dropVignBuilderDep, modifier="string", id.name="ocolDropVignBuilder")
+              ),
+              optiondisplay=FALSE
+            ),
+            label="Vignette builder",
+            id.name="optionsetVignBuilder"
+          ),
+          rk.XML.stretch()
+        )
       ),
       label="About the package"
-      # TODO: VignetteBuilder="knitr" // VignetteBuilder="knitr,rmarkdown"
-      # TODO: BugReports="https:..."
       # TODO: custom fields
     )
   ),
@@ -563,6 +601,8 @@ JS.preprocess <- rk.paste.JS(
     pckgLongDescription,
     pckgHomepage,
     pckgLicense,
+    pckgVignBuilder,
+    pckgBugReports,
     envPckgRoot,
     envRepoRoot,
     sandboxSource,
@@ -700,6 +740,18 @@ JS.preprocess <- rk.paste.JS(
     } else {},
     if(pckgLicense){
       echo("  License=\"", pckgLicense, "\",\n")
+    } else {},
+    rk.JS.optionset(optionsetVignBuilder, vars=TRUE, guess.getter=guess.getter),
+    if(ocolVignBuilder != ""){
+      echo("  VignetteBuilder=\"")
+      rk.JS.optionset(optionsetVignBuilder,
+        echo(ocolVignBuilder),
+        collapse=","
+      )
+      echo("\",\n")
+    } else {},
+    if(pckgBugReports){
+      echo("  BugReports=\"", pckgBugReports, "\",\n")
     } else {},
     echo("\n)\n\n"),
     ## multiple R homes
