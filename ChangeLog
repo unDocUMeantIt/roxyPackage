@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2018-08-01)
+changes in version 0.06-5 (2018-08-12)
 unreleased:
   - this release is under development
 added:
@@ -8,6 +8,9 @@ added:
     versions of R (if more than one was provided also)
   - roxy.package(): new action "gitCheckout" to switch to a tagged release
     for binary rebuilds, works well in sandbox mode
+  - roxy.package(): HTML page for Debain package installation now explains how
+    to break the circle and successfully install the keyring package if apt
+    refuses to install it because the keyring package wasn't installed yet
 
 changes in version 0.06-4 (2018-07-29)
 fixed:
