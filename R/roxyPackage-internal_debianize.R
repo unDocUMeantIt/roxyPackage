@@ -1474,7 +1474,7 @@ deb.list.packages.dirs <- function(repo, binary=TRUE, fullPath=FALSE){
 # - pckg: a package name without version string etc.; if NULL, all packages are returned (well, unique)
 # - repo: root of the *debian* repository
 # - boolean: if FALSE, returns the matching entries, if any
-# - binary: if TRUE, lists *.db, if FLASE, lists sources
+# - binary: if TRUE, lists *.deb, if FLASE, lists sources
 # - checkChanges: Packages don't list *.changes files; if TRUE, add them to the output
 # - searchPath: path starting with the "dists" folder and ending with the folder containing
 #     either "Packages" or "Sources" files to examine. if NULL, will be constructed from
