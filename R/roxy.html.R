@@ -202,6 +202,7 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
       stillNeedsUpdate <- ""
       xml.obj.list <- append(xml.obj.list,
         list(
+          XMLNode("p", "You might have to temporarily replace", XMLNode("code", "deb"), "with", XMLNode("code", "deb [trusted=yes]"), "in your", XMLNode("code", paste0(repo, ".list")), "file until after you installed the following keyring package, or apt might refuse to install it because it doesn't know the included OpenPGP key yet. Make sure you remove the", XMLNode("code", "[trusted=yes]"), "after the keyring was successfully installed!"),
           XMLNode("h4", "Add OpenPGP key"),
           XMLNode("p", "To be able to make use of secure apt, install the repository's OpenPGP keyring package:"),
           XMLNode("pre", paste0("&nbsp;\n", gpg.txt), attrs=list(class="repo")) # the "&nbsp;" works around a glitch in XiMpLe
