@@ -1,8 +1,11 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2018-08-12)
+changes in version 0.06-5 (2018-10-02)
 unreleased:
   - this release is under development
+fixed:
+  - debianize(): the generated copyright file now has https instead of http
+    in the format URL
 added:
   - roxy.package(): new action "buildEmAll" to trigger builds for multiple
     versions of R (if more than one was provided also)
