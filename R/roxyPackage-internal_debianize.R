@@ -829,7 +829,7 @@ deb.gen.copyright <- function(R.dscrptn, deb.name, description, year, deb.dir,
     )
     if(isTRUE(isRpackage)){
       txt.copyright <- paste0(
-        "Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n",
+        "Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n",
         "Upstream-Name: ", R.name, "\n",
         "Upstream-Contact: ", maintainer, "\n",
         if("Homepage" %in% names(description)){
@@ -857,7 +857,7 @@ deb.gen.copyright <- function(R.dscrptn, deb.name, description, year, deb.dir,
       )
     } else {
       txt.copyright <- paste0(
-        "Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n",
+        "Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/\n",
         "Upstream-Name: ", R.name, "\n",
         "Upstream-Contact: ", maintainer, "\n",
         if(!is.null(URL)){
