@@ -1,4 +1,4 @@
-# Copyright 2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2014-2018 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -101,7 +101,7 @@ debianizeKeyring <- function(
   description=paste("OpenPGP keyring for Debian packages hosted at the", repo.name, "repository.",
     "This keyring is necessary to use secure apt."),
   actions=c("bin", "src"),
-  overwrite=c("changelog", "control", "copyright", "postinst", "prerm", "rules", "compat"),
+  overwrite=c("changelog", "control", "copyright", "install", "rules", "compat"),
   bin.opts="-rfakeroot -b -uc",
   compat=9,
   epoch=NULL,
@@ -178,9 +178,12 @@ debianizeKeyring <- function(
   deb.pckg.name <- deb.srcs.name <- debianPkgName(package=keyname, origin=NULL, version=NULL, replace.dots=FALSE)
   deb.pckg.vers <- debianPkgVersion(version=version, revision=revision, epoch=epoch)
 
+  # the package will have the OpenPGP key in ASCII format in key/<keyID>.asc
+  # so the term "keyrings" is actually a bit misleading and only kept because
+  # the file eventually needs to end up in /usr/share/keyrings
   keyring.dir <- file.path(pck.source.dir, "keyrings")
   createMissingDir(dirPath=keyring.dir, action="deb-key", quiet=FALSE)
-  keyring.file <- paste0(keyname, ".gpg")
+  keyring.file <- paste0(keyname, ".asc")
   keyring.file.path.local <- file.path("keyrings", keyring.file)
   keyring.file.path.full <- file.path(keyring.dir, keyring.file)
 
@@ -213,8 +216,8 @@ debianizeKeyring <- function(
     defaults=list(
       Section="misc",
       Priority="extra",
-      Depends="gnupg (>= 1.0.6-4), ${misc:Depends}",
-      "Build.Depends.Indep"="debhelper (>> 7.0.0), cdbs",
+      Depends="gpgv, ${misc:Depends}",
+      "Build.Depends.Indep"="debhelper (>> 9.0.0), cdbs",
       Homepage=URL
     ),
     maintainer=maintainer,
@@ -276,7 +279,7 @@ debianizeKeyring <- function(
     action="deb-key"
   )
 
-  ## keyrings/<keyname>.gpg
+  ## keyrings/<keyname>.asc
   GPGwriteKey(
     key=gpg.key,
     file=keyring.file.path.full,
@@ -297,19 +300,27 @@ debianizeKeyring <- function(
     isRpackage=FALSE,
     keyringFiles=keyring.file.path.local
   )
-  
-  ## debian/postinst
-  deb.gen.postinst(
+
+  ## TODO: remove, these functions have been replaced
+  # we're simply copying files to /usr/share/keyrings and /etc/apt/trusted.gpg.d now
+  #     ## debian/postinst
+  #     deb.gen.postinst(
+  #       deb.dir=deb.dir.debian,
+  #       keyringFiles=keyring.file,
+  #       overwrite="postinst" %in% overwrite
+  #     )
+  # 
+  #     ## debian/prerm
+  #     deb.gen.prerm(
+  #       deb.dir=deb.dir.debian,
+  #       key=gpg.key,
+  #       overwrite="prerm" %in% overwrite
+  #     )
+  ## debian/install
+  deb.gen.install(
     deb.dir=deb.dir.debian,
     keyringFiles=keyring.file,
-    overwrite="postinst" %in% overwrite
-  )
-
-  ## debian/prerm
-  deb.gen.prerm(
-    deb.dir=deb.dir.debian,
-    key=gpg.key,
-    overwrite="prerm" %in% overwrite
+    overwrite="install" %in% overwrite
   )
 
   if(any(c("bin","src") %in% actions)){

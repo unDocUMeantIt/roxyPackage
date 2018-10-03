@@ -147,6 +147,29 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
   debian.path <- getURL(URL, purpose="debian.path", deb.dir=deb.dir)
   deb.URL <- getURL(URL, purpose="debian", deb.dir=deb.dir)
   repo.path <- debRepoPath(dist=dist, comp=comp, arch=arch, URL=URL, deb.dir=deb.dir)
+  # check for OpenPGP key info
+  keyring.options <- mergeOptions(
+    someFunction=debianizeKeyring,
+    customOptions=keyring.options,
+    newDefaults=list(
+      repo.name=repo.name,
+      repo.root=repo.root,
+      distribution=dist,
+      component=comp
+    )
+  )
+  keyname <- eval(keyring.options[["keyname"]])
+  if(!is.null(keyname)){
+    keyInRepo <- deb.search.repo(
+    pckg=keyname,
+    repo=file.path(keyring.options[["repo.root"]], deb.dir),
+    distribution=keyring.options[["distribution"]],
+    component=keyring.options[["component"]],
+    arch="all",
+    boolean=TRUE)
+  } else {
+    keyInRepo <- FALSE
+  }
   # check if URL points to a list of mirrors
   if(!is.null(mirror.list)){
     apt.base.txt <- paste(paste0("[ftp|http]://<mirror>", debian.path), dist, comp, sep=" ")
@@ -161,7 +184,15 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
     apt.base.txt <- paste(paste0(deb.URL, debian.path), dist, comp, sep=" ")
     instruction <- XMLNode("p", "Add the repository to your configuration (e.g.,", XMLNode("code", paste0("/etc/apt/sources.list.d/", repo, ".list")), "):")
   }
-  apt.types <- c("# for binary packages:\ndeb", "# for source packages:\ndeb-src")
+  if(isTRUE(keyInRepo)){
+    apt.signed.by <- paste0(" [signed-by=/usr/share/keyrings/", keyname, ".asc]")
+  } else {
+    apt.signed.by <- ""
+  }
+  apt.types <- c(
+    paste0("# for binary packages:\ndeb", apt.signed.by),
+    paste0("# for source packages:\ndeb-src", apt.signed.by)
+  )
   apt.full.txt <- paste(paste(apt.types, apt.base.txt, sep=" "), collapse="\n")
   # XiMpLe currently suffers from a layout glitch: it tries to auto-indent tag content, which doesn't look so great in <pre> tags
   # therefore, all values of <pre> tags start with an empty line to produce nice output in the web browser
@@ -176,19 +207,6 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
   # call it again when installing the package.
   stillNeedsUpdate <- "sudo apt update\n"
 
-  # check for OpenPGP key info
-  keyring.options <- mergeOptions(
-    someFunction=debianizeKeyring,
-    customOptions=keyring.options,
-    newDefaults=list(
-      repo.name=repo.name,
-      repo.root=repo.root,
-      distribution=dist,
-      component=comp
-    )
-  )
-  keyname <- eval(keyring.options[["keyname"]])
-  # is the keyring there?
   if(!is.null(keyname)){
     keyInRepo <- deb.search.repo(
       pckg=keyname,

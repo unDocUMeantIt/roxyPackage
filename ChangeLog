@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2018-10-02)
+changes in version 0.06-5 (2018-10-03)
 unreleased:
   - this release is under development
 fixed:
@@ -14,6 +14,14 @@ added:
   - roxy.package(): HTML page for Debain package installation now explains how
     to break the circle and successfully install the keyring package if apt
     refuses to install it because the keyring package wasn't installed yet
+changed:
+  - debianizeKeyring(): keyring packages now longer call apt-key but copy
+    ASCII exported keys to both /usr/share/keyrings and /etc/apt/trusted.gpg.d
+    from now on; the latter is to be removed at some future point, as pinning
+    repos to a particular keyring file is the more secure approach, but wasn't
+    supported before 2017
+  - roxy.package(): HTML pages for debian repositories now suggest to include
+    "signed-by" in the lists files
 
 changes in version 0.06-4 (2018-07-29)
 fixed:

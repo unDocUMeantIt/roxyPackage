@@ -913,8 +913,10 @@ deb.gen.rules <- function(deb.name, maintainer, year, origin, deb.dir, overwrite
         "# Copyright ", year, " by ", maintainer, "\n\n",
         "%:\n",
         "\tdh $@\n\n",
-        "override_dh_install:\n",
-        paste0("\tdh_install ", keyringFiles, " usr/share/keyrings/", collapse="\n"), "\n\n",
+        ## TODO: remove these lines
+        # content moved to an "install" file
+        # "override_dh_install:\n",
+        # paste0("\tdh_install ", keyringFiles, " usr/share/keyrings/", collapse="\n"), "\n\n",
         "override_dh_builddeb:\n",
         "\tdh_builddeb -- -Zxz\n"
       )
@@ -1008,6 +1010,9 @@ deb.gen.format <- function(deb.dir, action="deb"){
 
 ## function deb.gen.postinst()
 deb.gen.postinst <- function(deb.dir, keyringFiles, action="deb-key", overwrite=FALSE){
+  ## TODO: remove this function
+  # we're simply copying files to /usr/share/keyrings and /etc/apt/trusted.gpg.d/ now
+  .Deprecated()
   deb.file.postinst <- file.path(deb.dir, "postinst")
   if(!file_test("-f", deb.file.postinst) | isTRUE(overwrite)){
     postinst.txt <- paste0(
@@ -1039,6 +1044,9 @@ deb.gen.postinst <- function(deb.dir, keyringFiles, action="deb-key", overwrite=
 
 ## function deb.gen.prerm()
 deb.gen.prerm <- function(deb.dir, key, action="deb-key", overwrite=FALSE){
+  ## TODO: remove this function
+  # we're simply copying files to /usr/share/keyrings and /etc/apt/trusted.gpg.d/ now
+  .Deprecated()
   deb.file.prerm <- file.path(deb.dir, "prerm")
   if(!file_test("-f", deb.file.prerm) | isTRUE(overwrite)){
     prerm.txt <- paste0(
@@ -1070,6 +1078,21 @@ deb.gen.prerm <- function(deb.dir, key, action="deb-key", overwrite=FALSE){
   } else {}
   return(TRUE)
 } ## end function deb.gen.prerm()
+
+
+## function deb.gen.install()
+deb.gen.install <- function(deb.dir, keyringFiles, action="deb-key", overwrite=FALSE){
+  deb.file.install <- file.path(deb.dir, "install")
+  if(!file_test("-f", deb.file.install) | isTRUE(overwrite)){
+    install.txt <- paste0(
+      paste0("keyrings/", keyringFiles, " usr/share/keyrings/", collapse="\n"), "\n",
+      paste0("keyrings/", keyringFiles, " etc/apt/trusted.gpg.d/", collapse="\n"), "\n\n"
+    )
+    cat(install.txt, file=deb.file.install)
+    message(paste0(action, ": debian/install updated."))
+  } else {}
+  return(TRUE)
+} ## end function deb.gen.install()
 
 
 ## function deb.prepare.buildDir()
