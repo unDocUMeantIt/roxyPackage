@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2018-10-03)
+changes in version 0.06-5 (2012-01-06)
 unreleased:
   - this release is under development
 fixed:
@@ -22,6 +22,8 @@ changed:
     supported before 2017
   - roxy.package(): HTML pages for debian repositories now suggest to include
     "signed-by" in the lists files
+  - roxy.package(): the generated README.md now suggests "devtools::install_github()"
+    instead of loading the package first
 
 changes in version 0.06-4 (2018-07-29)
 fixed:
