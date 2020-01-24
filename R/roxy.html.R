@@ -421,31 +421,27 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         attrs=list(summary=paste0("Package ", pckg.name, " summary."))),
       XMLNode("h4", "Downloads:"),
       XMLNode("table",
+        if(!is.null(url.doc)){
+          rx.tr("Reference manual:", XMLNode("a",
+                                             url.doc,
+                                             attrs=list(href=url.doc)))
+        },
+        if(!is.null(url.vgn)){
+          if(is.null(title.vgn)){ title.vgn <- url.vgn }
+          rx.tr("Vignettes:", XMLNode("", .children=mapply(function(this.url, this.title){
+            XMLNode("", .children=list(
+              XMLNode("a", this.title, attrs=list(href=this.url)),
+              XMLNode("br")))},
+            url.vgn, title.vgn, SIMPLIFY=FALSE)
+          ))
+        },
         if(!is.null(url.src)){
           rx.tr("Package source:", XMLNode("a",
             url.src,
             attrs=list(href=paste0("../../src/contrib/", url.src))))
         },
-        if(length(url.mac) > 0){
-          rx.tr("MacOS X binaries:",
-            lapply(
-              length(url.mac):1,
-              function(this.num){
-                this.R <- names(url.mac)[this.num]
-                XMLNode("span",
-                  paste0("R ", this.R, ": "),
-                  XMLNode("a",
-                    ifelse(this.num > 1, paste0(url.mac[[this.num]], ", "), url.mac[[this.num]]),
-                    attrs=list(href=paste0("../../bin/macosx/", main.path.mac, "/", this.R, "/", url.mac[[this.num]]))
-                  )
-                )
-              }
-            ),
-            isList=TRUE
-          )
-        },
         if(length(url.win) > 0){
-          rx.tr("Windows binaries:", 
+          rx.tr("Windows binaries:",
             lapply(
               length(url.win):1,
               function(this.num){
@@ -462,21 +458,26 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
             isList=TRUE
           )
         },
+        if(length(url.mac) > 0){
+          rx.tr("OS X binaries:",
+            lapply(
+              length(url.mac):1,
+              function(this.num){
+                this.R <- names(url.mac)[this.num]
+                XMLNode("span",
+                  paste0("R ", this.R, ": "),
+                  XMLNode("a",
+                    ifelse(this.num > 1, paste0(url.mac[[this.num]], ", "), url.mac[[this.num]]),
+                    attrs=list(href=paste0("../../bin/macosx/", main.path.mac, "/", this.R, "/", url.mac[[this.num]]))
+                  )
+                )
+              }
+            ),
+            isList=TRUE
+          )
+        },
         if(!is.null(url.deb.repo)){
           rx.tr("Debain binary package:", XMLNode("a", "Learn how to install Debian packages from this repository", attrs=list(href=url.deb.repo)))},
-        if(!is.null(url.doc)){
-          rx.tr("Reference manual:", XMLNode("a",
-            url.doc,
-            attrs=list(href=url.doc)))},
-        if(!is.null(url.vgn)){
-          if(is.null(title.vgn)){ title.vgn <- url.vgn }
-          rx.tr("Vignettes:", XMLNode("", .children=mapply(function(this.url, this.title){
-            XMLNode("", .children=list(
-            XMLNode("a", this.title, attrs=list(href=this.url)),
-            XMLNode("br")))},
-            url.vgn, title.vgn, SIMPLIFY=FALSE)
-          ))
-        },
         # add NEWS or ChangeLog
         if(file_test("-f", news)){
           rx.tr("News/ChangeLog:", XMLNode("", .children=list(
