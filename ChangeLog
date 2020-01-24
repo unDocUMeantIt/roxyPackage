@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2012-01-06)
+changes in version 0.06-5 (2020-01-24)
 unreleased:
   - this release is under development
 fixed:
@@ -11,10 +11,12 @@ added:
     versions of R (if more than one was provided also)
   - roxy.package(): new action "gitCheckout" to switch to a tagged release
     for binary rebuilds, works well in sandbox mode
-  - roxy.package(): HTML page for Debain package installation now explains how
+  - roxy.package(): HTML page for debain package installation now explains how
     to break the circle and successfully install the keyring package if apt
     refuses to install it because the keyring package wasn't installed yet
 changed:
+  - roxy.package(): adjusted ordering of enties in repo HTML page similar to
+    CRAN (contributed by robert nuske)
   - debianizeKeyring(): keyring packages now longer call apt-key but copy
     ASCII exported keys to both /usr/share/keyrings and /etc/apt/trusted.gpg.d
     from now on; the latter is to be removed at some future point, as pinning
