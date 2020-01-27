@@ -389,7 +389,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     } else {}
 
     pckg.title <- rx.clean(pckg[,"Title"])
-    pckg.authors <- get.authors(pckg, maintainer=TRUE, all.participants=TRUE)
+    pckg.authors <- get.authors(pckg, maintainer=TRUE, all.participants=TRUE, check.orcid=TRUE)
     pckg.participants <- rx.clean(pckg.authors[["participants"]])
     pckg.maintainer <- rx.clean(pckg.authors[["cre"]], nomail=FALSE, textmail=TRUE)
 

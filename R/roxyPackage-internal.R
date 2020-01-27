@@ -1,4 +1,4 @@
-# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -156,7 +156,7 @@ get.by.role <- function(persons, role="aut"){
 
 
 ## function get.authors()
-get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyright=FALSE, all.participants=FALSE){
+get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyright=FALSE, all.participants=FALSE, check.orcid=FALSE){
   if("Authors@R" %in% names(description)){
     gotPersons <- TRUE
     authorsFromDescription <- description[["Authors@R"]]
@@ -178,9 +178,22 @@ get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyrig
     got.cph <- ifelse(isTRUE(copyright),
       paste(format(get.by.role(eval(parse(text=authorsFromDescription)), role="cph"), include=c("given", "family")), collapse=", "),
       "")
-    got.participants <- ifelse(isTRUE(all.participants), 
-      paste(format(eval(parse(text=description[["Authors@R"]])), include=c("given", "family", "role", "comment")), collapse=", "), 
-      "")
+    if(isTRUE(all.participants)){
+      AuthorsR_parsed <- eval(parse(text=description[["Authors@R"]]))
+      if(isTRUE(check.orcid)){
+        # try to turn ORCIDs into a link
+        AuthorsR_parsed <- lapply(AuthorsR_parsed, function(x){
+          if("ORCID" %in% names(x$comment)){
+            x$family <- paste0(x$family, " <a href=\"https://orcid.org/", x$comment[["ORCID"]] ,"\">o</a>")
+            x$comment <- x$comment[!names(x$comment) %in% "ORCID"]
+          } else {}
+          return(x)
+        })
+      } else {}
+      got.participants <- paste(format(AuthorsR_parsed, include=c("given", "family", "role", "comment")), collapse=", ")
+    } else {
+      got.participants <- ""
+    }
   } else {
     got.aut <- description[["Author"]]
     got.cre <- ifelse(isTRUE(maintainer),
