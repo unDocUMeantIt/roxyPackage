@@ -179,16 +179,29 @@ get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyrig
       paste(format(get.by.role(eval(parse(text=authorsFromDescription)), role="cph"), include=c("given", "family")), collapse=", "),
       "")
     if(isTRUE(all.participants)){
-      AuthorsR_parsed <- eval(parse(text=description[["Authors@R"]]))
+      AuthorsR_parsed <- eval(parse(text=authorsFromDescription))
       if(isTRUE(check.orcid)){
         # try to turn ORCIDs into a link
-        AuthorsR_parsed <- lapply(AuthorsR_parsed, function(x){
-          if("ORCID" %in% names(x$comment)){
-            x$family <- paste0(x$family, " <a href=\"https://orcid.org/", x$comment[["ORCID"]] ,"\">o</a>")
-            x$comment <- x$comment[!names(x$comment) %in% "ORCID"]
-          } else {}
-          return(x)
-        })
+        # this is a bit back and forth between unevaluated code and evaluated persons,
+        # but so far there doesn't seem to be a more robust way of altering person objects
+        AuthorsR_updated <- paste0("c(",
+          paste0(
+            sapply(AuthorsR_parsed, function(x){
+              if("ORCID" %in% names(x$comment)){
+                x <- person(
+                  given=x$given,
+                  family=paste0(x$family, " <a href=\"https://orcid.org/", x$comment[["ORCID"]] ,"\">o</a>"),
+                  role=x$role,
+                  comment=x$comment[!names(x$comment) %in% "ORCID"]
+                )
+              } else {}
+              return(paste0(format(x, style="R"), collapse=" "))
+            }),
+            collapse=", "
+          ),
+          ")"
+        )
+        AuthorsR_parsed <- eval(parse(text=AuthorsR_updated))
       } else {}
       got.participants <- paste(format(AuthorsR_parsed, include=c("given", "family", "role", "comment")), collapse=", ")
     } else {
