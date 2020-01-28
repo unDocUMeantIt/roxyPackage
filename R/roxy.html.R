@@ -390,7 +390,19 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
 
     pckg.title <- rx.clean(pckg[,"Title"])
     pckg.authors <- get.authors(pckg, maintainer=TRUE, all.participants=TRUE, check.orcid=TRUE)
+    # check if there's a hyperlink in the participant string, which should be the case
+    # for ORCIDs in a person's comment
     pckg.participants <- rx.clean(pckg.authors[["participants"]])
+    if(grepl("<a href=\"https://orcid.", pckg.participants)){
+      pckg.prt.start <- gsub("(.*)(<a href=\\\"https://orcid.*)", "\\1", pckg.participants, perl=TRUE)
+      pckg.prt.url <- gsub("(.*)(<a href=\\\"https://orcid.*)(.*</a>)(.*)", "\\2\\3", pckg.participants, perl=TRUE)
+      pckg.prt.end <- gsub("(.*</a>)(.*)", "\\2", pckg.participants, perl=TRUE)
+      pckg.participants <- XMLNode("span",
+        pckg.prt.start,
+        node(parseXMLTree(pckg.prt.url, object=TRUE), node=list("a")),
+        pckg.prt.end
+      )
+    } else {}
     pckg.maintainer <- rx.clean(pckg.authors[["cre"]], nomail=FALSE, textmail=TRUE)
 
     page.css <- paste0("../", css)
