@@ -394,14 +394,18 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     # for ORCIDs in a person's comment
     pckg.participants <- rx.clean(pckg.authors[["participants"]])
     if(grepl("<a href=\"https://orcid.", pckg.participants)){
-      pckg.prt.start <- gsub("(.*)(<a href=\\\"https://orcid.*)", "\\1", pckg.participants, perl=TRUE)
-      pckg.prt.url <- gsub("(.*)(<a href=\\\"https://orcid.*)(.*</a>)(.*)", "\\2\\3", pckg.participants, perl=TRUE)
-      pckg.prt.end <- gsub("(.*</a>)(.*)", "\\2", pckg.participants, perl=TRUE)
-      pckg.participants <- XMLNode("span",
-        pckg.prt.start,
-        node(parseXMLTree(pckg.prt.url, object=TRUE), node=list("a")),
-        pckg.prt.end
-      )
+      if(!grepl(paste0("https://orcid.org/", "([[:digit:]]{4}[-]){3}[[:digit:]]{3}[[:alnum:]]"), pckg.participants)){
+        warning("Invalid ORCID format, please check again!", call.=FALSE)
+      } else {
+        pckg.prt.start <- gsub("(.*)(<a href=\\\"https://orcid.*)", "\\1", pckg.participants, perl=TRUE)
+        pckg.prt.url <- gsub("(.*)(<a href=\\\"https://orcid.*)(.*</a>)(.*)", "\\2\\3", pckg.participants, perl=TRUE)
+        pckg.prt.end <- gsub("(.*</a>)(.*)", "\\2", pckg.participants, perl=TRUE)
+        pckg.participants <- XMLNode("span",
+          pckg.prt.start,
+          node(parseXMLTree(pckg.prt.url, object=TRUE), node=list("a")),
+          pckg.prt.end
+        )
+      }
     } else {}
     pckg.maintainer <- rx.clean(pckg.authors[["cre"]], nomail=FALSE, textmail=TRUE)
 

@@ -190,7 +190,7 @@ get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyrig
               if("ORCID" %in% names(x$comment)){
                 x <- person(
                   given=x$given,
-                  family=paste0(x$family, " <a href=\"https://orcid.org/", x$comment[["ORCID"]] ,"\">o</a>"),
+                  family=paste0(x$family, " <a href=\"https://orcid.org/", x$comment[["ORCID"]] ,"\" target=\"_blank\" style=\"text-decoration:none;\"><img alt=\"ORCID iD\" src=\"../orcid.svg\" style=\"width:16px; height:16px; margin-left:4px; margin-right:4px; vertical-align:middle;\" /></a>"),
                   role=x$role,
                   comment=x$comment[!names(x$comment) %in% "ORCID"]
                 )
