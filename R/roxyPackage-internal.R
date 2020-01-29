@@ -203,7 +203,7 @@ get.authors <- function(description, maintainer=TRUE, contributor=FALSE, copyrig
         )
         AuthorsR_parsed <- eval(parse(text=AuthorsR_updated))
       } else {}
-      got.participants <- paste(format(AuthorsR_parsed, include=c("given", "family", "role", "comment")), collapse=", ")
+      got.participants <- format(AuthorsR_parsed, include=c("given", "family", "role", "comment"))
     } else {
       got.participants <- ""
     }

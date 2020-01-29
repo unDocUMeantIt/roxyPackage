@@ -392,21 +392,30 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     pckg.authors <- get.authors(pckg, maintainer=TRUE, all.participants=TRUE, check.orcid=TRUE)
     # check if there's a hyperlink in the participant string, which should be the case
     # for ORCIDs in a person's comment
-    pckg.participants <- rx.clean(pckg.authors[["participants"]])
-    if(grepl("<a href=\"https://orcid.", pckg.participants)){
-      if(!grepl(paste0("https://orcid.org/", "([[:digit:]]{4}[-]){3}[[:digit:]]{3}[[:alnum:]]"), pckg.participants)){
-        warning("Invalid ORCID format, please check again!", call.=FALSE)
-      } else {
-        pckg.prt.start <- gsub("(.*)(<a href=\\\"https://orcid.*)", "\\1", pckg.participants, perl=TRUE)
-        pckg.prt.url <- gsub("(.*)(<a href=\\\"https://orcid.*)(.*</a>)(.*)", "\\2\\3", pckg.participants, perl=TRUE)
-        pckg.prt.end <- gsub("(.*</a>)(.*)", "\\2", pckg.participants, perl=TRUE)
-        pckg.participants <- XMLNode("span",
-          pckg.prt.start,
-          node(parseXMLTree(pckg.prt.url, object=TRUE), node=list("a")),
-          pckg.prt.end
-        )
+    pckg.participants <- lapply(
+      seq_along(pckg.authors[["participants"]]),
+      function(this_prtc_num){
+        this_prtc <- rx.clean(pckg.authors[["participants"]][this_prtc_num])
+        if(this_prtc_num < length(pckg.authors[["participants"]])){
+          this_prtc <- paste0(this_prtc, ", ")
+        } else {}
+        if(grepl("<a href=\"https://orcid.", this_prtc)){
+          if(!grepl(paste0("https://orcid.org/", "([[:digit:]]{4}[-]){3}[[:digit:]]{3}[[:alnum:]]"), this_prtc)){
+            warning("Invalid ORCID format, please check again!", call.=FALSE)
+          } else {
+            pckg.prt.start <- gsub("(.*)(<a href=\\\"https://orcid.*)", "\\1", this_prtc, perl=TRUE)
+            pckg.prt.url <- gsub("(.*)(<a href=\\\"https://orcid.*)(.*</a>)(.*)", "\\2\\3", this_prtc, perl=TRUE)
+            pckg.prt.end <- gsub("(.*</a>)(.*)", "\\2", this_prtc, perl=TRUE)
+            this_prtc <- XMLNode("span",
+              pckg.prt.start,
+              node(parseXMLTree(pckg.prt.url, object=TRUE), node=list("a")),
+              pckg.prt.end
+            )
+          }
+        } else {}
+        return(this_prtc)
       }
-    } else {}
+    )
     pckg.maintainer <- rx.clean(pckg.authors[["cre"]], nomail=FALSE, textmail=TRUE)
 
     page.css <- paste0("../", css)
@@ -422,7 +431,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         rx.html.switch(desc=pckg, field="Enhances"),
         rx.html.switch(desc=pckg, field="Additional_repositories"),
         rx.tr("Published:", as.character(as.Date(getDescField(pckg, field=c("Date","Packaged","Date/Publication"))))),
-        rx.tr("Author:", pckg.participants),
+        rx.tr("Author:", pckg.participants, isList=TRUE),
         rx.tr("Maintainer:", pckg.maintainer),
         rx.html.switch(desc=pckg, field="BugReports"),
         rx.tr("License:", pckg[,"License"]),
