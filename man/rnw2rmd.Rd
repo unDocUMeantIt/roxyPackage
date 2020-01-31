@@ -4,10 +4,18 @@
 \alias{rnw2rmd}
 \title{Convert vognettes from *.Rnw to *.Rmd}
 \usage{
-rnw2rmd(file, output = "rmarkdown::html_vignette",
-  output_options = c(toc = "true"), engine = "knitr::rmarkdown",
-  csl = NULL, eval = FALSE, replace = NULL, flattr_id = NULL,
-  write_file = FALSE, overwrite = FALSE)
+rnw2rmd(
+  file,
+  output = "rmarkdown::html_vignette",
+  output_options = c(toc = "true"),
+  engine = "knitr::rmarkdown",
+  csl = NULL,
+  eval = FALSE,
+  replace = NULL,
+  flattr_id = NULL,
+  write_file = FALSE,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{file}{Path to an *.Rnw file to convert.}
@@ -62,7 +70,7 @@ rnw2rmd(
     theme="cerulean",
     highlight="kate",
     toc="true",
-    toc_float="\\n      collapsed: false\\n      smooth_scroll: false",
+    toc_float="\n      collapsed: false\n      smooth_scroll: false",
     toc_depth=3
   )
 )

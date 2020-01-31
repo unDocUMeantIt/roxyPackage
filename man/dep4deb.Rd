@@ -4,10 +4,17 @@
 \alias{dep4deb}
 \title{Download package dependencies}
 \usage{
-dep4deb(pck.source.dir, pck.name = NULL, destdir = file.path(tempdir(),
-  "roxyPackge", "downloads"), repos = getOption("repos"), all = FALSE,
-  check.deb = TRUE, origin = "cran", origin.alt = list(),
-  available = NULL)
+dep4deb(
+  pck.source.dir,
+  pck.name = NULL,
+  destdir = file.path(tempdir(), "roxyPackge", "downloads"),
+  repos = getOption("repos"),
+  all = FALSE,
+  check.deb = TRUE,
+  origin = "cran",
+  origin.alt = list(),
+  available = NULL
+)
 }
 \arguments{
 \item{pck.source.dir}{Character string,

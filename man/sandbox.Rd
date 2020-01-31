@@ -4,9 +4,15 @@
 \alias{sandbox}
 \title{Run actions in a sandbox}
 \usage{
-sandbox(active = FALSE, sandbox.dir = file.path(tempdir(),
-  "roxyPackge", "sandbox"), pck.source.dir = TRUE, R.libs = TRUE,
-  repo.root = TRUE, archive = repo.root, clean = FALSE)
+sandbox(
+  active = FALSE,
+  sandbox.dir = file.path(tempdir(), "roxyPackge", "sandbox"),
+  pck.source.dir = TRUE,
+  R.libs = TRUE,
+  repo.root = TRUE,
+  archive = repo.root,
+  clean = FALSE
+)
 }
 \arguments{
 \item{active}{Logical, whether sandboxing should be active or not}

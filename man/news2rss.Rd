@@ -4,9 +4,13 @@
 \alias{news2rss}
 \title{Generate RSS feeds from R NEWS files}
 \usage{
-news2rss(news, rss = NULL, html = NULL, encoding = "UTF-8",
-  channel = c(title = "", link = "", description = "", language = "",
-  atom = ""))
+news2rss(
+  news,
+  rss = NULL,
+  html = NULL,
+  encoding = "UTF-8",
+  channel = c(title = "", link = "", description = "", language = "", atom = "")
+)
 }
 \arguments{
 \item{news}{Character string, path to the R NEWS file to be converted.}

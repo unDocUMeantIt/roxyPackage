@@ -4,16 +4,30 @@
 \alias{roxy.package}
 \title{Automatic doc creation, package building and repository update}
 \usage{
-roxy.package(pck.source.dir, pck.version, pck.description, R.libs,
-  repo.root, pck.date = Sys.Date(), actions = c("roxy", "package"),
-  cleanup = FALSE, rm.vignette = FALSE, R.homes = R.home(),
+roxy.package(
+  pck.source.dir,
+  pck.version,
+  pck.description,
+  R.libs,
+  repo.root,
+  pck.date = Sys.Date(),
+  actions = c("roxy", "package"),
+  cleanup = FALSE,
+  rm.vignette = FALSE,
+  R.homes = R.home(),
   Rcmd.options = c(install = "--install-tests", build =
-  "--no-manual --no-build-vignettes --md5", check = "--as-cran", Rd2pdf =
-  "--pdf --no-preview"), URL = NULL, deb.options = NULL,
-  readme.options = NULL, html.options = NULL,
-  ChangeLog = list(changed = c("initial release"), fixed =
-  c("missing ChangeLog")), Rbuildignore = NULL, Rinstignore = NULL,
-  OSX.repo = list(main = "contrib", symlinks = "el-capitan"), ...)
+    "--no-manual --no-build-vignettes --md5", check = "--as-cran", Rd2pdf =
+    "--pdf --no-preview"),
+  URL = NULL,
+  deb.options = NULL,
+  readme.options = NULL,
+  html.options = NULL,
+  ChangeLog = list(changed = c("initial release"), fixed = c("missing ChangeLog")),
+  Rbuildignore = NULL,
+  Rinstignore = NULL,
+  OSX.repo = list(main = "contrib", symlinks = "el-capitan"),
+  ...
+)
 }
 \arguments{
 \item{pck.source.dir}{Character string,
@@ -58,7 +72,7 @@ in the present DESCRIPTION file, then \code{pck.date} will be used. Otherwise,
   \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
     \code{URL} accordingly}
   \item{"doc"}{Update PDF documentation (\code{R CMD Rd2pdf}) and vignettes if present; }
-  \item{"html"}{Update HTML index files}
+  \item{"html"}{Update HTML index files and compile HTML versions of README.md and NEWS.md (if \code{pandoc} is available).}
   \item{"win"}{Update the Windows binary package}
   \item{"macosx"}{Update the Mac OS X binary package}
   \item{"log"}{Generate initial ChangeLog or update a present ChangeLog file}
@@ -308,12 +322,12 @@ pckg.dscrptn <- package_description(
   Title="Squaring the circle using Heisenberg compensation",
   Author="Ernst Dölle [aut, cre, cph], Ludwig Dölle [trl,
       ctb] (initial translation to whitespace)",
-  AuthorsR="c(person(given=\\"Ernst\\", family=\\"Dölle\\",
-       email=\\"e.a.doelle@example.com\\",
-       role=c(\\"aut\\", \\"cre\\", \\"cph\\")),
-     person(given=\\"Ludwig\\", family=\\"Dölle\\",
-       role=c(\\"trl\\", \\"ctb\\"),
-       comment=\\"initial translation to whitespace\\")
+  AuthorsR="c(person(given=\"Ernst\", family=\"Dölle\",
+       email=\"e.a.doelle@example.com\",
+       role=c(\"aut\", \"cre\", \"cph\")),
+     person(given=\"Ludwig\", family=\"Dölle\",
+       role=c(\"trl\", \"ctb\"),
+       comment=\"initial translation to whitespace\")
      )",
   Maintainer="E.A. Dölle <doelle@eternalwondermaths.example.org>",
   Depends="R (>= 2.10.0),heisenberg (>= 0.23),tools",

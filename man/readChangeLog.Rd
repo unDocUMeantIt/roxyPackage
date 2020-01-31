@@ -6,15 +6,28 @@
 \alias{initChangeLog}
 \title{Read/write ChangeLog files}
 \usage{
-readChangeLog(file, head = "ChangeLog for package",
-  change = "changes in version", item = "  -")
+readChangeLog(
+  file,
+  head = "ChangeLog for package",
+  change = "changes in version",
+  item = "  -"
+)
 
-writeChangeLog(log, file = NULL, head = "ChangeLog for package",
-  change = "changes in version", item = "  -", lineEnd = 78)
+writeChangeLog(
+  log,
+  file = NULL,
+  head = "ChangeLog for package",
+  change = "changes in version",
+  item = "  -",
+  lineEnd = 78
+)
 
-initChangeLog(entry = list(changed = c("initial release"), fixed =
-  c("missing ChangeLog")), package = "unknown", version = "0.01-1",
-  date = Sys.Date())
+initChangeLog(
+  entry = list(changed = c("initial release"), fixed = c("missing ChangeLog")),
+  package = "unknown",
+  version = "0.01-1",
+  date = Sys.Date()
+)
 }
 \arguments{
 \item{file}{Character string, path to the ChangeLog file to read.}

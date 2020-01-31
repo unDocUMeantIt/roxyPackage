@@ -4,17 +4,36 @@
 \alias{debianize}
 \title{Basic Debian package creation from R source packages}
 \usage{
-debianize(pck.source.dir, repo.root, build.dir = tempdir(),
-  revision = 1, repo.name = "roxypackage", origin = paste0("other-",
-  repo.name), distribution = "unstable", component = "main",
-  urgency = "low", changelog = c("new upstream release"),
-  deb.description = NULL, depends.origin = "cran",
-  depends.origin.alt = list(), actions = c("deb", "bin", "src"),
+debianize(
+  pck.source.dir,
+  repo.root,
+  build.dir = tempdir(),
+  revision = 1,
+  repo.name = "roxypackage",
+  origin = paste0("other-", repo.name),
+  distribution = "unstable",
+  component = "main",
+  urgency = "low",
+  changelog = c("new upstream release"),
+  deb.description = NULL,
+  depends.origin = "cran",
+  depends.origin.alt = list(),
+  actions = c("deb", "bin", "src"),
   overwrite = c("changelog", "control", "copyright", "rules", "compat"),
-  bin.opts = "-rfakeroot -b -uc", arch = "all", compat = 9,
-  epoch = NULL, gpg.key = NULL, keyring = NULL, gpg.version = 2,
-  deb.keyring.options = NULL, compression = "xz", keep.build = FALSE,
-  keep.existing.orig = FALSE, replace.dots = FALSE, deb.dir = "deb")
+  bin.opts = "-rfakeroot -b -uc",
+  arch = "all",
+  compat = 9,
+  epoch = NULL,
+  gpg.key = NULL,
+  keyring = NULL,
+  gpg.version = 2,
+  deb.keyring.options = NULL,
+  compression = "xz",
+  keep.build = FALSE,
+  keep.existing.orig = FALSE,
+  replace.dots = FALSE,
+  deb.dir = "deb"
+)
 }
 \arguments{
 \item{pck.source.dir}{Character string,

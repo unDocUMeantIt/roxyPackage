@@ -1,4 +1,4 @@
-# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -113,7 +113,7 @@
 #'      \item{"news2rss"}{Try to convert \code{inst/NEWS.Rd} into an RSS feed. You must also set
 #'        \code{URL} accordingly}
 #'      \item{"doc"}{Update PDF documentation (\code{R CMD Rd2pdf}) and vignettes if present; }
-#'      \item{"html"}{Update HTML index files}
+#'      \item{"html"}{Update HTML index files and compile HTML versions of README.md and NEWS.md (if \code{pandoc} is available).}
 #'      \item{"win"}{Update the Windows binary package}
 #'      \item{"macosx"}{Update the Mac OS X binary package}
 #'      \item{"log"}{Generate initial ChangeLog or update a present ChangeLog file}
@@ -779,7 +779,7 @@ roxy.package <- function(
 
       # only do the moving if any vignettes were built
       if(length(pckg.vigns$outputs) > 0){
-        message("build: vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
+        message("doc: build vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
 
         # what to move and where to move it to
         what.mv <- unique(c(pckg.vigns$outputs, unlist(pckg.vigns$sources, use.names=FALSE)))
@@ -802,7 +802,7 @@ roxy.package <- function(
 
         ## copy to repo/website
         stopifnot(file.copy(pckg.vigns$outputs, repo.pckg.info, overwrite=TRUE))
-        message("repo: updated vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
+        message("doc: updated vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '), " in repo")
 
         # copy to src-package's inst/doc if not already there (this is the case if they live in directory vignettes)
         if(!grepl("inst/doc$", pckg.vigns$dir)){
@@ -823,7 +823,7 @@ roxy.package <- function(
           } else {}
         }
       } else {
-        warning("build: Couldn't build all vignettes", call.=FALSE)
+        warning("doc: couldn't build all vignettes", call.=FALSE)
       }
     } else {}
 
@@ -837,25 +837,7 @@ roxy.package <- function(
       r.cmd.doc.call <- paste0(clean.env.win, R.bin, " CMD ", Rcmd.cmd.Rd2pdf, " ", Rcmd.opt.Rd2pdf, "--output=", shQuote(pdf.docs, type="cmd"), " ", shQuote(pck.source.dir, type="cmd"))
       shell(r.cmd.doc.call, translate=TRUE, ignore.stderr=TRUE, intern=FALSE)
     }
-    message("build: created PDF docs")
-
-    # treat markdown files (README.md and NEWS.md) if found
-    for(mdfile in c("README", "NEWS")){
-      this_md <- file.path(pck.source.dir, paste0(mdfile, ".md"))
-      if(file.exists(this_md)){
-        this_html <- file.path(repo.pckg.info, paste0(mdfile, ".html"))
-        removeIfExists(filePath=this_html)
-        pandoc_success <- pandoc(
-          infile=this_md,
-          outfile=this_html
-        )
-        if(isTRUE(pandoc_success)){
-          message(paste0("doc: created ", mdfile, ".html from markdown document"))
-        } else {
-          warning(paste0("doc: something went wrong while compiling ", mdfile, ".html from markdown document!"))
-        }
-      } else {}
-    }
+    message("doc: created PDF docs")
   } else {}
 
   if(any(c("package", "binonly") %in% actions)){
@@ -1151,6 +1133,23 @@ roxy.package <- function(
     if(!file_test("-f", pckg.NEWS.rss)){
       RSS.file.name <- NULL
     } else {}
+    # treat markdown files (README.md and NEWS.md) if found
+    for(mdfile in c("README", "NEWS")){
+      this_md <- file.path(pck.source.dir, paste0(mdfile, ".md"))
+      if(file.exists(this_md)){
+        this_html <- file.path(repo.pckg.info, paste0(mdfile, ".html"))
+        removeIfExists(filePath=this_html)
+        pandoc_success <- pandoc(
+          infile=this_md,
+          outfile=this_html
+        )
+        if(isTRUE(pandoc_success)){
+          message(paste0("html: created ", mdfile, ".html from markdown document"))
+        } else {
+          warning(paste0("html: something went wrong while compiling ", mdfile, ".html from markdown document!"))
+        }
+      } else {}
+    }
     package.html <- roxy.html(
       pckg.dscrptn,
       index=FALSE,

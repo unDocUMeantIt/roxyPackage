@@ -4,12 +4,20 @@
 \alias{archive.packages}
 \title{Deal with old packages in your local repository}
 \usage{
-archive.packages(repo.root, to.dir = "Archive", keep = 1,
-  keep.revisions = 2, package = NULL, type = "source",
-  archive.root = repo.root, overwrite = FALSE, reallyDoIt = FALSE,
-  graceful = FALSE, deb.options = list(distribution = "unstable",
-  component = "main", gpg.version = 2, gpg.key = NULL, keyring = NULL,
-  deb.dir = "deb"))
+archive.packages(
+  repo.root,
+  to.dir = "Archive",
+  keep = 1,
+  keep.revisions = 2,
+  package = NULL,
+  type = "source",
+  archive.root = repo.root,
+  overwrite = FALSE,
+  reallyDoIt = FALSE,
+  graceful = FALSE,
+  deb.options = list(distribution = "unstable", component = "main", gpg.version = 2,
+    gpg.key = NULL, keyring = NULL, deb.dir = "deb")
+)
 }
 \arguments{
 \item{repo.root}{Path to the repository root, i.e.,
