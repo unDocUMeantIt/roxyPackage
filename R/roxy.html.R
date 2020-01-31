@@ -418,6 +418,18 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
               paste0(pckg.name, " citation info"),
               attrs=list(href="citation.html")))
           },
+        # add NEWS or ChangeLog
+        if(file_test("-f", news)){
+          rx.tr("Materials:", XMLNode("", .children=list(
+              XMLNode("a", "NEWS", attrs=list(href=gsub("(.*)(NEWS)(.*)", "\\2\\3", news, perl=TRUE))),
+              rss.feed)))
+        } else {
+           if(file_test("-f", changelog)){
+            rx.tr("Materials:", XMLNode("", .children=list(
+              XMLNode("a", "ChangeLog", attrs=list(href="ChangeLog")),
+              rss.feed)))
+          } else {}
+        },
         attrs=list(summary=paste0("Package ", pckg.name, " summary."))),
       XMLNode("h4", "Downloads:"),
       XMLNode("table",
@@ -478,18 +490,6 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         },
         if(!is.null(url.deb.repo)){
           rx.tr("Debain binary package:", XMLNode("a", "Learn how to install Debian packages from this repository", attrs=list(href=url.deb.repo)))},
-        # add NEWS or ChangeLog
-        if(file_test("-f", news)){
-          rx.tr("News/ChangeLog:", XMLNode("", .children=list(
-              XMLNode("a", "NEWS", attrs=list(href=gsub("(.*)(NEWS)(.*)", "\\2\\3", news, perl=TRUE))),
-              rss.feed)))
-        } else {
-           if(file_test("-f", changelog)){
-            rx.tr("News/ChangeLog:", XMLNode("", .children=list(
-              XMLNode("a", "ChangeLog", attrs=list(href="ChangeLog")),
-              rss.feed)))
-          } else {}
-        },
         attrs=list(summary=paste0("Package ", pckg.name, " downloads."))),
         imprint_node(imprint=imprint, privacy.policy=privacy.policy),
       attrs=list(lang="en"))
