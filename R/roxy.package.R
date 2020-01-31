@@ -772,15 +772,15 @@ roxy.package <- function(
     pckg.vigns <- tools::pkgVignettes(dir=pck.source.dir)
     if(length(pckg.vigns$docs) > 0){
       # build vignettes and move them (partly inspired by devtools::build_vignettes)
-      
+
       # create vignettes and gather fresh information
       tools::buildVignettes(dir=pck.source.dir, tangle=TRUE)
       pckg.vigns <- tools::pkgVignettes(dir=pck.source.dir, output=TRUE, source=TRUE)
-      
+
       # only do the moving if any vignettes were built
       if(length(pckg.vigns$outputs) > 0){
         message("build: vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
-        
+
         # what to move and where to move it to
         what.mv <- unique(c(pckg.vigns$outputs, unlist(pckg.vigns$sources, use.names=FALSE)))
         what.cp <- pckg.vigns$docs
@@ -790,7 +790,7 @@ roxy.package <- function(
         what.cp <- keep_files(files=what.cp, install_extras=inst_extras_path)
         to.bin.doc <- file.path(R.libs, pck.package, "doc")
         to.src.inst.doc <- file.path(pck.source.dir, "inst", "doc")
-        
+
         # copy to bin-package
         createMissingDir(to.bin.doc, action="doc")
         if(length(what.mv) > 0){
@@ -799,11 +799,11 @@ roxy.package <- function(
         if(length(what.cp) > 0){
           stopifnot(file.copy(what.cp, to.bin.doc, overwrite=TRUE))
         } else {}
-        
+
         ## copy to repo/website
         stopifnot(file.copy(pckg.vigns$outputs, repo.pckg.info, overwrite=TRUE))
         message("repo: updated vignettes ", paste(basename(pckg.vigns$outputs), collapse=', '))
-        
+
         # copy to src-package's inst/doc if not already there (this is the case if they live in directory vignettes)
         if(!grepl("inst/doc$", pckg.vigns$dir)){
           createMissingDir(to.src.inst.doc, action="doc")
@@ -838,6 +838,24 @@ roxy.package <- function(
       shell(r.cmd.doc.call, translate=TRUE, ignore.stderr=TRUE, intern=FALSE)
     }
     message("build: created PDF docs")
+
+    # treat markdown files (README.md and NEWS.md) if found
+    for(mdfile in c("README", "NEWS")){
+      this_md <- file.path(pck.source.dir, paste0(mdfile, ".md"))
+      if(file.exists(this_md)){
+        this_html <- file.path(repo.pckg.info, paste0(mdfile, ".html"))
+        removeIfExists(filePath=this_html)
+        pandoc_success <- pandoc(
+          infile=this_md,
+          outfile=this_html
+        )
+        if(isTRUE(pandoc_success)){
+          message(paste0("doc: created ", mdfile, ".html from markdown document"))
+        } else {
+          warning(paste0("doc: something went wrong while compiling ", mdfile, ".html from markdown document!"))
+        }
+      } else {}
+    }
   } else {}
 
   if(any(c("package", "binonly") %in% actions)){

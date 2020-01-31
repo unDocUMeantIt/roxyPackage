@@ -857,3 +857,22 @@ keep_files <- function(files, install_extras){
   }
   return(result)
 } ## end function keep_files()
+
+
+## function pandoc()
+# mimics tools:::.pandoc_md_for_CRAN()
+# returns TRUE/FALSE to indicate whether the output file does exist
+pandoc <- function(infile, outfile, args="-s --email-obfuscation=references --self-contained"){
+  pandoc_bin <- Sys.which("pandoc")
+  if(isTRUE(pandoc_bin == "")){
+    warning("no pandoc installation found. skipped compilation of markdown documents.")
+  } else {
+    pandoc_call <- paste0(pandoc_bin, " ", shQuote(infile), " ", args, " -o ", shQuote(outfile))
+    if(isTRUE(isUNIX())){
+      system(pandoc_call, intern=TRUE)
+    } else {
+      shell(pandoc_call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
+    }
+  }
+  return(file.exists(outfile))
+} ## end function pandoc()
