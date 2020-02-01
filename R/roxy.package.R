@@ -544,6 +544,7 @@ roxy.package <- function(
   pckg.license.file <- file.path(pck.source.dir, "LICENSE")
   pckg.license.file.old <- file.path(pck.source.dir, "LICENSE.txt")
   pckg.readme.file <- file.path(pck.source.dir, "README.md")
+  pckg.readme.html <- file.path(repo.pckg.info, "README.html")
   pckg.pdf.doc <- paste0(pck.package, ".pdf")
   pckg.vign.dir <- file.path(pck.source.dir, "vignettes")
   pckg.vign.file <- file.path(pckg.vign.dir, paste0(pck.package, "_vignette.Rmd"))
@@ -1167,6 +1168,7 @@ roxy.package <- function(
       cite=pckg.cite.file.html,
       news=url.NEWS,
       changelog=pckg.changelog,
+      readme=pckg.readme.html,
       rss.file=RSS.file.name,
       flattr.id=html.options[["flattr.id"]],
       URL=getURL(URL, purpose="default"),

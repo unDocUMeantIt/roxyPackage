@@ -1,4 +1,4 @@
-# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -343,7 +343,7 @@ URLs_in_DESCRIPTION <- function(desc, result_node="p"){
 #' @import XiMpLe
 roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
   url.src=NULL, url.win=NULL, url.mac=NULL, url.doc=NULL, url.vgn=NULL, title.vgn=NULL, url.deb.repo=NULL, main.path.mac=NULL, title=NULL,
-  cite="", news="", changelog="", redirect="", rss.file=NULL, flattr.id=NULL, URL=NULL, imprint=NULL, privacy.policy=NULL) {
+  cite="", news="", changelog="", readme="", redirect="", rss.file=NULL, flattr.id=NULL, URL=NULL, imprint=NULL, privacy.policy=NULL) {
 
   rss.header <- rss.feed <- NULL
 
@@ -393,6 +393,26 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     pckg.participants <- rx.clean(pckg.authors[["participants"]])
     pckg.maintainer <- rx.clean(pckg.authors[["cre"]], nomail=FALSE, textmail=TRUE)
 
+    pckg.materials <- list()
+    if(file_test("-f", news)){
+      pckg.materials <- append(pckg.materials, XMLNode("a", "NEWS", attrs=list(href=gsub("(.*)(NEWS)(.*)", "\\2\\3", news, perl=TRUE))))
+    } else {}
+    if(file_test("-f", changelog)){
+      if(length(pckg.materials)){
+        pckg.materials <- append(pckg.materials, XMLNode("", ", "))
+      } else {}
+      pckg.materials <- append(pckg.materials, XMLNode("a", "ChangeLog", attrs=list(href="ChangeLog")))
+    } else {}
+    if(file_test("-f", readme)){
+      if(length(pckg.materials)){
+        pckg.materials <- append(pckg.materials, XMLNode("", ", "))
+      } else {}
+      pckg.materials <- append(pckg.materials, XMLNode("a", "README", attrs=list(href="README.html")))
+    } else {}
+    if(!is.null(rss.feed)){
+      pckg.materials <- append(pckg.materials, rss.feed)
+    } else {}
+
     page.css <- paste0("../", css)
     html.body <- XMLNode("body",
       XMLNode("h2", paste0(pckg.name, ": ", pckg.title)),
@@ -413,22 +433,13 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         rx.html.switch(desc=pckg, field="URL"),
         rx.html.switch(desc=pckg, field="NeedsCompilation"),
         rx.html.switch(desc=pckg, field="SystemRequirements"),
-          if(file_test("-f", cite)){
-            rx.tr("Citation:", XMLNode("a",
-              paste0(pckg.name, " citation info"),
-              attrs=list(href="citation.html")))
-          },
-        # add NEWS or ChangeLog
-        if(file_test("-f", news)){
-          rx.tr("Materials:", XMLNode("", .children=list(
-              XMLNode("a", "NEWS", attrs=list(href=gsub("(.*)(NEWS)(.*)", "\\2\\3", news, perl=TRUE))),
-              rss.feed)))
-        } else {
-           if(file_test("-f", changelog)){
-            rx.tr("Materials:", XMLNode("", .children=list(
-              XMLNode("a", "ChangeLog", attrs=list(href="ChangeLog")),
-              rss.feed)))
-          } else {}
+        if(file_test("-f", cite)){
+          rx.tr("Citation:", XMLNode("a",
+            paste0(pckg.name, " citation info"),
+            attrs=list(href="citation.html")))
+        },
+        if(length(pckg.materials)){
+          rx.tr("Materials:", pckg.materials)
         },
         attrs=list(summary=paste0("Package ", pckg.name, " summary."))),
       XMLNode("h4", "Downloads:"),
