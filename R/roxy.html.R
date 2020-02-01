@@ -399,13 +399,13 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     } else {}
     if(file_test("-f", changelog)){
       if(length(pckg.materials)){
-        pckg.materials <- append(pckg.materials, XMLNode("", ", "))
+        pckg.materials <- append(pckg.materials, XMLNode("span", ", ", attrs=list(style="margin-left: 0px;")))
       } else {}
       pckg.materials <- append(pckg.materials, XMLNode("a", "ChangeLog", attrs=list(href="ChangeLog")))
     } else {}
     if(file_test("-f", readme)){
       if(length(pckg.materials)){
-        pckg.materials <- append(pckg.materials, XMLNode("", ", "))
+        pckg.materials <- append(pckg.materials, XMLNode("span", ", ", attrs=list(style="margin-left: 0px;")))
       } else {}
       pckg.materials <- append(pckg.materials, XMLNode("a", "README", attrs=list(href="README.html")))
     } else {}
