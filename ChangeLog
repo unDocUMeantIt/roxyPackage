@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2020-01-24)
+changes in version 0.06-5 (2020-01-28)
 unreleased:
   - this release is under development
 fixed:
@@ -14,6 +14,8 @@ added:
   - roxy.package(): HTML page for debain package installation now explains how
     to break the circle and successfully install the keyring package if apt
     refuses to install it because the keyring package wasn't installed yet
+  - roxy.package(): HTML page now links to ORCID if a valid ID is provided
+    as a person's comment named "ORCID"
 changed:
   - roxy.package(): adjusted ordering of enties in repo HTML page similar to
     CRAN (contributed by robert nuske)
