@@ -1127,6 +1127,8 @@ roxy.package <- function(
     } else if(file_test("-f", pckg.NEWS)){
       stopifnot(file.copy(pckg.NEWS, file.path(repo.pckg.info, "NEWS"), overwrite=TRUE))
       url.NEWS <- file.path(repo.pckg.info, "NEWS")
+    } else if(file_test("-f", pckg.NEWS.html)){
+      url.NEWS <- file.path(repo.pckg.info, "NEWS.html")
     } else {
       url.NEWS <- ""
     }
