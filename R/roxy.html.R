@@ -419,20 +419,20 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     pckg.maintainer <- rx.clean(pckg.authors[["cre"]], nomail=FALSE, textmail=TRUE)
 
     pckg.materials <- list()
+    if(file_test("-f", readme)){
+      pckg.materials <- append(pckg.materials, XMLNode("a", "README", attrs=list(href="README.html")))
+    } else {}
     if(file_test("-f", news)){
+      if(length(pckg.materials)){
+        pckg.materials <- append(pckg.materials, XMLNode("span", "&nbsp;"))
+      } else {}
       pckg.materials <- append(pckg.materials, XMLNode("a", "NEWS", attrs=list(href=gsub("(.*)(NEWS)(.*)", "\\2\\3", news, perl=TRUE))))
     } else {}
     if(file_test("-f", changelog)){
       if(length(pckg.materials)){
-        pckg.materials <- append(pckg.materials, XMLNode("span", ", ", attrs=list(style="margin-left: 0px;")))
+        pckg.materials <- append(pckg.materials, XMLNode("span", "&nbsp;"))
       } else {}
       pckg.materials <- append(pckg.materials, XMLNode("a", "ChangeLog", attrs=list(href="ChangeLog")))
-    } else {}
-    if(file_test("-f", readme)){
-      if(length(pckg.materials)){
-        pckg.materials <- append(pckg.materials, XMLNode("span", ", ", attrs=list(style="margin-left: 0px;")))
-      } else {}
-      pckg.materials <- append(pckg.materials, XMLNode("a", "README", attrs=list(href="README.html")))
     } else {}
     if(!is.null(rss.feed)){
       pckg.materials <- append(pckg.materials, rss.feed)
