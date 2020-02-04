@@ -694,10 +694,24 @@ roxy.package <- function(
   if("cleanRd" %in% actions){
     pckg.man.dir <- file.path(pck.source.dir, "man")
     Rd.files <- list.files(pckg.man.dir, pattern="*.Rd", ignore.case=TRUE)
-    if(length(Rd.files) > 0){
+    files_changed <- c()
+    if(length(Rd.files)){
       for (this.file in Rd.files){
-        sanitizeRdFiles(this.file, root.dir=pckg.man.dir, maxlength=90)
+        # this step both checks the files and changes them if neccessary,
+        # and keeps track of changes
+        if(isTRUE(sanitizeRdFiles(this.file, root.dir=pckg.man.dir, maxlength=90))){
+          files_changed <- c(files_changed, this.file)
+        }
       }
+      if(length(files_changed)){
+        warning(
+          paste0(
+            "cleanRd: one or more Rd files had lines >90 chars and were sanitized, please check:\n    ",
+            paste0(shQuote(files_changed), collapse=",\n    ")
+          ),
+          call.=FALSE
+        )
+      } else {}
     } else {}
   } else {}
 
@@ -1144,7 +1158,8 @@ roxy.package <- function(
         removeIfExists(filePath=this_html)
         pandoc_success <- pandoc(
           infile=this_md,
-          outfile=this_html
+          outfile=this_html,
+          title=paste0(pck.package, ": ", mdfile)
         )
         if(isTRUE(pandoc_success)){
           message(paste0("html: created ", mdfile, ".html from markdown document"))
@@ -1177,6 +1192,8 @@ roxy.package <- function(
       imprint=html.options[["imprint"]],
       privacy.policy=html.options[["privacy.policy"]]
     )
+    # make sure there's an ORCID icon should we need one
+    check_orcid_icon(pckg=pckg.dscrptn, repo=repo.pckg.info.main)
     target.file.pckg <- file.path(repo.pckg.info, "index.html")
     cat(package.html, file=target.file.pckg)
     message(paste0("html: updated ", target.file.pckg))
