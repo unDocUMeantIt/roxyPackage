@@ -93,17 +93,23 @@ splitDepends <- function(dep){
 ## function R_API_dependency()
 # check for API dependencies
 # R >= 3.2 should depend on r-api-3,
-# R >= 3.4 on r-api-3.4, and
-# R >= 3.5 on r-api-3.5
+# R >= 3.4 on r-api-3.4,
+# R >= 3.5 on r-api-3.5, and
+# R >= 4.0 on r-api-4.0
 R_API_dependency <- function(dep.list){
-  if(all(
-    !is.null(dep.list[["R"]]),
-    is.null(dep.list[["r-api-3"]]),
-    is.null(dep.list[["r-api-3.4"]]),
-    is.null(dep.list[["r-api-3.5"]]))
+  if(
+    all(
+      !is.null(dep.list[["R"]]),
+      is.null(dep.list[["r-api-3"]]),
+      is.null(dep.list[["r-api-3.4"]]),
+      is.null(dep.list[["r-api-3.5"]]),
+      is.null(dep.list[["r-api-4.0"]])
+    )
   ){
     R_version <- package_version(gsub("[^0-9.]", "", dep.list[["R"]][["version"]]))
-    if(R_version >= "3.5"){
+    if(R_version >= "4.0"){
+      dep.list[["r-api-4.0"]] <- list(package="r-api-4.0", version=NULL, origin=NULL)
+    } else if(R_version >= "3.5"){
       dep.list[["r-api-3.5"]] <- list(package="r-api-3.5", version=NULL, origin=NULL)
     } else if(R_version >= "3.4"){
       dep.list[["r-api-3.4"]] <- list(package="r-api-3.4", version=NULL, origin=NULL)

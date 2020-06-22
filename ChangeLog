@@ -37,6 +37,8 @@ changed:
     one summary warning listing all affected files
   - roxy.package(): the ChangeLog was moved to "Materials" on a package's index page,
     next to README.html and NEWS.html
+  - roxy.package(): if R >= 4.0 is detected, the default directory for debian
+    package files will be set to "debR40" instead of "deb"
 
 changes in version 0.06-4 (2018-07-29)
 fixed:

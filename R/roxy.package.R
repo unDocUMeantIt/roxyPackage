@@ -157,7 +157,7 @@
 #'    if \code{flattr.id} is also set in \code{html.options}, a Flattr meta tag be added to the HTML page.
 #' @param deb.options A named list with parameters to pass through to \code{\link[roxyPackage:debianize]{debianize}}. By default, \code{pck.source.dir}
 #'    and \code{repo.root} are set to the values given to the parameters above, and if packages are being build for R 3.5, the default \code{deb.dir} changes
-#'    from \code{"deb"} to \code{"debR35"}. As for the other options, if not set, the defaults of \code{debianize} will be used.
+#'    from \code{"deb"} to \code{"debR35"}, and if built for R 4.0  to \code{"debR40"}. As for the other options, if not set, the defaults of \code{debianize} will be used.
 #' @param readme.options A named list with parameters that add optional extra information to an initial README.md file, namely instructions to install the package
 #'    directly from a GitHub repository. Ignore this if you don't use GitHub. Theoretically, you can overwrite all values of the internal
 #'    function \code{readme_text} (e.g., try \code{formals(roxyPackage:::readme_text)}). But in practice, these two should be all you need to set:
@@ -406,8 +406,13 @@ roxy.package <- function(
     isTRUE(R_system_version(R.Version.full) >= "3.5"),
     is.null(deb.options[["deb.dir"]])
   )){
-    message("deb: R >= 3.5 detected, using \"debR35\" as the default directory for debian package files")
-    deb.options[["deb.dir"]] <- "debR35"
+    if(isTRUE(R_system_version(R.Version.full) >= "4.0")){
+      message("deb: R >= 4.0 detected, using \"debR40\" as the default directory for debian package files")
+      deb.options[["deb.dir"]] <- "debR40"
+    } else if(isTRUE(R_system_version(R.Version.full) >= "3.5")){
+      message("deb: R >= 3.5 detected, using \"debR35\" as the default directory for debian package files")
+      deb.options[["deb.dir"]] <- "debR35"
+    } else {}
   } else {}
 
   # should we try to checkout a certain git tag?

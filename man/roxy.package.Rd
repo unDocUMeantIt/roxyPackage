@@ -144,8 +144,8 @@ if \code{flattr.id} is also set in \code{html.options},
       \code{pck.source.dir}
 and \code{repo.root} are set to the values given to the parameters above,
       and if packages are being build for R 3.5, the default \code{deb.dir} changes
-from \code{"deb"} to \code{"debR35"}. As for the other options, if not set,
-      the defaults of \code{debianize} will be used.}
+from \code{"deb"} to \code{"debR35"},
+      and if built for R 4.0  to \code{"debR40"}. As for the other options, if not set, the defaults of \code{debianize} will be used.}
 
 \item{readme.options}{A named list with parameters that add optional extra information to an initial README.md file,
       namely instructions to install the package
