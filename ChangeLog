@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2020-02-04)
+changes in version 0.06-5 (2020-06-24)
 unreleased:
   - this release is under development
 fixed:
@@ -21,6 +21,8 @@ added:
     icon into your repository should you need one
   - roxy.package(): if pandoc is available, README.md and NEWS.md will be compiled
     into HTML versions and linked in a package's index page unser "Materials"
+  - roxy.package(): new argument "R.libs.site" to add R libraries that are by
+    default included during package builds
 changed:
   - roxy.package(): adjusted ordering of enties in repo HTML page similar to
     CRAN (contributed by robert nuske)

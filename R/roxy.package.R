@@ -133,6 +133,8 @@
 #'    they will not be kept in the source package but just be moved to the \code{./pckg/$PACKAGENAME} directory of the repository.
 #' @param R.homes Path to the R installation to use. Can be set manually to build packages for other R versions than the default one,
 #'    if you have installed them in parallel. Should probably be used together with \code{R.libs}.
+#' @param R.libs.site An optional vector of paths pointing to R libraries to always be included for package lookup. These locations will be added
+#'    to package build calls by setting the \code{R_LIBS_SITE} environment variable accordingly, if not \code{NULL}.
 #' @param Rcmd.options A named character vector with options to be passed on to the internal calls of \code{R CMD build},
 #'    \code{R CMD INSTALL}, \code{R CMD check} and \code{R CMD Rd2pdf}. Change these only if you know what you're doing!
 #'    Will be passed on as given here. To deactivate, options must explicitly be se to \code{""}, missing options will be used with the default values.
@@ -249,6 +251,7 @@ roxy.package <- function(
   cleanup=FALSE,
   rm.vignette=FALSE,
   R.homes=R.home(),
+  R.libs.site=NULL,
   Rcmd.options=c(
     install="--install-tests",
     build="--no-manual --no-build-vignettes --md5",
@@ -340,6 +343,7 @@ roxy.package <- function(
           cleanup=cleanup,
           rm.vignette=rm.vignette,
           R.homes=this.home,
+          R.libs.site=R.libs.site,
           Rcmd.options=Rcmd.options,
           URL=URL,
           deb.options=this.deb.options,
@@ -553,11 +557,19 @@ roxy.package <- function(
   pckg.pdf.doc <- paste0(pck.package, ".pdf")
   pckg.vign.dir <- file.path(pck.source.dir, "vignettes")
   pckg.vign.file <- file.path(pckg.vign.dir, paste0(pck.package, "_vignette.Rmd"))
-  clean.env.unix <- "unset R_LIBS_USER R_BINARY R_CMD ; "
-  clean.env.win  <- "SET R_LIBS_USER=\"\" & SET R_BINARY=\"\" & SET R_CMD=\"\" & "
-  set.env.unix <- paste0("export R_LIBS_USER=\"", R.libs, "\" ; ")
-  set.env.win <- paste0("SET R_LIBS_USER=\"", R.libs, "\" & ")
-  
+  if(!is.null(R.libs.site)){
+    unset_R_LIBS_SITE.unix <- " R_LIBS_SITE"
+    unset_R_LIBS_SITE.win <- " & SET R_LIBS_SITE=\"\""
+    set_R_LIBS_SITE.unix <- paste0("export R_LIBS_SITE=\"", paste0(R.libs.site, collapse=":"), "\" ;")
+    set_R_LIBS_SITE.win <- paste0("SET R_LIBS_SITE=\"", paste0(R.libs.site, collapse=":"), "\" & ")
+  } else {
+    unset_R_LIBS_SITE.unix <- unset_R_LIBS_SITE.win <- set_R_LIBS_SITE.unix <- set_R_LIBS_SITE.win <- ""
+  }
+  clean.env.unix <- paste0("unset R_LIBS_USER", unset_R_LIBS_SITE.unix, " R_BINARY R_CMD ; ")
+  clean.env.win  <- paste0("SET R_LIBS_USER=\"\"", unset_R_LIBS_SITE.win, " & SET R_BINARY=\"\" & SET R_CMD=\"\" & ")
+  set.env.unix <- paste0("export R_LIBS_USER=\"", R.libs, "\" ; ", set_R_LIBS_SITE.unix)
+  set.env.win <- paste0("SET R_LIBS_USER=\"", R.libs, "\" & ", set_R_LIBS_SITE.win)
+
   # take care of .Rbuildignore and .Rinstignore
   pckg.Rbuildignore <- configFile(root=pck.source.dir, type="build", content=Rbuildignore)
   pckg.Rinstignore <- configFile(root=pck.source.dir, type="inst", content=Rinstignore)
@@ -899,11 +911,11 @@ roxy.package <- function(
     # install.packages() doesn't work if we want to build for/with other R installations than
     # the actual running one, so we'll use  R CMD INSTALL instead
     if(isTRUE(unix.OS)){
-      r.cmd.install.call <- paste0(clean.env.unix, R.bin, " CMD INSTALL -l ", R.libs, " ",
+      r.cmd.install.call <- paste0(clean.env.unix, set_R_LIBS_SITE.unix, R.bin, " CMD INSTALL -l ", R.libs, " ",
         Rcmd.opt.install, pck.source.dir)
       system(r.cmd.install.call, intern=TRUE)
     } else {
-      r.cmd.install.call <- paste0(clean.env.win, R.bin, " CMD INSTALL -l ", shQuote(R.libs, type="cmd"), " ",
+      r.cmd.install.call <- paste0(clean.env.win, set_R_LIBS_SITE.win, R.bin, " CMD INSTALL -l ", shQuote(R.libs, type="cmd"), " ",
         Rcmd.opt.install, shQuote(pck.source.dir, type="cmd"))
       shell(r.cmd.install.call, translate=TRUE, ignore.stderr=TRUE, intern=TRUE)
     }

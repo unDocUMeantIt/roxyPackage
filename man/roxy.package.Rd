@@ -15,6 +15,7 @@ roxy.package(
   cleanup = FALSE,
   rm.vignette = FALSE,
   R.homes = R.home(),
+  R.libs.site = NULL,
   Rcmd.options = c(install = "--install-tests", build =
     "--no-manual --no-build-vignettes --md5", check = "--as-cran", Rd2pdf =
     "--pdf --no-preview"),
@@ -103,6 +104,10 @@ they will not be kept in the source package but just be moved to the \code{./pck
 
 \item{R.homes}{Path to the R installation to use. Can be set manually to build packages for other R versions than the default one,
 if you have installed them in parallel. Should probably be used together with \code{R.libs}.}
+
+\item{R.libs.site}{An optional vector of paths pointing to R libraries to always be included for package lookup. These locations will be added
+to package build calls by setting the \code{R_LIBS_SITE} environment variable accordingly,
+      if not \code{NULL}.}
 
 \item{Rcmd.options}{A named character vector with options to be passed on to the internal calls of \code{R CMD build},
 \code{R CMD INSTALL},
