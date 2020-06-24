@@ -1,4 +1,4 @@
-# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -158,6 +158,10 @@
 #'    work, because it will automatically create a symlink in the build directory if needed.
 #' @param deb.dir Character string, name to use for the root directory of the debian repository. Defaults to \code{"deb"}, which is obviously a good choice,
 #'    but you might want to use different directories for different builds, e.g., a separate one for R 3.5 packages.
+#' @param R.libs.append An optional vector of paths pointing to R libraries to be included for package lookup. These locations will be added
+#'    to package build calls by appending them to the \code{R_LIBS_USER} environment variable accordingly, if not \code{NULL}. This is only
+#'    only useful if R packages are provided by dependencies but not installed to default locations, so you need to point to them explicitly in order
+#'    for the packaging to finish successfully.
 #' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run debianize() in a sandbox.
 #' @references
 #' Eddelbuettel, D. & Bates, D. (2003). \emph{Debian R Policy -- Draft Proposal v 0.1.3}.
@@ -216,7 +220,8 @@ debianize <- function(
   keep.build=FALSE,
   keep.existing.orig=FALSE,
   replace.dots=FALSE,
-  deb.dir="deb"
+  deb.dir="deb",
+  R.libs.append=NULL
 ){
 
   # anything to do at all?
@@ -412,7 +417,8 @@ debianize <- function(
       dpkg.buildpackage=buildTools[["dpkg-buildpackage"]],
       dpkg.genchanges=buildTools[["dpkg-genchanges"]],
       apt.ftparchive=buildTools[["apt-ftparchive"]],
-      deb.name.lower=deb.pckg.name.lower
+      deb.name.lower=deb.pckg.name.lower,
+      R.libs.append=R.libs.append
     )
   } else {}
 

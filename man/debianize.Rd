@@ -32,7 +32,8 @@ debianize(
   keep.build = FALSE,
   keep.existing.orig = FALSE,
   replace.dots = FALSE,
-  deb.dir = "deb"
+  deb.dir = "deb",
+  R.libs.append = NULL
 )
 }
 \arguments{
@@ -181,6 +182,13 @@ work, because it will automatically create a symlink in the build directory if n
       name to use for the root directory of the debian repository. Defaults to \code{"deb"}, which is obviously a good choice,
 but you might want to use different directories for different builds, e.g.,
       a separate one for R 3.5 packages.}
+
+\item{R.libs.append}{An optional vector of paths pointing to R libraries to be included for package lookup. These locations will be added
+to package build calls by appending them to the \code{R_LIBS_USER} environment variable accordingly,
+      if not \code{NULL}. This is only
+only useful if R packages are provided by dependencies but not installed to default locations,
+      so you need to point to them explicitly in order
+for the packaging to finish successfully.}
 }
 \description{
 This function attempts to 'debianize' your R source package. This means,

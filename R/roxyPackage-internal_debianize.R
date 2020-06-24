@@ -1,4 +1,4 @@
-# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -1221,7 +1221,7 @@ deb.build.sources <- function(srcs.name, build, src.dir.name, version,
 deb.build.binary <- function(deb.name, build, src.dir.name, options, version, repo,
   revision=1, distribution="unstable", component="main", arch="all", repo.all.arch=c("binary-i386","binary-amd64"),
   dpkg.buildpackage=Sys.which("dpkg-buildpackage"), dpkg.genchanges=Sys.which("dpkg-genchanges"),
-  apt.ftparchive=Sys.which("apt-ftparchive"), deb.name.lower=deb.name, action="deb"){
+  apt.ftparchive=Sys.which("apt-ftparchive"), deb.name.lower=deb.name, action="deb", R.libs.append=NULL){
 
   repo.arch.rel.paths <- file.path("dists", distribution, component, repo.all.arch)
   repo.arch.paths <- file.path(repo, repo.arch.rel.paths)
@@ -1236,7 +1236,12 @@ deb.build.binary <- function(deb.name, build, src.dir.name, options, version, re
   }
 
   prev.wd <- getwd()
-  dpkg.build.call <- paste0(dpkg.buildpackage, " ", options)
+  if(!is.null(R.libs.append)){
+    R_libs_append_deb <- paste0("unset R_LIBS_USER ; export R_LIBS_USER=\"", paste0(R.libs.append, collapse=":"), "\" ;")
+  } else {
+    R_libs_append_deb <- ""
+  }
+  dpkg.build.call <- paste0(R_libs_append_deb, dpkg.buildpackage, " ", options)
   dpkg.gench.call <- paste0(dpkg.genchanges, " -b > ../", deb.name, "_", version, "-", revision, "_", arch, ".changes")
   bin.build.dir <- file.path(build, src.dir.name)
   setwd(bin.build.dir)
