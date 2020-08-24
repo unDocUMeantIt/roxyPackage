@@ -1226,9 +1226,9 @@ GPGwriteKey <- function(key, file, gpg=Sys.which("gpg"), overwrite=FALSE, keyrin
     }
   } else {}
   
-  gpg.copy.call <- paste0(gpg, add.options, " --armor --output ", file, " --export ", key)
+  gpg.copy.call <- paste0(gpg, add.options, " --armor --output ", file, " --export ", paste0(key, collapse=" "))
   system(gpg.copy.call, intern=TRUE)
-  message(paste0(action, ": updated OpenPGP key file: ", key))
+  message(paste0(action, ": updated OpenPGP key file: ", paste0(key, collapse=", ")))
 } ## end function GPGwriteKey()
 
 
@@ -1253,7 +1253,8 @@ GPGsign <- function(key, fileToSign, signatureFile, gpg=Sys.which("gpg"), keyrin
     gpg, add.options,
     " --cert-digest-algo ", certDigestAlgo,
     " --digest-algo ", digestAlgo,
-    " --no-tty --yes --default-key ", key,
+    " --no-tty --yes ",
+    paste0("-u", key, collapse=" "), # should create like "-u key1 -u key2 ...", overrides "--default-key"
     outOptions,
     " ", fileToSign
   )
@@ -1305,7 +1306,7 @@ deb.keyring.in.repo <- function(repo.root, gpg.key=NULL, keyring.options=NULL,
       } else {}
     } else {
       # fall back to single key file?
-      repo.gpg.key.file <- file.path(repo.root, paste0(gpg.key, ".asc"))
+      repo.gpg.key.file <- file.path(repo.root, paste0(paste0(gpg.key, collapse=""), ".asc"))
       GPGwriteKey(
         key=gpg.key,
         file=repo.gpg.key.file,
@@ -1347,7 +1348,7 @@ deb.update.release <- function(repo.root, deb.dir="deb", repo=file.path(repo.roo
       gpg=gpg,
       keyring=keyring
     )
-    message(paste0(action, ": signed Release file with key ", gpg.key, "."))
+    message(paste0(action, ": signed Release file with key ", paste0(gpg.key, collapse=", "), "."))
   } else {}
   setwd(prev.wd)
 } ## end function deb.update.release()
