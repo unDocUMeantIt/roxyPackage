@@ -1,4 +1,4 @@
-# Copyright 2014-2018 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2014-2020 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -22,8 +22,8 @@
 #' provide keys in a Debian package repository, hence enabling secure apt. They are probably easier to handle
 #' for users.
 #' 
-#' @param gpg.key Character string, the OpenPGP key ID for the key that should be included in the package.
-#'    This key must be available in your keyring (or in the one specified by \code{keyring}).
+#' @param gpg.key Character string or vector, the OpenPGP key ID(s) for the key(s) that should be included in the package.
+#'    All keys must be available in your keyring (or in the one specified by \code{keyring}).
 #' @param repo.name Character string, name of the repository this keyring will be used for. Must not include spaces or special characters!
 #' @param repo.root Character string, valid path to a directory where to build/update a local package repository.
 #' @param maintainer Character string, name an mail address of the maintainer of the keyring package, in the format of
@@ -301,21 +301,6 @@ debianizeKeyring <- function(
     keyringFiles=keyring.file.path.local
   )
 
-  ## TODO: remove, these functions have been replaced
-  # we're simply copying files to /usr/share/keyrings and /etc/apt/trusted.gpg.d now
-  #     ## debian/postinst
-  #     deb.gen.postinst(
-  #       deb.dir=deb.dir.debian,
-  #       keyringFiles=keyring.file,
-  #       overwrite="postinst" %in% overwrite
-  #     )
-  # 
-  #     ## debian/prerm
-  #     deb.gen.prerm(
-  #       deb.dir=deb.dir.debian,
-  #       key=gpg.key,
-  #       overwrite="prerm" %in% overwrite
-  #     )
   ## debian/install
   deb.gen.install(
     deb.dir=deb.dir.debian,

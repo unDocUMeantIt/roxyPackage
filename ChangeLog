@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2020-06-24)
+changes in version 0.06-5 (2020-08-24)
 unreleased:
   - this release is under development
 fixed:
@@ -41,6 +41,7 @@ changed:
     next to README.html and NEWS.html
   - roxy.package(): if R >= 4.0 is detected, the default directory for debian
     package files will be set to "debR40" instead of "deb"
+  - removed deprecated internal functions deb.gen.prerm() and deb.gen.postinst()
 
 changes in version 0.06-4 (2018-07-29)
 fixed:
