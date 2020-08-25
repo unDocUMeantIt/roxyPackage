@@ -185,7 +185,7 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
     instruction <- XMLNode("p", "Add the repository to your configuration (e.g.,", XMLNode("code", paste0("/etc/apt/sources.list.d/", repo, ".list")), "):")
   }
   if(isTRUE(keyInRepo)){
-    apt.signed.by <- paste0(" [signed-by=/usr/share/keyrings/", keyname, ".asc]")
+    apt.signed.by <- paste0(" [signed-by=/usr/share/keyrings/", keyname, ".gpg]")
   } else {
     apt.signed.by <- ""
   }

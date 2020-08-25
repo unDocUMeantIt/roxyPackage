@@ -913,7 +913,7 @@ pandoc <- function(infile, outfile, title, args="-s --mathjax --email-obfuscatio
 } ## end function pandoc()
 
 
-## function check_orcid_icon
+## function check_orcid_icon()
 check_orcid_icon <- function(pckg, repo, filename="orcid.svg"){
   icon_file <- file.path(repo, filename)
   pckg.authors <- get.authors(pckg, maintainer=FALSE, all.participants=TRUE, check.orcid=TRUE)
@@ -929,4 +929,22 @@ check_orcid_icon <- function(pckg, repo, filename="orcid.svg"){
     } else {}
   }
   return(invisible(NULL))
-} ## end function check_orcid_icon
+} ## end function check_orcid_icon()
+
+
+## function fetch_inst_from_package()
+# when find.package() is run from a sandbox, path.package() which is called internally might
+# return the sandboxed source directory as the library location, which messes up "inst" paths.
+# can only happen if pck is roxyPackage itself. so just in case, try to fix the issue by checking paths
+fetch_inst_from_package <- function(dir, pckg="roxyPackage"){
+  libloc <- find.package(pckg)
+  std_dir <- file.path(libloc, dir)
+  src_dir <- file.path(libloc, "inst", dir)
+  if(dir.exists(std_dir)){
+    return(std_dir)
+  } else if(dir.exists(src_dir)) {
+    return(src_dir)
+  } else {
+    stop(simpleError(paste0("none of these directories found:\n  ", std_dir, "\n  ", src_dir)))
+  }
+} ## end function fetch_inst_from_package()

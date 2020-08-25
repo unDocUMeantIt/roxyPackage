@@ -35,9 +35,9 @@ debianizeKeyring(
 )
 }
 \arguments{
-\item{gpg.key}{Character string,
-      the OpenPGP key ID for the key that should be included in the package.
-This key must be available in your keyring (or in the one specified by \code{keyring}).}
+\item{gpg.key}{Character string or vector,
+      the OpenPGP key ID(s) for the key(s) that should be included in the package.
+All keys must be available in your keyring (or in the one specified by \code{keyring}).}
 
 \item{repo.name}{Character string,
       name of the repository this keyring will be used for. Must not include spaces or special characters!}

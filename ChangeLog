@@ -1,11 +1,19 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2020-08-24)
+changes in version 0.06-5 (2020-08-25)
 unreleased:
   - this release is under development
 fixed:
   - debianize(): the generated copyright file now has https instead of http
     in the format URL
+  - debianizeKeyring(): no longer use ASCII armored key files but binary only
+  - debianizeKeyring(): dropped deprecated support for /etc/apt/trusted.gpg.d/,
+    also "apt-key add" is no longer used. keys are just copied to
+    /usr/share/keyrings/ and therefore *must* be pinned explicitly for the
+    reposiory via "[signed-by=/usr/share/keyrings/...]".
+    this is the more secure approach, but wasn't supported before 2017
+  - roxy.package(): if roxyPackage was in sandbox mode, there were issues
+    finding the RSS image
 added:
   - roxy.package(): new action "buildEmAll" to trigger builds for multiple
     versions of R (if more than one was provided also)
@@ -26,11 +34,6 @@ added:
 changed:
   - roxy.package(): adjusted ordering of enties in repo HTML page similar to
     CRAN (contributed by robert nuske)
-  - debianizeKeyring(): keyring packages now longer call apt-key but copy
-    ASCII exported keys to both /usr/share/keyrings and /etc/apt/trusted.gpg.d
-    from now on; the latter is to be removed at some future point, as pinning
-    repos to a particular keyring file is the more secure approach, but wasn't
-    supported before 2017
   - roxy.package(): HTML pages for debian repositories now suggest to include
     "signed-by" in the lists files
   - roxy.package(): the generated README.md now suggests "devtools::install_github()"
@@ -42,6 +45,8 @@ changed:
   - roxy.package(): if R >= 4.0 is detected, the default directory for debian
     package files will be set to "debR40" instead of "deb"
   - removed deprecated internal functions deb.gen.prerm() and deb.gen.postinst()
+  - debianizeKeyring(): you can now define multiple OpenPGP keys to sign the Release
+    files, which can be used to seamlessly replace a soon expired key
 
 changes in version 0.06-4 (2018-07-29)
 fixed:

@@ -1019,8 +1019,12 @@ deb.gen.install <- function(deb.dir, keyringFiles, action="deb-key", overwrite=F
   deb.file.install <- file.path(deb.dir, "install")
   if(!file_test("-f", deb.file.install) | isTRUE(overwrite)){
     install.txt <- paste0(
-      paste0("keyrings/", keyringFiles, " usr/share/keyrings/", collapse="\n"), "\n",
-      paste0("keyrings/", keyringFiles, " etc/apt/trusted.gpg.d/", collapse="\n"), "\n\n"
+      paste0("keyrings/", keyringFiles, " usr/share/keyrings/", collapse="\n"), "\n\n"#,
+      ## TODO:
+      # using /etc/apt/trusted.gpg.d is deprecated now, keys need to end up only in /usr/share/keyrings/
+      # and referenced in the repo list/source files via "[signed-by=/usr/share/keyrings/...]", see
+      # https://wiki.debian.org/DebianRepository/UseThirdParty
+      # paste0("keyrings/", keyringFiles, " etc/apt/trusted.gpg.d/", collapse="\n"), "\n\n"
     )
     cat(install.txt, file=deb.file.install)
     message(paste0(action, ": debian/install updated."))
@@ -1226,7 +1230,7 @@ GPGwriteKey <- function(key, file, gpg=Sys.which("gpg"), overwrite=FALSE, keyrin
     }
   } else {}
   
-  gpg.copy.call <- paste0(gpg, add.options, " --armor --output ", file, " --export ", paste0(key, collapse=" "))
+  gpg.copy.call <- paste0(gpg, add.options, " --output ", file, " --export ", paste0(key, collapse=" "))
   system(gpg.copy.call, intern=TRUE)
   message(paste0(action, ": updated OpenPGP key file: ", paste0(key, collapse=", ")))
 } ## end function GPGwriteKey()
@@ -1254,7 +1258,7 @@ GPGsign <- function(key, fileToSign, signatureFile, gpg=Sys.which("gpg"), keyrin
     " --cert-digest-algo ", certDigestAlgo,
     " --digest-algo ", digestAlgo,
     " --no-tty --yes ",
-    paste0("-u", key, collapse=" "), # should create like "-u key1 -u key2 ...", overrides "--default-key"
+    paste0("-u ", key, collapse=" "), # should create like "-u key1 -u key2 ...", overrides "--default-key"
     outOptions,
     " ", fileToSign
   )
@@ -1306,7 +1310,7 @@ deb.keyring.in.repo <- function(repo.root, gpg.key=NULL, keyring.options=NULL,
       } else {}
     } else {
       # fall back to single key file?
-      repo.gpg.key.file <- file.path(repo.root, paste0(paste0(gpg.key, collapse=""), ".asc"))
+      repo.gpg.key.file <- file.path(repo.root, paste0(paste0(gpg.key, collapse=""), ".gpg"))
       GPGwriteKey(
         key=gpg.key,
         file=repo.gpg.key.file,

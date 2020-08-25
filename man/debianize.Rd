@@ -238,7 +238,7 @@ You'd have to sign those files later, e.g. with \code{debsign},
 a valid GnuPG key ID from your keyring,
       which will then be used to sign the generated \code{Release} file. If not present yet, a copy of
 the public key will automatically be saved to the repository,
-      in a file named \code{<key ID>.asc}.
+      in a file named \code{<key ID>.gpg}.
 
 Package building is done in a temporal directory,
       and the source files a copied there first. Set \code{build.dir=pck.source.dir} if

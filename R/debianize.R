@@ -46,7 +46,7 @@
 #' but it would likely fail when it comes to signing the .changes/.dsc files, because \code{gpg} gets invoked without \code{"--no-tty"}.
 #' You'd have to sign those files later, e.g. with \code{debsign}, if you really need this. However, secure-apt can still be ensured, if you provide
 #' a valid GnuPG key ID from your keyring, which will then be used to sign the generated \code{Release} file. If not present yet, a copy of
-#' the public key will automatically be saved to the repository, in a file named \code{<key ID>.asc}.
+#' the public key will automatically be saved to the repository, in a file named \code{<key ID>.gpg}.
 #' 
 #' Package building is done in a temporal directory, and the source files a copied there first. Set \code{build.dir=pck.source.dir} if
 #' you want to build in-place instead.

@@ -1075,7 +1075,7 @@ roxy.package <- function(
     # copy RSS image, if not present
     RSS.image <- file.path(repo.pckg.info.main, "feed-icon-14x14.png")
     if(!file_test("-f", RSS.image)){
-      RSS.local.image <- file.path(find.package("roxyPackage"), "images", "feed-icon-14x14.png")
+      RSS.local.image <- file.path(fetch_inst_from_package("images"), "feed-icon-14x14.png")
       stopifnot(file.copy(RSS.local.image, RSS.image))
       message(paste0("html: copied RSS image to ", RSS.image))
     } else {}

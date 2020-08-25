@@ -171,19 +171,17 @@ debianizeKeyring <- function(
   buildTools <- debChecked[["buildTools"]]
   
   # define some paths
-#  pck.src.path.parts <- unlist(strsplit(pck.source.dir, .Platform$file.sep))
-#  pck.src.folder.name <- pck.src.path.parts[length(pck.src.path.parts)]
   deb.dir.debian <- file.path(pck.source.dir, "debian")
 
   deb.pckg.name <- deb.srcs.name <- debianPkgName(package=keyname, origin=NULL, version=NULL, replace.dots=FALSE)
   deb.pckg.vers <- debianPkgVersion(version=version, revision=revision, epoch=epoch)
 
-  # the package will have the OpenPGP key in ASCII format in key/<keyID>.asc
+  # the package will have the OpenPGP key in binary format in key/<keyID>.gpg
   # so the term "keyrings" is actually a bit misleading and only kept because
   # the file eventually needs to end up in /usr/share/keyrings
   keyring.dir <- file.path(pck.source.dir, "keyrings")
   createMissingDir(dirPath=keyring.dir, action="deb-key", quiet=FALSE)
-  keyring.file <- paste0(keyname, ".asc")
+  keyring.file <- paste0(keyname, ".gpg")
   keyring.file.path.local <- file.path("keyrings", keyring.file)
   keyring.file.path.full <- file.path(keyring.dir, keyring.file)
 
@@ -279,7 +277,7 @@ debianizeKeyring <- function(
     action="deb-key"
   )
 
-  ## keyrings/<keyname>.asc
+  ## keyrings/<keyname>.gpg
   GPGwriteKey(
     key=gpg.key,
     file=keyring.file.path.full,
