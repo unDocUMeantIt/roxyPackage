@@ -423,15 +423,12 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
       pckg.materials <- append(pckg.materials, XMLNode("a", "README", attrs=list(href="README.html", class="urls")))
     } else {}
     if(file_test("-f", news)){
-      pckg.materials <- append(pckg.materials, " ")
       pckg.materials <- append(pckg.materials, XMLNode("a", "NEWS", attrs=list(href=gsub("(.*)(NEWS)(.*)", "\\2\\3", news, perl=TRUE), class="urls")))
     } else {}
     if(file_test("-f", changelog)){
-      pckg.materials <- append(pckg.materials, " ")
       pckg.materials <- append(pckg.materials, XMLNode("a", "ChangeLog", attrs=list(href="ChangeLog", class="urls")))
     } else {}
     if(!is.null(rss.feed)){
-      pckg.materials <- append(pckg.materials, " ")
       pckg.materials <- append(pckg.materials, rss.feed)
     } else {}
 
