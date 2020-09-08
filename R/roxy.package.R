@@ -1150,6 +1150,24 @@ roxy.package <- function(
         )
       }
     } else {}
+    # treat markdown files (README.md and NEWS.md) if found
+    for(mdfile in c("README", "NEWS")){
+      this_md <- file.path(pck.source.dir, paste0(mdfile, ".md"))
+      if(file.exists(this_md)){
+        this_html <- file.path(repo.pckg.info, paste0(mdfile, ".html"))
+        removeIfExists(filePath=this_html)
+        pandoc_success <- pandoc(
+          infile=this_md,
+          outfile=this_html,
+          title=paste0(pck.package, ": ", mdfile)
+        )
+        if(isTRUE(pandoc_success)){
+          message(paste0("html: created ", mdfile, ".html from markdown document"))
+        } else {
+          warning(paste0("html: something went wrong while compiling ", mdfile, ".html from markdown document!"))
+        }
+      } else {}
+    }
     # check for NEWS.Rd or NEWS file
     if(file_test("-f", pckg.NEWS.Rd)){
       roxy.NEWS2HTML(newsRd=pckg.NEWS.Rd, newsHTML=file.path(repo.pckg.info, "NEWS.html"), pckg=pck.package, css="../web.css")
@@ -1169,24 +1187,6 @@ roxy.package <- function(
     if(!file_test("-f", pckg.NEWS.rss)){
       RSS.file.name <- NULL
     } else {}
-    # treat markdown files (README.md and NEWS.md) if found
-    for(mdfile in c("README", "NEWS")){
-      this_md <- file.path(pck.source.dir, paste0(mdfile, ".md"))
-      if(file.exists(this_md)){
-        this_html <- file.path(repo.pckg.info, paste0(mdfile, ".html"))
-        removeIfExists(filePath=this_html)
-        pandoc_success <- pandoc(
-          infile=this_md,
-          outfile=this_html,
-          title=paste0(pck.package, ": ", mdfile)
-        )
-        if(isTRUE(pandoc_success)){
-          message(paste0("html: created ", mdfile, ".html from markdown document"))
-        } else {
-          warning(paste0("html: something went wrong while compiling ", mdfile, ".html from markdown document!"))
-        }
-      } else {}
-    }
     package.html <- roxy.html(
       pckg.dscrptn,
       index=FALSE,
