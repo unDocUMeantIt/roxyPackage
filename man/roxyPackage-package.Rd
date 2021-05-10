@@ -13,7 +13,7 @@ The DESCRIPTION file:
 \tabular{ll}{
 Package: \tab roxyPackage\cr
 Type: \tab Package\cr
-Version: \tab 0.06-5\cr
+Version: \tab 0.10-1\cr
 Date: \tab 2021-05-10\cr
 Depends: \tab R (>= 3.0.0)\cr
 Encoding: \tab UTF-8\cr

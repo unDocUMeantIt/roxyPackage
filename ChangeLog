@@ -1,5 +1,9 @@
 ChangeLog for package roxyPackage
 
+changes in version 0.10-1 (2021-05-10)
+unreleased:
+  - this version is under development
+
 changes in version 0.06-5 (2021-05-10)
 fixed:
   - debianize(): the generated copyright file now has https instead of http
