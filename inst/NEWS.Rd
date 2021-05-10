@@ -1,6 +1,63 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
+\section{Changes in roxyPackage version 0.06-5 (2021-05-10)}{
+  \subsection{fixed}{
+    \itemize{
+      \item \code{debianize()}: the generated copyright file now has https instead of http
+        in the format URL
+      \item \code{debianizeKeyring()}: no longer use ASCII armored key files but binary only
+      \item \code{debianizeKeyring()}: dropped deprecated support for
+        /etc/apt/trusted.gpg.d/, also "apt-key add" is no longer used. keys are just copied to
+        /usr/share/keyrings/ and therefore *must* be pinned explicitly for the reposiory
+        via "[signed-by=/usr/share/keyrings/...]". this is the more secure approach,
+        but wasn't supported before 2017
+      \item \code{roxy.package()}: if roxyPackage was in sandbox mode, there were issues
+        finding the RSS image
+    }
+  }
+  \subsection{added}{
+    \itemize{
+      \item \code{roxy.package()}: new action \code{"buildEmAll"} to trigger builds for multiple
+        versions of R (if more than one was provided also)
+      \item \code{roxy.package()}: new action \code{"gitCheckout"} to switch to a tagged release
+        for binary rebuilds, works well in sandbox mode
+      \item \code{roxy.package()}: HTML page for debain package installation now explains
+        how to break the circle and successfully install the keyring package if apt
+        refuses to install it because the keyring package wasn't installed yet
+      \item \code{roxy.package()}: HTML page now links to ORCID if a valid ID is provided as
+        a person's comment named \code{"ORCID"}; it will ask you to call
+        \code{orcid_icon_fetcher()} as well, to fetch the correct icon file
+      \item \code{orcid_icon_fetcher()}: small helper function to download the ORCID SVG
+        icon into your repository should you need one
+      \item \code{roxy.package()}: if pandoc is available, README.md and NEWS.md will be
+        compiled into HTML versions and linked in a package's index page unser
+        \code{"Materials"}
+      \item \code{roxy.package()}: new argument \code{"R.libs.append"} to add R libraries that are
+        by default included during package builds
+    }
+  }
+  \subsection{changed}{
+    \itemize{
+      \item \code{roxy.package()}: adjusted ordering of enties in repo HTML page similar to
+        CRAN (contributed by robert nuske)
+      \item \code{roxy.package()}: HTML pages for debian repositories now suggest to include
+        "signed-by" in the lists files
+      \item \code{roxy.package()}: the generated README.md now suggests
+        "\code{devtools::install_github()}" instead of loading the package first
+      \item \code{roxy.package()}: \code{"cleanRd"} no longer throws a warning for each file
+        changed, but one summary warning listing all affected files
+      \item \code{roxy.package()}: the ChangeLog was moved to \code{"Materials"} on a package's
+        index page, next to README.html and NEWS.html
+      \item \code{roxy.package()}: if R >= 4.0 is detected, the default directory for debian
+        package files will be set to \code{"debR40"} instead of \code{"deb"}
+      \item removed deprecated internal functions \code{deb.gen.prerm()} and
+        \code{deb.gen.postinst()}
+      \item \code{debianizeKeyring()}: you can now define multiple OpenPGP keys to sign the
+        Release files, which can be used to seamlessly replace a soon expired key
+    }
+  }
+}
 \section{Changes in roxyPackage version 0.06-4 (2018-07-29)}{
   \subsection{fixed}{
     \itemize{
@@ -12,25 +69,26 @@
       \item \code{debianize()}: new argument \code{"deb.dir"} to use a custom debian main directory
         for the package repository, mainly to make it possible to have separate
         repos for incompatible R versions
-      \item \code{debianize()}: now tries to add proper r-api-* package dependencies if R >= 3.2
-        is detected
+      \item \code{debianize()}: now tries to add proper r-api-* package dependencies if R >=
+        3.2 is detected
       \item \code{debianizeKeyring()} also gained the new \code{"deb.dir"} argument
-      \item \code{sandbox()}: new argument \code{"clean"} to wipe an existing sandbox before setting
-        up a new vanilla one
+      \item \code{sandbox()}: new argument \code{"clean"} to wipe an existing sandbox before
+        setting up a new vanilla one
     }
   }
   \subsection{changed}{
     \itemize{
       \item \code{roxy.package()}: if R >= 3.5 is detected, the default directory for debian
         package files will be set to \code{"debR35"} instead of \code{"deb"}
-      \item \code{roxy.package()}: added \code{"buildVignettes"} to the actions only performed only during
-        first run if building for multiple R versions
-      \item \code{archive.packages()}: \code{"deb.dir"} must now also be set explicitly in the \code{"deb.options"}
-      \item \code{roxy.description()}: updated internal function responsible for setting
-        up the *-package.R file to use more macros (\\packageTitle\{\},
-        \\packageDescription\{\}, \\packageAuthor\{\}, and \\packageMaintainer\{\});
-        didn't yet get \\packageDESCRIPTION\{\} or \\packageIndices\{\} to generate
-        useful info, so that's still done the old way
+      \item \code{roxy.package()}: added \code{"buildVignettes"} to the actions only performed only
+        during first run if building for multiple R versions
+      \item \code{archive.packages()}: \code{"deb.dir"} must now also be set explicitly in the
+        \code{"deb.options"}
+      \item \code{roxy.description()}: updated internal function responsible for setting up
+        the *-package.R file to use more macros (\\packageTitle\{\},
+        \\packageDescription\{\}, \\packageAuthor\{\}, and \\packageMaintainer\{\}); didn't yet get
+        \\packageDESCRIPTION\{\} or \\packageIndices\{\} to generate useful info, so that's
+        still done the old way
     }
   }
 }

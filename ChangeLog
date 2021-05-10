@@ -1,17 +1,15 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.06-5 (2020-08-25)
-unreleased:
-  - this release is under development
+changes in version 0.06-5 (2021-05-10)
 fixed:
   - debianize(): the generated copyright file now has https instead of http
     in the format URL
   - debianizeKeyring(): no longer use ASCII armored key files but binary only
-  - debianizeKeyring(): dropped deprecated support for /etc/apt/trusted.gpg.d/,
-    also "apt-key add" is no longer used. keys are just copied to
-    /usr/share/keyrings/ and therefore *must* be pinned explicitly for the
-    reposiory via "[signed-by=/usr/share/keyrings/...]".
-    this is the more secure approach, but wasn't supported before 2017
+  - debianizeKeyring(): dropped deprecated support for
+    /etc/apt/trusted.gpg.d/, also "apt-key add" is no longer used. keys are just copied to
+    /usr/share/keyrings/ and therefore *must* be pinned explicitly for the reposiory
+    via "[signed-by=/usr/share/keyrings/...]". this is the more secure approach,
+    but wasn't supported before 2017
   - roxy.package(): if roxyPackage was in sandbox mode, there were issues
     finding the RSS image
 added:
@@ -19,34 +17,36 @@ added:
     versions of R (if more than one was provided also)
   - roxy.package(): new action "gitCheckout" to switch to a tagged release
     for binary rebuilds, works well in sandbox mode
-  - roxy.package(): HTML page for debain package installation now explains how
-    to break the circle and successfully install the keyring package if apt
+  - roxy.package(): HTML page for debain package installation now explains
+    how to break the circle and successfully install the keyring package if apt
     refuses to install it because the keyring package wasn't installed yet
-  - roxy.package(): HTML page now links to ORCID if a valid ID is provided
-    as a person's comment named "ORCID"; it will ask you to call
+  - roxy.package(): HTML page now links to ORCID if a valid ID is provided as
+    a person's comment named "ORCID"; it will ask you to call
     orcid_icon_fetcher() as well, to fetch the correct icon file
   - orcid_icon_fetcher(): small helper function to download the ORCID SVG
     icon into your repository should you need one
-  - roxy.package(): if pandoc is available, README.md and NEWS.md will be compiled
-    into HTML versions and linked in a package's index page unser "Materials"
-  - roxy.package(): new argument "R.libs.append" to add R libraries that are by
-    default included during package builds
+  - roxy.package(): if pandoc is available, README.md and NEWS.md will be
+    compiled into HTML versions and linked in a package's index page unser
+    "Materials"
+  - roxy.package(): new argument "R.libs.append" to add R libraries that are
+    by default included during package builds
 changed:
   - roxy.package(): adjusted ordering of enties in repo HTML page similar to
     CRAN (contributed by robert nuske)
   - roxy.package(): HTML pages for debian repositories now suggest to include
     "signed-by" in the lists files
-  - roxy.package(): the generated README.md now suggests "devtools::install_github()"
-    instead of loading the package first
-  - roxy.package(): "cleanRd" no longer throws a warning for each file changed, but
-    one summary warning listing all affected files
-  - roxy.package(): the ChangeLog was moved to "Materials" on a package's index page,
-    next to README.html and NEWS.html
+  - roxy.package(): the generated README.md now suggests
+    "devtools::install_github()" instead of loading the package first
+  - roxy.package(): "cleanRd" no longer throws a warning for each file
+    changed, but one summary warning listing all affected files
+  - roxy.package(): the ChangeLog was moved to "Materials" on a package's
+    index page, next to README.html and NEWS.html
   - roxy.package(): if R >= 4.0 is detected, the default directory for debian
     package files will be set to "debR40" instead of "deb"
-  - removed deprecated internal functions deb.gen.prerm() and deb.gen.postinst()
-  - debianizeKeyring(): you can now define multiple OpenPGP keys to sign the Release
-    files, which can be used to seamlessly replace a soon expired key
+  - removed deprecated internal functions deb.gen.prerm() and
+    deb.gen.postinst()
+  - debianizeKeyring(): you can now define multiple OpenPGP keys to sign the
+    Release files, which can be used to seamlessly replace a soon expired key
 
 changes in version 0.06-4 (2018-07-29)
 fixed:
@@ -55,22 +55,23 @@ added:
   - debianize(): new argument "deb.dir" to use a custom debian main directory
     for the package repository, mainly to make it possible to have separate
     repos for incompatible R versions
-  - debianize(): now tries to add proper r-api-* package dependencies if R >= 3.2
-    is detected
+  - debianize(): now tries to add proper r-api-* package dependencies if R >=
+    3.2 is detected
   - debianizeKeyring() also gained the new "deb.dir" argument
-  - sandbox(): new argument "clean" to wipe an existing sandbox before setting
-    up a new vanilla one
+  - sandbox(): new argument "clean" to wipe an existing sandbox before
+    setting up a new vanilla one
 changed:
   - roxy.package(): if R >= 3.5 is detected, the default directory for debian
     package files will be set to "debR35" instead of "deb"
-  - roxy.package(): added "buildVignettes" to the actions only performed only during
-    first run if building for multiple R versions
-  - archive.packages(): "deb.dir" must now also be set explicitly in the "deb.options"
-  - roxy.description(): updated internal function responsible for setting
-    up the *-package.R file to use more macros (\packageTitle{},
-    \packageDescription{}, \packageAuthor{}, and \packageMaintainer{});
-    didn't yet get \packageDESCRIPTION{} or \packageIndices{} to generate
-    useful info, so that's still done the old way
+  - roxy.package(): added "buildVignettes" to the actions only performed only
+    during first run if building for multiple R versions
+  - archive.packages(): "deb.dir" must now also be set explicitly in the
+    "deb.options"
+  - roxy.description(): updated internal function responsible for setting up
+    the *-package.R file to use more macros (\packageTitle{},
+    \packageDescription{}, \packageAuthor{}, and \packageMaintainer{}); didn't yet get
+    \packageDESCRIPTION{} or \packageIndices{} to generate useful info, so that's
+    still done the old way
 
 changes in version 0.06-3 (2018-05-07)
 fixed:

@@ -12,50 +12,92 @@
 
 <meta name="author" content="m.eik michalke" />
 
-<meta name="date" content="2020-01-31" />
+<meta name="date" content="2021-05-10" />
 
 <title>Managing R Packages with roxyPackage</title>
 
 <meta name="flattr:id" content="4zdzgd" />
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 
 </style>
 <script>
@@ -92,7 +134,188 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </style>
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -106,10 +329,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Managing R Packages with roxyPackage</h1>
 <h4 class="author">m.eik michalke</h4>
-<h4 class="date">2020-01-31</h4>
+<h4 class="date">2021-05-10</h4>
 <div class="abstract">
 <p class="abstract">Abstract</p>
-<p>R packages consist of numerous files in various formats, like <code>*.R</code>, <code>*.Rd</code>, <code>DESCRIPTION</code>, <code>NAMESPACE</code> or <code>CITATION</code>, ordered in a specific directory structure. <code>roxyPackage</code> tries to automatically generate most of these structures and files, so that you can concentrate on writing the actual R code for your package. If your code includes <code>roxygen2</code>-style documentation, this package can update your docs as well. It is also capable of creating a local package repository, including limited support for generating macOS, Windows and Debian packages.</p>
+R packages consist of numerous files in various formats, like <code>*.R</code>, <code>*.Rd</code>, <code>DESCRIPTION</code>, <code>NAMESPACE</code> or <code>CITATION</code>, ordered in a specific directory structure. <code>roxyPackage</code> tries to automatically generate most of these structures and files, so that you can concentrate on writing the actual R code for your package. If your code includes <code>roxygen2</code>-style documentation, this package can update your docs as well. It is also capable of creating a local package repository, including limited support for generating macOS, Windows and Debian packages.
 </div>
 
 
@@ -131,13 +354,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <div id="getting-started" class="section level1">
 <h1>Getting started</h1>
-<p>Apart from installing <code>roxyPackage</code> and having written some R code, no further requirements for building your first R package need to be fulfilled. I tried to keep the dependencies for <code>roxyPackage</code> to a minimum, and basically they come down to <code>roxygen2</code><a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> (used to generate the documentation) and <code>XiMpLe</code><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> (used to generate the HTML and RSS files of the repository).</p>
+<p>Apart from installing <code>roxyPackage</code> and having written some R code, no further requirements for building your first R package need to be fulfilled. I tried to keep the dependencies for <code>roxyPackage</code> to a minimum, and basically they come down to <code>roxygen2</code><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> (used to generate the documentation) and <code>XiMpLe</code><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> (used to generate the HTML and RSS files of the repository).</p>
 <p>To demonstrate this, we will start with an extremely simple one: Let’s assume you would like to have an R package called “examplePackage” and have just written a first function for it, called “simpleExample”, which does nothing but return <code>NULL</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">simpleExample &lt;-<span class="st"> </span><span class="cf">function</span>(){<span class="ot">NULL</span>}</code></pre></div>
-<p>To transform this code into a package, save it as a file called <code>&quot;examplePackage/R/simpleExample.R&quot;</code>, that is, create a directory with the package name and in it another one named <code>&quot;R&quot;</code>. If you were to create the package manually,<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> you would now at least write a <code>DESCRIPTION</code> file with meta information like the license, version number and release date, a <code>NAMESPSACE</code> file to export the function so it can acually be seen and used after the package was loaded, and a <code>*-package.Rd</code> file, which has the meta information in Rd format so it’s accessible via the R help system. In a minute, all of this will be done automatically by <code>roxyPackage</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">simpleExample &lt;-<span class="st"> </span><span class="cf">function</span>(){<span class="ot">NULL</span>}</a></code></pre></div>
+<p>To transform this code into a package, save it as a file called <code>&quot;examplePackage/R/simpleExample.R&quot;</code>, that is, create a directory with the package name and in it another one named <code>&quot;R&quot;</code>. If you were to create the package manually,<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> you would now at least write a <code>DESCRIPTION</code> file with meta information like the license, version number and release date, a <code>NAMESPSACE</code> file to export the function so it can acually be seen and used after the package was loaded, and a <code>*-package.Rd</code> file, which has the meta information in Rd format so it’s accessible via the R help system. In a minute, all of this will be done automatically by <code>roxyPackage</code>.</p>
 <p>Before this, we need to add at least one <code>roxygen2</code> command to the function code, which will make sure that the function is exported and user accessible:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#' @export</span>
-simpleExample &lt;-<span class="st"> </span><span class="cf">function</span>(){<span class="ot">NULL</span>}</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co">#&#39; @export</span></a>
+<a class="sourceLine" id="cb2-2" title="2">simpleExample &lt;-<span class="st"> </span><span class="cf">function</span>(){<span class="ot">NULL</span>}</a></code></pre></div>
 <p>This must be done for every function, class etc. you would like to export. But that’s about it – we can now call <code>roxy.package()</code> to create a valid R package. You only have to tell the function a few things:</p>
 <ul>
 <li>where is the source directory of the package (e.g., <code>&quot;~/myRcode/examplePackage&quot;</code>)?</li>
@@ -146,27 +369,27 @@ simpleExample &lt;-<span class="st"> </span><span class="cf">function</span>(){<
 <li>what is the package version number, description, author, its dependencies etc.?</li>
 </ul>
 <p>This is what such a call could look like:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">roxy.package</span>(
-  <span class="dt">pck.source.dir=</span><span class="st">&quot;~/myRcode/examplePackage&quot;</span>,
-  <span class="dt">pck.version=</span><span class="st">&quot;0.01-1&quot;</span>,
-  <span class="dt">R.libs=</span><span class="st">&quot;~/R&quot;</span>,
-  <span class="dt">repo.root=</span><span class="st">&quot;~/myRcode/repo&quot;</span>,
-  <span class="dt">pck.description=</span><span class="kw">package_description</span>(
-    <span class="dt">Package=</span><span class="st">&quot;examplePackage&quot;</span>,
-    <span class="dt">Type=</span><span class="st">&quot;Package&quot;</span>,
-    <span class="dt">Title=</span><span class="st">&quot;An R Example Package&quot;</span>,
-    <span class="dt">AuthorsR=</span><span class="st">&quot;c(person(given=</span><span class="ch">\&quot;</span><span class="st">Ernst</span><span class="ch">\&quot;</span><span class="st">, family=</span><span class="ch">\&quot;</span><span class="st">Dölle</span><span class="ch">\&quot;</span><span class="st">,</span>
-<span class="st">      email=</span><span class="ch">\&quot;</span><span class="st">e.a.doelle@example.com</span><span class="ch">\&quot;</span><span class="st">,</span>
-<span class="st">      role=c(</span><span class="ch">\&quot;</span><span class="st">aut</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\&quot;</span><span class="st">cre</span><span class="ch">\&quot;</span><span class="st">)))&quot;</span>,
-    <span class="dt">Depends=</span><span class="st">&quot;R (&gt;= 3.0.0)&quot;</span>,
-    <span class="dt">Description=</span><span class="st">&quot;Provides a great function to produce NULL results.&quot;</span>,
-    <span class="dt">License=</span><span class="st">&quot;GPL (&gt;= 3)&quot;</span>,
-    <span class="dt">Encoding=</span><span class="st">&quot;UTF-8&quot;</span>,
-    <span class="dt">LazyLoad=</span><span class="st">&quot;yes&quot;</span>,
-    <span class="dt">URL=</span><span class="st">&quot;https://example.com/doelleInnovations&quot;</span>
-  )
-)</code></pre></div>
-<p>We’re using a function called <code>package_description()</code> to set <code>pck.description</code>. It returns a simple <code>data.frame</code> which is used for the <code>DESCRIPTION</code> file. You can alternative use any ordinary <code>data.frame</code> as long as it only includes valid <code>DESCRIPTION</code> fields<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> except “Version:” and “Date:”, as these have their own parameters (<code>pck.version</code> and <code>pck.date</code>, which defaults to <code>Sys.Date()</code>), and <code>Authors@R</code> was simplified to <code>AuthorsR</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">roxy.package</span>(</a>
+<a class="sourceLine" id="cb3-2" title="2">  <span class="dt">pck.source.dir=</span><span class="st">&quot;~/myRcode/examplePackage&quot;</span>,</a>
+<a class="sourceLine" id="cb3-3" title="3">  <span class="dt">pck.version=</span><span class="st">&quot;0.01-1&quot;</span>,</a>
+<a class="sourceLine" id="cb3-4" title="4">  <span class="dt">R.libs=</span><span class="st">&quot;~/R&quot;</span>,</a>
+<a class="sourceLine" id="cb3-5" title="5">  <span class="dt">repo.root=</span><span class="st">&quot;~/myRcode/repo&quot;</span>,</a>
+<a class="sourceLine" id="cb3-6" title="6">  <span class="dt">pck.description=</span><span class="kw">package_description</span>(</a>
+<a class="sourceLine" id="cb3-7" title="7">    <span class="dt">Package=</span><span class="st">&quot;examplePackage&quot;</span>,</a>
+<a class="sourceLine" id="cb3-8" title="8">    <span class="dt">Type=</span><span class="st">&quot;Package&quot;</span>,</a>
+<a class="sourceLine" id="cb3-9" title="9">    <span class="dt">Title=</span><span class="st">&quot;An R Example Package&quot;</span>,</a>
+<a class="sourceLine" id="cb3-10" title="10">    <span class="dt">AuthorsR=</span><span class="st">&quot;c(person(given=</span><span class="ch">\&quot;</span><span class="st">Ernst</span><span class="ch">\&quot;</span><span class="st">, family=</span><span class="ch">\&quot;</span><span class="st">Dölle</span><span class="ch">\&quot;</span><span class="st">,</span></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="st">      email=</span><span class="ch">\&quot;</span><span class="st">e.a.doelle@example.com</span><span class="ch">\&quot;</span><span class="st">,</span></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="st">      role=c(</span><span class="ch">\&quot;</span><span class="st">aut</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\&quot;</span><span class="st">cre</span><span class="ch">\&quot;</span><span class="st">)))&quot;</span>,</a>
+<a class="sourceLine" id="cb3-13" title="13">    <span class="dt">Depends=</span><span class="st">&quot;R (&gt;= 3.0.0)&quot;</span>,</a>
+<a class="sourceLine" id="cb3-14" title="14">    <span class="dt">Description=</span><span class="st">&quot;Provides a great function to produce NULL results.&quot;</span>,</a>
+<a class="sourceLine" id="cb3-15" title="15">    <span class="dt">License=</span><span class="st">&quot;GPL (&gt;= 3)&quot;</span>,</a>
+<a class="sourceLine" id="cb3-16" title="16">    <span class="dt">Encoding=</span><span class="st">&quot;UTF-8&quot;</span>,</a>
+<a class="sourceLine" id="cb3-17" title="17">    <span class="dt">LazyLoad=</span><span class="st">&quot;yes&quot;</span>,</a>
+<a class="sourceLine" id="cb3-18" title="18">    <span class="dt">URL=</span><span class="st">&quot;https://example.com/doelleInnovations&quot;</span></a>
+<a class="sourceLine" id="cb3-19" title="19">  )</a>
+<a class="sourceLine" id="cb3-20" title="20">)</a></code></pre></div>
+<p>We’re using a function called <code>package_description()</code> to set <code>pck.description</code>. It returns a simple <code>data.frame</code> which is used for the <code>DESCRIPTION</code> file. You can alternative use any ordinary <code>data.frame</code> as long as it only includes valid <code>DESCRIPTION</code> fields<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> except “Version:” and “Date:”, as these have their own parameters (<code>pck.version</code> and <code>pck.date</code>, which defaults to <code>Sys.Date()</code>), and <code>Authors@R</code> was simplified to <code>AuthorsR</code>.</p>
 <p>At a first glance this maybe look like a lot. But as you can see, except for of course the version number and release date, most of this information will probably remain the same over time, so you can write all of this in a script and then run the script to generate/update your package.</p>
 <p>If you run the above call to <code>roxy.package()</code>, the R console will display verbose status information:</p>
 <pre><code>R environment
@@ -199,8 +422,8 @@ repo: src/contrib/PACKAGES (unix) updated.</code></pre>
 <h1>Why the local repository?</h1>
 <p>If you build a package of your R code you probably want to share your work with others. Of course you can upload your package to CRAN. But there might be reasons to have your own repository, for example, if your release pace is considerably higher than the volunteers running CRAN are able to cope with.</p>
 <p>Since <code>roxyPackage</code> needed to save its packages somewhere anyway, i chose to organize this place like a proper R package repository. So effectively, you can simply copy the generated repository directory to your webserver, and you’re done. Packages in that repository can then easily be installed from an R session:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;examplePackage&quot;</span>, <span class="dt">repos=</span><span class="st">&quot;https://myRepoURL.example.com&quot;</span>)</code></pre></div>
-<p>If you’re running a Debian GNU/Linux based system, <code>roxyPackage</code> can also “debianize”<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> your package, build Debian source and binary packages, and add an additional Debian package repository hosting your R packages (see <code>&quot;deb&quot;</code> action below).</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;examplePackage&quot;</span>, <span class="dt">repos=</span><span class="st">&quot;https://myRepoURL.example.com&quot;</span>)</a></code></pre></div>
+<p>If you’re running a Debian GNU/Linux based system, <code>roxyPackage</code> can also “debianize”<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> your package, build Debian source and binary packages, and add an additional Debian package repository hosting your R packages (see <code>&quot;deb&quot;</code> action below).</p>
 </div>
 <div id="more-actions" class="section level1">
 <h1>More actions</h1>
@@ -216,40 +439,40 @@ repo: src/contrib/PACKAGES (unix) updated.</code></pre>
 <li><code>&quot;log&quot;</code>: Generate initial <code>ChangeLog</code> or update a present <code>ChangeLog</code> file.</li>
 <li><code>&quot;cl2news&quot;</code>: Look for a <code>ChangeLog</code> file in the package root directory, and translate it into an <code>inst/NEWS.Rd</code> file.</li>
 <li><code>&quot;news2rss&quot;</code>: Look for an <code>inst/NEWS.Rd</code> file and translate it into an RSS feed for the repository; you need to provide a value for the <code>URL</code> parameter for this to work, where the URL should point to the root location where your repository is available.</li>
-<li><code>&quot;html&quot;</code>: Generate updated HTML index files<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> throughout the repository, very similar to the HTML pages CRAN provides for its packages; will also include links to the RSS feed and provide HTML versions of the citation info and news/changelog.</li>
+<li><code>&quot;html&quot;</code>: Generate updated HTML index files<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> throughout the repository, very similar to the HTML pages CRAN provides for its packages; will also include links to the RSS feed and provide HTML versions of the citation info and news/changelog.</li>
 <li><code>&quot;win&quot;</code>: Build a Windows binary package (only works for pure R packages).</li>
 <li><code>&quot;macosx&quot;</code>: Build a macOS binary package (only works for pure R packages).</li>
-<li><code>&quot;deb&quot;</code>: Build Debian source and/or binary packages (only works on Debian based operating systems); this will also set up a Debian package repository inside the defined repository directory and generate the documentation<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a> on how to use it, and also needs the <code>URL</code> parameter to work, as well as probably additional configuration via the <code>deb.options</code> parameter.</li>
+<li><code>&quot;deb&quot;</code>: Build Debian source and/or binary packages (only works on Debian based operating systems); this will also set up a Debian package repository inside the defined repository directory and generate the documentation<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> on how to use it, and also needs the <code>URL</code> parameter to work, as well as probably additional configuration via the <code>deb.options</code> parameter.</li>
 <li><code>&quot;check&quot;</code>: Run <code>R CMD check</code> on the package.</li>
 <li><code>&quot;binonly&quot;</code>: (Re-)build &amp; install the package, binaries only. Useful if you need to repackage your Windows, macOS or Debian packages but don’t want to touch the sources.</li>
 </ul>
 <p>So, let’s re-run <code>roxy.package()</code>, to get a copy of the GPL into our sources, HTML index files for the repository and information on how to cite the package properly:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">roxy.package</span>(
-  <span class="dt">pck.source.dir=</span><span class="st">&quot;~/myRcode/examplePackage&quot;</span>,
-  <span class="dt">pck.version=</span><span class="st">&quot;0.01-1&quot;</span>,
-  <span class="dt">R.libs=</span><span class="st">&quot;~/R&quot;</span>,
-  <span class="dt">repo.root=</span><span class="st">&quot;~/myRcode/repo&quot;</span>,
-  <span class="dt">pck.description=</span><span class="kw">package_description</span>(
-    <span class="dt">Package=</span><span class="st">&quot;examplePackage&quot;</span>,
-    <span class="dt">Type=</span><span class="st">&quot;Package&quot;</span>,
-    <span class="dt">Title=</span><span class="st">&quot;An R Example Package&quot;</span>,
-    <span class="dt">AuthorsR=</span><span class="st">&quot;c(person(given=</span><span class="ch">\&quot;</span><span class="st">Ernst</span><span class="ch">\&quot;</span><span class="st">, family=</span><span class="ch">\&quot;</span><span class="st">Dölle</span><span class="ch">\&quot;</span><span class="st">,</span>
-<span class="st">      email=</span><span class="ch">\&quot;</span><span class="st">e.a.doelle@example.com</span><span class="ch">\&quot;</span><span class="st">,</span>
-<span class="st">      role=c(</span><span class="ch">\&quot;</span><span class="st">aut</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\&quot;</span><span class="st">cre</span><span class="ch">\&quot;</span><span class="st">)))&quot;</span>,
-    <span class="dt">Depends=</span><span class="st">&quot;R (&gt;= 3.0.0)&quot;</span>,
-    <span class="dt">Description=</span><span class="st">&quot;Provides a great function to produce NULL results.&quot;</span>,
-    <span class="dt">License=</span><span class="st">&quot;GPL (&gt;= 3)&quot;</span>,
-    <span class="dt">Encoding=</span><span class="st">&quot;UTF-8&quot;</span>,
-    <span class="dt">LazyLoad=</span><span class="st">&quot;yes&quot;</span>,
-    <span class="dt">URL=</span><span class="st">&quot;https://example.com/doelleInnovations&quot;</span>
-  ),
-  <span class="dt">actions=</span><span class="kw">c</span>(
-    <span class="st">&quot;roxy&quot;</span>,
-    <span class="st">&quot;cite&quot;</span>,
-    <span class="st">&quot;html&quot;</span>,
-    <span class="st">&quot;license&quot;</span>,
-    <span class="st">&quot;package&quot;</span>
-  ))</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">roxy.package</span>(</a>
+<a class="sourceLine" id="cb6-2" title="2">  <span class="dt">pck.source.dir=</span><span class="st">&quot;~/myRcode/examplePackage&quot;</span>,</a>
+<a class="sourceLine" id="cb6-3" title="3">  <span class="dt">pck.version=</span><span class="st">&quot;0.01-1&quot;</span>,</a>
+<a class="sourceLine" id="cb6-4" title="4">  <span class="dt">R.libs=</span><span class="st">&quot;~/R&quot;</span>,</a>
+<a class="sourceLine" id="cb6-5" title="5">  <span class="dt">repo.root=</span><span class="st">&quot;~/myRcode/repo&quot;</span>,</a>
+<a class="sourceLine" id="cb6-6" title="6">  <span class="dt">pck.description=</span><span class="kw">package_description</span>(</a>
+<a class="sourceLine" id="cb6-7" title="7">    <span class="dt">Package=</span><span class="st">&quot;examplePackage&quot;</span>,</a>
+<a class="sourceLine" id="cb6-8" title="8">    <span class="dt">Type=</span><span class="st">&quot;Package&quot;</span>,</a>
+<a class="sourceLine" id="cb6-9" title="9">    <span class="dt">Title=</span><span class="st">&quot;An R Example Package&quot;</span>,</a>
+<a class="sourceLine" id="cb6-10" title="10">    <span class="dt">AuthorsR=</span><span class="st">&quot;c(person(given=</span><span class="ch">\&quot;</span><span class="st">Ernst</span><span class="ch">\&quot;</span><span class="st">, family=</span><span class="ch">\&quot;</span><span class="st">Dölle</span><span class="ch">\&quot;</span><span class="st">,</span></a>
+<a class="sourceLine" id="cb6-11" title="11"><span class="st">      email=</span><span class="ch">\&quot;</span><span class="st">e.a.doelle@example.com</span><span class="ch">\&quot;</span><span class="st">,</span></a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="st">      role=c(</span><span class="ch">\&quot;</span><span class="st">aut</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\&quot;</span><span class="st">cre</span><span class="ch">\&quot;</span><span class="st">)))&quot;</span>,</a>
+<a class="sourceLine" id="cb6-13" title="13">    <span class="dt">Depends=</span><span class="st">&quot;R (&gt;= 3.0.0)&quot;</span>,</a>
+<a class="sourceLine" id="cb6-14" title="14">    <span class="dt">Description=</span><span class="st">&quot;Provides a great function to produce NULL results.&quot;</span>,</a>
+<a class="sourceLine" id="cb6-15" title="15">    <span class="dt">License=</span><span class="st">&quot;GPL (&gt;= 3)&quot;</span>,</a>
+<a class="sourceLine" id="cb6-16" title="16">    <span class="dt">Encoding=</span><span class="st">&quot;UTF-8&quot;</span>,</a>
+<a class="sourceLine" id="cb6-17" title="17">    <span class="dt">LazyLoad=</span><span class="st">&quot;yes&quot;</span>,</a>
+<a class="sourceLine" id="cb6-18" title="18">    <span class="dt">URL=</span><span class="st">&quot;https://example.com/doelleInnovations&quot;</span></a>
+<a class="sourceLine" id="cb6-19" title="19">  ),</a>
+<a class="sourceLine" id="cb6-20" title="20">  <span class="dt">actions=</span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb6-21" title="21">    <span class="st">&quot;roxy&quot;</span>,</a>
+<a class="sourceLine" id="cb6-22" title="22">    <span class="st">&quot;cite&quot;</span>,</a>
+<a class="sourceLine" id="cb6-23" title="23">    <span class="st">&quot;html&quot;</span>,</a>
+<a class="sourceLine" id="cb6-24" title="24">    <span class="st">&quot;license&quot;</span>,</a>
+<a class="sourceLine" id="cb6-25" title="25">    <span class="st">&quot;package&quot;</span></a>
+<a class="sourceLine" id="cb6-26" title="26">  ))</a></code></pre></div>
 <p>This is what we’re told:</p>
 <pre><code>R environment
   R.home: /usr/lib/R 
@@ -297,44 +520,44 @@ changed:
 </div>
 <div id="maintaining-a-changelog" class="section level3">
 <h3>Maintaining a ChangeLog</h3>
-<p>It’s OK to maintain your ChangeLog manually with an editor of your choice, as long as you stick to a valid format. To make this even easier, <code>roxyPackage</code> has some dedicated functions and methods to deal with ChangeLogs <a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>. Typically, you want to add entries to the package version you are currently working on, to document what has been changed, added or fixed. You can do this directly within a <code>roxy.package()</code> call, using the <code>&quot;log&quot;</code> action in combination with a list of items given to the <code>ChangeLog</code> argument:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">roxy.package</span>(
-  <span class="dt">pck.source.dir=</span><span class="st">&quot;~/myRcode/examplePackage&quot;</span>,
-  <span class="dt">pck.version=</span><span class="st">&quot;0.01-1&quot;</span>,
-  <span class="dt">R.libs=</span><span class="st">&quot;~/R&quot;</span>,
-  <span class="dt">repo.root=</span><span class="st">&quot;~/myRcode/repo&quot;</span>,
-  <span class="dt">pck.description=</span><span class="kw">package_description</span>(
-    <span class="dt">Package=</span><span class="st">&quot;examplePackage&quot;</span>,
-    <span class="dt">Type=</span><span class="st">&quot;Package&quot;</span>,
-    <span class="dt">Title=</span><span class="st">&quot;An R Example Package&quot;</span>,
-    <span class="dt">AuthorsR=</span><span class="st">&quot;c(person(given=</span><span class="ch">\&quot;</span><span class="st">Ernst</span><span class="ch">\&quot;</span><span class="st">, family=</span><span class="ch">\&quot;</span><span class="st">Dölle</span><span class="ch">\&quot;</span><span class="st">,</span>
-<span class="st">      email=</span><span class="ch">\&quot;</span><span class="st">e.a.doelle@example.com</span><span class="ch">\&quot;</span><span class="st">,</span>
-<span class="st">      role=c(</span><span class="ch">\&quot;</span><span class="st">aut</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\&quot;</span><span class="st">cre</span><span class="ch">\&quot;</span><span class="st">)))&quot;</span>,
-    <span class="dt">Depends=</span><span class="st">&quot;R (&gt;= 3.0.0)&quot;</span>,
-    <span class="dt">Description=</span><span class="st">&quot;Provides a great function to produce NULL results.&quot;</span>,
-    <span class="dt">License=</span><span class="st">&quot;GPL (&gt;= 3)&quot;</span>,
-    <span class="dt">Encoding=</span><span class="st">&quot;UTF-8&quot;</span>,
-    <span class="dt">LazyLoad=</span><span class="st">&quot;yes&quot;</span>,
-    <span class="dt">URL=</span><span class="st">&quot;https://example.com/doelleInnovations&quot;</span>
-  ),
-  <span class="dt">actions=</span><span class="kw">c</span>(
-    <span class="st">&quot;roxy&quot;</span>,
-    <span class="st">&quot;cite&quot;</span>,
-    <span class="st">&quot;html&quot;</span>,
-    <span class="st">&quot;license&quot;</span>,
-    <span class="st">&quot;log&quot;</span>,
-    <span class="st">&quot;package&quot;</span>
-  ),
-  <span class="dt">ChangeLog=</span><span class="kw">list</span>(
-    <span class="dt">added=</span><span class="kw">c</span>(<span class="st">&quot;new extra NULL feature&quot;</span>, <span class="st">&quot;new oblivion matrix&quot;</span>),
-    <span class="dt">fixed=</span><span class="kw">c</span>(<span class="st">&quot;finally resolved the reandom results bug&quot;</span>)
-  )
-)</code></pre></div>
+<p>It’s OK to maintain your ChangeLog manually with an editor of your choice, as long as you stick to a valid format. To make this even easier, <code>roxyPackage</code> has some dedicated functions and methods to deal with ChangeLogs <a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>. Typically, you want to add entries to the package version you are currently working on, to document what has been changed, added or fixed. You can do this directly within a <code>roxy.package()</code> call, using the <code>&quot;log&quot;</code> action in combination with a list of items given to the <code>ChangeLog</code> argument:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">roxy.package</span>(</a>
+<a class="sourceLine" id="cb9-2" title="2">  <span class="dt">pck.source.dir=</span><span class="st">&quot;~/myRcode/examplePackage&quot;</span>,</a>
+<a class="sourceLine" id="cb9-3" title="3">  <span class="dt">pck.version=</span><span class="st">&quot;0.01-1&quot;</span>,</a>
+<a class="sourceLine" id="cb9-4" title="4">  <span class="dt">R.libs=</span><span class="st">&quot;~/R&quot;</span>,</a>
+<a class="sourceLine" id="cb9-5" title="5">  <span class="dt">repo.root=</span><span class="st">&quot;~/myRcode/repo&quot;</span>,</a>
+<a class="sourceLine" id="cb9-6" title="6">  <span class="dt">pck.description=</span><span class="kw">package_description</span>(</a>
+<a class="sourceLine" id="cb9-7" title="7">    <span class="dt">Package=</span><span class="st">&quot;examplePackage&quot;</span>,</a>
+<a class="sourceLine" id="cb9-8" title="8">    <span class="dt">Type=</span><span class="st">&quot;Package&quot;</span>,</a>
+<a class="sourceLine" id="cb9-9" title="9">    <span class="dt">Title=</span><span class="st">&quot;An R Example Package&quot;</span>,</a>
+<a class="sourceLine" id="cb9-10" title="10">    <span class="dt">AuthorsR=</span><span class="st">&quot;c(person(given=</span><span class="ch">\&quot;</span><span class="st">Ernst</span><span class="ch">\&quot;</span><span class="st">, family=</span><span class="ch">\&quot;</span><span class="st">Dölle</span><span class="ch">\&quot;</span><span class="st">,</span></a>
+<a class="sourceLine" id="cb9-11" title="11"><span class="st">      email=</span><span class="ch">\&quot;</span><span class="st">e.a.doelle@example.com</span><span class="ch">\&quot;</span><span class="st">,</span></a>
+<a class="sourceLine" id="cb9-12" title="12"><span class="st">      role=c(</span><span class="ch">\&quot;</span><span class="st">aut</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\&quot;</span><span class="st">cre</span><span class="ch">\&quot;</span><span class="st">)))&quot;</span>,</a>
+<a class="sourceLine" id="cb9-13" title="13">    <span class="dt">Depends=</span><span class="st">&quot;R (&gt;= 3.0.0)&quot;</span>,</a>
+<a class="sourceLine" id="cb9-14" title="14">    <span class="dt">Description=</span><span class="st">&quot;Provides a great function to produce NULL results.&quot;</span>,</a>
+<a class="sourceLine" id="cb9-15" title="15">    <span class="dt">License=</span><span class="st">&quot;GPL (&gt;= 3)&quot;</span>,</a>
+<a class="sourceLine" id="cb9-16" title="16">    <span class="dt">Encoding=</span><span class="st">&quot;UTF-8&quot;</span>,</a>
+<a class="sourceLine" id="cb9-17" title="17">    <span class="dt">LazyLoad=</span><span class="st">&quot;yes&quot;</span>,</a>
+<a class="sourceLine" id="cb9-18" title="18">    <span class="dt">URL=</span><span class="st">&quot;https://example.com/doelleInnovations&quot;</span></a>
+<a class="sourceLine" id="cb9-19" title="19">  ),</a>
+<a class="sourceLine" id="cb9-20" title="20">  <span class="dt">actions=</span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb9-21" title="21">    <span class="st">&quot;roxy&quot;</span>,</a>
+<a class="sourceLine" id="cb9-22" title="22">    <span class="st">&quot;cite&quot;</span>,</a>
+<a class="sourceLine" id="cb9-23" title="23">    <span class="st">&quot;html&quot;</span>,</a>
+<a class="sourceLine" id="cb9-24" title="24">    <span class="st">&quot;license&quot;</span>,</a>
+<a class="sourceLine" id="cb9-25" title="25">    <span class="st">&quot;log&quot;</span>,</a>
+<a class="sourceLine" id="cb9-26" title="26">    <span class="st">&quot;package&quot;</span></a>
+<a class="sourceLine" id="cb9-27" title="27">  ),</a>
+<a class="sourceLine" id="cb9-28" title="28">  <span class="dt">ChangeLog=</span><span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb9-29" title="29">    <span class="dt">added=</span><span class="kw">c</span>(<span class="st">&quot;new extra NULL feature&quot;</span>, <span class="st">&quot;new oblivion matrix&quot;</span>),</a>
+<a class="sourceLine" id="cb9-30" title="30">    <span class="dt">fixed=</span><span class="kw">c</span>(<span class="st">&quot;finally resolved the reandom results bug&quot;</span>)</a>
+<a class="sourceLine" id="cb9-31" title="31">  )</a>
+<a class="sourceLine" id="cb9-32" title="32">)</a></code></pre></div>
 <p>This would generate a new log entry for version 0.01-1 if none is present, otherwise the entries in the named <code>ChangeLog</code> list would be appended to the existing entry and its date stamp updated. In the list, the element names are treated as the names of log sections, and each character string as a log entry item of that section. Duplicate items will be ignored automatically, so you can simply append new ones to the list as you see fit. However, it wouldn’t hurt to check the log from time to time, to convince yourself it’s still in shape.</p>
 </div>
 <div id="generating-rss-feeds" class="section level3">
 <h3>Generating RSS feeds</h3>
-<p>RSS technology allows you to spread the news on package updates instantly, after interested users subscribed to the news feed. All you need to define additionally is the <code>URL</code> parameter with the web address of your repository. After that, you can combine the actions <code>&quot;cl2news&quot;</code>, <code>&quot;news2rss&quot;</code> and <code>&quot;html&quot;</code> to generate an up-to-date RSS feed<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> from your <code>ChangeLog</code> file.</p>
+<p>RSS technology allows you to spread the news on package updates instantly, after interested users subscribed to the news feed. All you need to define additionally is the <code>URL</code> parameter with the web address of your repository. After that, you can combine the actions <code>&quot;cl2news&quot;</code>, <code>&quot;news2rss&quot;</code> and <code>&quot;html&quot;</code> to generate an up-to-date RSS feed<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a> from your <code>ChangeLog</code> file.</p>
 </div>
 </div>
 <div id="archiving-packages" class="section level2">
@@ -345,20 +568,20 @@ changed:
 <div id="no-more-excuses-generating-template-files" class="section level1">
 <h1>No more excuses: Generating template files</h1>
 <p>Imagine you just wrote a new function or two and would like to share your work with others. But when you try to remember how to write sufficient <code>roxygen2</code> documentation, your motivation disappears. Well, <code>roxyPackage</code> comes to the rescue: It can write template files for you, prefilled with some usefull tags and hints which should leave you with no more excuses. Depending on the arguments given to <code>templateFile()</code>, you can see the script code on screen or write it directly to a file:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># you can re-use the package description here, but only a</span>
-<span class="co"># subset of it's data is needed for templates</span>
-pckg.dscrptn &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
-  <span class="dt">Package=</span><span class="st">&quot;examplePackage&quot;</span>,
-  <span class="dt">Author=</span><span class="st">&quot;Ernst A. Dölle &lt;e.a.doelle@example.com&gt;&quot;</span>,
-  <span class="dt">License=</span><span class="st">&quot;GPL (&gt;= 3)&quot;</span>,
-  <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>
-)
-<span class="kw">cat</span>(
-  <span class="kw">templateFile</span>(
-    <span class="dt">name=</span><span class="st">&quot;exampleFunction&quot;</span>,
-    <span class="dt">pck.description=</span>pckg.dscrptn
-  )
-)</code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># you can re-use the package description here, but only a</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="co"># subset of it&#39;s data is needed for templates</span></a>
+<a class="sourceLine" id="cb10-3" title="3">pckg.dscrptn &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</a>
+<a class="sourceLine" id="cb10-4" title="4">  <span class="dt">Package=</span><span class="st">&quot;examplePackage&quot;</span>,</a>
+<a class="sourceLine" id="cb10-5" title="5">  <span class="dt">Author=</span><span class="st">&quot;Ernst A. Dölle &lt;e.a.doelle@example.com&gt;&quot;</span>,</a>
+<a class="sourceLine" id="cb10-6" title="6">  <span class="dt">License=</span><span class="st">&quot;GPL (&gt;= 3)&quot;</span>,</a>
+<a class="sourceLine" id="cb10-7" title="7">  <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb10-8" title="8">)</a>
+<a class="sourceLine" id="cb10-9" title="9"><span class="kw">cat</span>(</a>
+<a class="sourceLine" id="cb10-10" title="10">  <span class="kw">templateFile</span>(</a>
+<a class="sourceLine" id="cb10-11" title="11">    <span class="dt">name=</span><span class="st">&quot;exampleFunction&quot;</span>,</a>
+<a class="sourceLine" id="cb10-12" title="12">    <span class="dt">pck.description=</span>pckg.dscrptn</a>
+<a class="sourceLine" id="cb10-13" title="13">  )</a>
+<a class="sourceLine" id="cb10-14" title="14">)</a></code></pre></div>
 <pre><code># Copyright (C) 2017 Ernst A. Dölle &lt;e.a.doelle@example.com&gt;
 #
 # This file is part of the R package examplePackage.
@@ -377,33 +600,33 @@ pckg.dscrptn &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
 # package as the file COPYING or LICENSE.  If not, see
 # &lt;http://www.gnu.org/licenses/&gt;.
 
-#' Function exampleFunction
-#' 
-#' \code{\link[:]{}}
-#' 
-#' @section &lt;section&gt;: 
-#'   \describe{
-#'     \item{\code{}:} {}
-#'   }
-#' 
-#'   itemize{
-#'     \item{\code{}} {:}
-#'   }
-#' 
-#' @note 
-#' 
-#' @param obj An object of class someClass.
-#' @param ... Additional arguments passed through to \code{\link[somepackage]{somefunction}}.
-#' @return An object of class \code{\link[aPackage]{aFunction-class}}.
-#' @references &lt;ref&gt;
-#' @seealso \code{\link[aPackage]{aFunction}}.
-#' @keywords functions
-#' @rdname exampleFunction
-#' @export
-#' @examples
-#' \dontrun{
-#' exampleFunction()
-#' }
+#&#39; Function exampleFunction
+#&#39; 
+#&#39; \code{\link[:]{}}
+#&#39; 
+#&#39; @section &lt;section&gt;: 
+#&#39;   \describe{
+#&#39;     \item{\code{}:} {}
+#&#39;   }
+#&#39; 
+#&#39;   itemize{
+#&#39;     \item{\code{}} {:}
+#&#39;   }
+#&#39; 
+#&#39; @note 
+#&#39; 
+#&#39; @param obj An object of class someClass.
+#&#39; @param ... Additional arguments passed through to \code{\link[somepackage]{somefunction}}.
+#&#39; @return An object of class \code{\link[aPackage]{aFunction-class}}.
+#&#39; @references &lt;ref&gt;
+#&#39; @seealso \code{\link[aPackage]{aFunction}}.
+#&#39; @keywords functions
+#&#39; @rdname exampleFunction
+#&#39; @export
+#&#39; @examples
+#&#39; \dontrun{
+#&#39; exampleFunction()
+#&#39; }
 
 exampleFunction &lt;- function(
   obj=someClass(),
@@ -415,15 +638,15 @@ exampleFunction &lt;- function(
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="https://CRAN.R-project.org/package=roxygen2" class="uri">https://CRAN.R-project.org/package=roxygen2</a><a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p><a href="https://www.reaktanz.de/?c=hacking\&amp;s=XiMpLe" class="uri">https://www.reaktanz.de/?c=hacking\&amp;s=XiMpLe</a><a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p>see <a href="https://cran.r-project.org/doc/manuals/R-exts.html" class="uri">https://cran.r-project.org/doc/manuals/R-exts.html</a><a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p>see <a href="https://cran.r-project.org/doc/manuals/R-exts.html#The-DESCRIPTION-file" class="uri">https://cran.r-project.org/doc/manuals/R-exts.html#The-DESCRIPTION-file</a><a href="#fnref4">↩</a></p></li>
-<li id="fn5"><p>in accordance with the “Debian R Policy”, <a href="https://lists.debian.org/debian-devel/2003/12/msg02332.html" class="uri">https://lists.debian.org/debian-devel/2003/12/msg02332.html</a><a href="#fnref5">↩</a></p></li>
-<li id="fn6"><p>for a practical example, see <a href="https://reaktanz.de/R/pckg/index.html" class="uri">https://reaktanz.de/R/pckg/index.html</a><a href="#fnref6">↩</a></p></li>
-<li id="fn7"><p>for a practical example, see <a href="https://reaktanz.de/R/pckg/roxyPackage/deb_repo.html" class="uri">https://reaktanz.de/R/pckg/roxyPackage/deb_repo.html</a><a href="#fnref7">↩</a></p></li>
-<li id="fn8"><p>have a look at the documentation for <code>readChangeLog()</code><a href="#fnref8">↩</a></p></li>
-<li id="fn9"><p>for a practical example, see <a href="https://reaktanz.de/R/pckg/roxyPackage/RSS.xml" class="uri">https://reaktanz.de/R/pckg/roxyPackage/RSS.xml</a><a href="#fnref9">↩</a></p></li>
+<li id="fn1"><p><a href="https://CRAN.R-project.org/package=roxygen2" class="uri">https://CRAN.R-project.org/package=roxygen2</a><a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p><a href="https://www.reaktanz.de/?c=hacking\&amp;s=XiMpLe" class="uri">https://www.reaktanz.de/?c=hacking\&amp;s=XiMpLe</a><a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>see <a href="https://cran.r-project.org/doc/manuals/R-exts.html" class="uri">https://cran.r-project.org/doc/manuals/R-exts.html</a><a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn4"><p>see <a href="https://cran.r-project.org/doc/manuals/R-exts.html#The-DESCRIPTION-file" class="uri">https://cran.r-project.org/doc/manuals/R-exts.html#The-DESCRIPTION-file</a><a href="#fnref4" class="footnote-back">↩</a></p></li>
+<li id="fn5"><p>in accordance with the “Debian R Policy”, <a href="https://lists.debian.org/debian-devel/2003/12/msg02332.html" class="uri">https://lists.debian.org/debian-devel/2003/12/msg02332.html</a><a href="#fnref5" class="footnote-back">↩</a></p></li>
+<li id="fn6"><p>for a practical example, see <a href="https://reaktanz.de/R/pckg/index.html" class="uri">https://reaktanz.de/R/pckg/index.html</a><a href="#fnref6" class="footnote-back">↩</a></p></li>
+<li id="fn7"><p>for a practical example, see <a href="https://reaktanz.de/R/pckg/roxyPackage/deb_repo.html" class="uri">https://reaktanz.de/R/pckg/roxyPackage/deb_repo.html</a><a href="#fnref7" class="footnote-back">↩</a></p></li>
+<li id="fn8"><p>have a look at the documentation for <code>readChangeLog()</code><a href="#fnref8" class="footnote-back">↩</a></p></li>
+<li id="fn9"><p>for a practical example, see <a href="https://reaktanz.de/R/pckg/roxyPackage/RSS.xml" class="uri">https://reaktanz.de/R/pckg/roxyPackage/RSS.xml</a><a href="#fnref9" class="footnote-back">↩</a></p></li>
 </ol>
 </div>
 

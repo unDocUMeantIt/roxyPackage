@@ -46,7 +46,7 @@ git_checkout <- function(src_dir, ref){
   }
   
   if(successful_checkout != 0){
-    warning(paste0("git: unable to checkout branch/tag \"", pck.version, "\", are you sure it exists?"))
+    warning(paste0("git: unable to checkout branch/tag \"", ref, "\", are you sure it exists?"))
     return(FALSE)
   } else {
     return(TRUE)
