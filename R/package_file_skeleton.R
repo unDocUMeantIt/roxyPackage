@@ -33,5 +33,13 @@ package_file_skeleton <- function(
         "data"
     )
 ){
-    return("unimplemented")
+    type <- match.arg(type)
+    txt <- switch(
+        type,
+        "function"=paste0(),
+        "S4Class"=paste0(),
+        "S4Method"=paste0(),
+        "data"=paste0()
+    )
+    return(txt)
 }
