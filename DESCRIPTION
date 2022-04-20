@@ -25,8 +25,8 @@ LazyLoad: yes
 Authors@R: c(person(given="m.eik", family="michalke", email="meik.michalke@hhu.de",
           role=c("aut", "cre")), person(given="Robert", family="Nuske", role=c("ctb")))
 Version: 0.10-1
-Date: 2021-05-10
-RoxygenNote: 7.1.1
+Date: 2022-04-12
+RoxygenNote: 7.1.2
 Collate: 
     '00_classes_01_ChangeLog_internal.R'
     '00_classes_02_sandbox_internal.R'
@@ -44,6 +44,7 @@ Collate:
     'news2rss.R'
     'orcid_icon_fetcher.R'
     'package_description.R'
+    'package_file_skeleton.R'
     'rnw2rmd.R'
     'roxy.description.R'
     'roxy.html.R'

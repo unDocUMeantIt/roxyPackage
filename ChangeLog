@@ -1,8 +1,11 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.10-1 (2021-05-10)
+changes in version 0.10-1 (2022-04-12)
 unreleased:
   - this version is under development
+fixed:
+  - news2rss(): adjusted to newer HTML scheme, which now uses <html><body><div>
+    instead of just <html><body> for its content
 
 changes in version 0.06-5 (2021-05-10)
 fixed:

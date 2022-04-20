@@ -41,5 +41,6 @@ package_file_skeleton <- function(
         "S4Method"=paste0(),
         "data"=paste0()
     )
+    warning("this is still a stub!")
     return(txt)
 }

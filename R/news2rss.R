@@ -1,4 +1,4 @@
-# Copyright 2011-2017 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2022 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -121,14 +121,14 @@ news2rss <- function(news, rss=NULL, html=NULL, encoding="UTF-8",
     # if this works it should be relatively easy to make an RSS XML object from this object
     html.tree <- XiMpLe::parseXMLTree(html.tags, object=TRUE)
 
-    # News for Package '*': XiMpLe::node(html.tags, node=list("html","body","h2"))
-    # Changes in * version *: XiMpLe::node(html.tags, node=list("html","body","h3"))
+    # News for Package '*': XiMpLe::node(html.tree, node=list("html","body","div","h2"))
+    # Changes in * version *: XiMpLe::node(html.tree, node=list("html","body","div","h3"))
     # 
     # everything between two <h3>s is news for one release
 
     # we only need the body child nodes to search for news
     # this node() call returns a named list
-    html.body <- XiMpLe::node(html.tree, node=list("html","body"), what="children")
+    html.body <- XiMpLe::node(html.tree, node=list("html","body","div"), what="children")
     # now go through the child nodes and return everything from one <h3> to another
     news.start <- which(names(html.body) %in% "h3")
     # how many news nodes are there?
