@@ -27,6 +27,7 @@ roxy.package(
   Rbuildignore = NULL,
   Rinstignore = NULL,
   OSX.repo = list(main = "contrib", symlinks = "el-capitan"),
+  pck.aliases = NULL,
   ...
 )
 }
@@ -203,6 +204,15 @@ Mac OS X should be copied,
       and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="el-capitan"}
 would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
 make sure they're correctly transferred to your server, where applicable.}
+
+\item{pck.aliases}{A character vector,
+      defining all aliases to be used in the \code{*-package.R} file. The default \code{NULL} results in
+\code{paste0(pck.description[["Package"]], c("",
+      "-package"))} to be set in the \code{*-package.Rd} file after roxygenizing the docs.
+It can be necessary to limit this to \code{paste0(pck.description[["Package"]],
+      "-package")} if your package has the same name as one of its
+exported objects (e.\,
+     g. a function/method) to not end up with two aliases two \code{pck.description[["Package"]]} in different files.}
 
 \item{...}{Additional options passed through to \code{roxygenize}.}
 }

@@ -1,4 +1,4 @@
-# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2022 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -189,6 +189,10 @@
 #'    Mac OS X should be copied, and the second optional one named \code{"symlink"} can be used to set symbolic links, e.g., \code{symlinks="el-capitan"}
 #'    would also make the repository available via \code{./bin/macosx/mavericks}. Symbolic links will be ignored when run on on Windows. If you use them,
 #'    make sure they're correctly transferred to your server, where applicable.
+#' @param pck.aliases A character vector, defining all aliases to be used in the \code{*-package.R} file. The default \code{NULL} results in
+#'    \code{paste0(pck.description[["Package"]], c("", "-package"))} to be set in the \code{*-package.Rd} file after roxygenizing the docs.
+#'    It can be necessary to limit this to \code{paste0(pck.description[["Package"]], "-package")} if your package has the same name as one of its
+#'    exported objects (e.\,g. a function/method) to not end up with two aliases two \code{pck.description[["Package"]]} in different files.
 #' @param ... Additional options passed through to \code{roxygenize}.
 #' @references
 #' [1] \url{https://CRAN.R-project.org/package=roxygen2}
@@ -265,6 +269,7 @@ roxy.package <- function(
   Rbuildignore=NULL,
   Rinstignore=NULL,
   OSX.repo=list(main="contrib", symlinks="el-capitan"),
+  pck.aliases=NULL,
   ...){
   
   # ensure backwards compatibility
@@ -488,7 +493,13 @@ roxy.package <- function(
     pckg.dscrptn <- roxy.description("description", description=pck.description, version=pck.version, date=as.character(pck.date))
     pckg.license <- pck.description[["License"]]
   }
-  pckg.package <- roxy.description("pckg.description", description=pck.description, version=pck.version, date=as.character(pck.date))
+  pckg.package <- roxy.description(
+    "pckg.description",
+    description=pck.description,
+    version=pck.version,
+    date=as.character(pck.date),
+    pck.aliases=pck.aliases
+  )
 
   ## check for sandboxing
   if(isTRUE(check.sandbox())){

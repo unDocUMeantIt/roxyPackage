@@ -1,11 +1,16 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.10-1 (2022-04-12)
+changes in version 0.10-1 (2022-06-28)
 unreleased:
   - this version is under development
 fixed:
   - news2rss(): adjusted to newer HTML scheme, which now uses <html><body><div>
     instead of just <html><body> for its content
+added:
+  - roxy.package(): new argument "pck.aliases" to manually define aliases used
+    in the *-package.Rd file, useful if your package has the same name as one of its
+    functions or methods
+  - roxy.package(): added usethis block to *-package.Rd file
 
 changes in version 0.06-5 (2021-05-10)
 fixed:

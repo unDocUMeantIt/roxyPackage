@@ -1,4 +1,4 @@
-# Copyright 2011-2018 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2022 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -18,7 +18,7 @@
 
 ## function roxy.description()
 # create package description
-roxy.description <- function(val, description, version=NULL, date=NULL){
+roxy.description <- function(val, description, version=NULL, date=NULL, pck.aliases=NULL){
 
   if(!is.null(version)){
     description[["Version"]] <- version
@@ -65,6 +65,16 @@ roxy.description <- function(val, description, version=NULL, date=NULL){
     pck.type <- "Package"
   }
 
+  if(is.character(pck.aliases)){
+    if(all(nchar(pck.aliases) > 0)){
+      pck_aliases <- paste0("\n#' @aliases\n#' ", paste0(pck.aliases, collapse=" "))
+    } else {
+      stop(simpleError("empty values are not valid for \"pck.aliases\"!"))
+    }
+  } else {
+    pck_aliases <- ""
+  }
+
   pckg.package.v <- paste0(
 #       "#' \\packageDescription{",description[["Package"]],"}\n#'",
       "#' \\packageDescription{",description[["Package"]],"}\n#'\n#' The DESCRIPTION file:\n#' \\tabular{ll}{",
@@ -79,12 +89,18 @@ roxy.description <- function(val, description, version=NULL, date=NULL){
       "\n#' @title\n#' \\packageTitle{",description[["Package"]],"}",
       "\n#' @author\n#' \\packageAuthor{",description[["Package"]],"}\n#'",
       "\n#' Maintainer: \\packageMaintainer{",description[["Package"]],"}",
+      pck_aliases,
       ## TODO:
       #"\n#' @references",
       #"\n#' @seealso",
       #"\n#' @examples",
       #"\n#' @keywords package",
-      "\n\"_PACKAGE\"\n"
+      "\n\"_PACKAGE\"\n",
+      "\n# The following block is used by usethis to automatically manage",
+      "\n# roxygen namespace tags. Modify with care!",
+      "\n## usethis namespace: start",
+      "\n## usethis namespace: end",
+      "\nNULL"
   )
   if(identical(val, "pckg.description")){
     return(pckg.package.v)
