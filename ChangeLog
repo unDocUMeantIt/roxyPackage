@@ -11,6 +11,8 @@ added:
     in the *-package.Rd file, useful if your package has the same name as one of its
     functions or methods
   - roxy.package(): added usethis block to *-package.Rd file
+  - roxy.package(): added generator note to *-package.Rd file, so you know it
+    won't last long if you edited the file manually
 
 changes in version 0.06-5 (2021-05-10)
 fixed:
