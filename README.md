@@ -40,9 +40,8 @@ If you're running a Debian based operating system, you might be interested in th
 To install it directly from GitHub, you can use `install_github()` from the [devtools](https://github.com/hadley/devtools) package:
 
 ```r
-library(devtools)
-install_github("unDocUMeantIt/roxyPackage") # stable release
-install_github("unDocUMeantIt/roxyPackage", ref="develop") # development release
+devtools::install_github("unDocUMeantIt/roxyPackage") # stable release
+devtools::install_github("unDocUMeantIt/roxyPackage", ref="develop") # development release
 ```
 
 ### Not on CRAN
@@ -64,7 +63,7 @@ branch will be rejected, as it is reserved for the current stable release.
 
 ## Licence
 
-Copyright 2012-2021 Meik Michalke <meik.michalke@hhu.de>
+Copyright 2012-2022 Meik Michalke <meik.michalke@hhu.de>
 
 roxyPackage is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
