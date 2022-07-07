@@ -116,6 +116,9 @@ news2rss <- function(news, rss=NULL, html=NULL, encoding="UTF-8",
         html.tags,
         ignore.case=TRUE, perl=TRUE)
     }
+    # in R 4.2 am empty argument "defer" was added to a <script> tag which
+    # confuses XiMpLe
+    html.tags <- gsub(" defer ", " defer=\"defer\" ", html.tags, ignore.case=TRUE)
 
     ## get HTML tree
     # if this works it should be relatively easy to make an RSS XML object from this object

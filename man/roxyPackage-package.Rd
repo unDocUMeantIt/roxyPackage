@@ -14,7 +14,7 @@ The DESCRIPTION file:
 Package: \tab roxyPackage\cr
 Type: \tab Package\cr
 Version: \tab 0.10-1\cr
-Date: \tab 2022-06-28\cr
+Date: \tab 2022-07-07\cr
 Depends: \tab R (>= 3.0.0)\cr
 Encoding: \tab UTF-8\cr
 License: \tab GPL (>= 3)\cr
