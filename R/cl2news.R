@@ -1,4 +1,4 @@
-# Copyright 2011-2014 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2022 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -31,7 +31,7 @@
 #' The ChangeLog related functions and methods of this package, e.g. \code{\link[roxyPackage:initChangeLog]{initChangeLog}}, are
 #' a convenient way to maintain R ChangeLogs in a proper format.
 #' 
-#' This function is basically a wrapper for the internal function \code{tools::news2Rd}.
+#' This function is basically a wrapper for the internal function \code{tools:::news2Rd}.
 #' 
 #' @param log Character string, path to the ChangeLog or NEWS file to be converted.
 #' @param news Character string, path to the NEWS.Rd file to be written.
