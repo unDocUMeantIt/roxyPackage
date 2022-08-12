@@ -727,7 +727,7 @@ roxy.package <- function(
     files_changed <- c()
     if(length(Rd.files)){
       for (this.file in Rd.files){
-        # this step both checks the files and changes them if neccessary,
+        # this step both checks the files and changes them if necessary,
         # and keeps track of changes
         if(isTRUE(sanitizeRdFiles(this.file, root.dir=pckg.man.dir, maxlength=90))){
           files_changed <- c(files_changed, this.file)
