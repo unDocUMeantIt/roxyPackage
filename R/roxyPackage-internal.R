@@ -560,7 +560,7 @@ sanitizeRdFiles <- function(
   RdFileFullPath <- ifelse(is.null(root.dir), RdFile, file.path(root.dir, RdFile))
   # read in the Rd file
   origFile <- readLines(RdFileFullPath)
-  # we'll use the autoLineBreak() function defined in 01_methods_01_ChangeLog.R:
+  # we'll use the autoLineBreak() function defined in 01_methods_02_ChangeLog_internal.R:
   newFile <- autoLineBreak(origFile, lineEnd=maxlength, breakAt=c(","), breakBy=",\n     ", preserveCommentChar=preserveCommentChar)
   # just in case no comma split was possible
   # newFile <- autoLineBreak(newFile, lineEnd=maxlength, breakAt=c(" "), breakBy="\n     ")
