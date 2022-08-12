@@ -1,12 +1,15 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.10-1 (2022-07-07)
+changes in version 0.10-1 (2022-08-12)
 unreleased:
   - this version is under development
 fixed:
   - news2rss(): adjusted to newer HTML scheme, which now uses <html><body><div>
     instead of just <html><body> for its content; also a workaround was added
     for XiMpLe getting confused by an empty "defer" argument
+  - debianizeKeyring(): default package description now uses a proper synopsis
+  - debianize()/debianizeKeyring(): description lines are now adjusted to adhere
+    to the 80 character limit
 added:
   - roxy.package(): new argument "pck.aliases" to manually define aliases used
     in the *-package.Rd file, useful if your package has the same name as one of its
@@ -14,6 +17,11 @@ added:
   - roxy.package(): added usethis block to *-package.Rd file
   - roxy.package(): added generator note to *-package.Rd file, so you know it
     won't last long if you edited the file manually
+changed:
+  - debianize()/debianizeKeyring(): lifted Standards-Version to 4.6.1.1 and
+    changed Priority from "extra" to "optional" also for keyring packages
+  - internally, private function autoLineBreak() is now a mere wrapper for
+    strwrap() for simple cases
 
 changes in version 0.06-5 (2021-05-10)
 fixed:

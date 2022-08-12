@@ -1,4 +1,4 @@
-# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2022 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -703,7 +703,7 @@ deb.gen.control <- function(srcs.name, deb.name, description, R.dscrptn, deb.dir
     if("Build.Depends" %in% names(description)){
       deb.txt.control.src$`Build-Depends` <- description[["Build.Depends"]]
     } else {}
-    deb.txt.control.src$`Standards-Version` <- "3.9.3.1"
+    deb.txt.control.src$`Standards-Version` <- "4.6.1.1"
 
     if(is.null(fullDescription)){
       fullDescription <- as.character(R.dscrptn[["Description"]])
@@ -737,9 +737,9 @@ deb.gen.control <- function(srcs.name, deb.name, description, R.dscrptn, deb.dir
     }
 
     # write the control file
-    write.dcf(deb.txt.control.src, file=file, append=FALSE, indent=1)
+    write.dcf(deb.txt.control.src, file=file, append=FALSE, indent=1, width=80)
     cat("\n", file=file, append=TRUE)
-    write.dcf(deb.txt.control.pck, file=file, append=TRUE, indent=1)
+    write.dcf(deb.txt.control.pck, file=file, append=TRUE, indent=1, width=80)
     message(paste0(action, ": debian/control updated."))
   } else {}
   return(TRUE)

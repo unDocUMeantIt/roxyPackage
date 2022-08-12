@@ -54,7 +54,12 @@ setAs(from="list", to="ChangeLog.items", function(from){
 # still has the needed comment character, so the Rd file is broken. to work around this, the
 # "preserveCommentChar" option can be used. set it to "%" to ensure that comment lines always start with "%"
 autoLineBreak <- function(text, lineEnd=78, breakAt=c(" "), breakBy="\n", preserveCommentChar=NULL){
-  results <- sapply(text, function(thisText){
+  if(all(identical(breakAt, " "), is.null(preserveCommentChar))){
+    # simple case, we can just leave it to strwrap()
+    results <- paste0(strwrap(x=text, width=lineEnd), collapse=breakBy)
+  } else {
+    # TODO: replace chunks of this code with strwrap() as well, should be much more efficient
+    results <- sapply(text, function(thisText){
       if(nchar(thisText) > lineEnd){
         if(is.null(preserveCommentChar)){
           needCommentChecks <- FALSE
@@ -63,7 +68,7 @@ autoLineBreak <- function(text, lineEnd=78, breakAt=c(" "), breakBy="\n", preser
           needCommentChecks <- grepl(paste0("^[[:space:]]*", preserveCommentChar), thisText)
         }
         if(isTRUE(needCommentChecks)){
-	  lineStart <- gsub("^([[:space:]]*%)(.*)", "\\1", thisText)
+          lineStart <- gsub("^([[:space:]]*%)(.*)", "\\1", thisText)
           lineEnd <- lineEnd - nchar(lineStart)
           breakBy <- paste0(breakBy, lineStart)
         } else {}
@@ -90,6 +95,7 @@ autoLineBreak <- function(text, lineEnd=78, breakAt=c(" "), breakBy="\n", preser
         return(thisText)
       }
     })
+  }
   return(as.character(results))
 } ## end function autoLineBreak()
 

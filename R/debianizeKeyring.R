@@ -1,4 +1,4 @@
-# Copyright 2014-2020 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2014-2022 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -98,8 +98,9 @@ debianizeKeyring <- function(
   urgency="low",
   URL=NULL,
   changelog=c("new upstream release"),
-  description=paste("OpenPGP keyring for Debian packages hosted at the", repo.name, "repository.",
-    "This keyring is necessary to use secure apt."),
+  description=paste0("OpenPGP keyring for the ", repo.name, " repository\n\n",
+    "Provides the keyring for Debian packages hosted at the ", repo.name,
+    " repository. It is necessary to be able to use secure apt."),
   actions=c("bin", "src"),
   overwrite=c("changelog", "control", "copyright", "install", "rules", "compat"),
   bin.opts="-rfakeroot -b -uc",
@@ -213,7 +214,7 @@ debianizeKeyring <- function(
     arch="all",
     defaults=list(
       Section="misc",
-      Priority="extra",
+      Priority="optional",
       Depends="gpgv, ${misc:Depends}",
       "Build.Depends.Indep"="debhelper (>> 9.0.0), cdbs",
       Homepage=URL
