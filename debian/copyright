@@ -16,9 +16,9 @@ Comment:
   found in /usr/lib/R/site-library/roxyPackage/DESCRIPTION.
 
 Files: *
-Copyright: 2021 m.eik michalke
+Copyright: 2023 m.eik michalke
 License: GPL (>= 3)
-  roxyPackage Copyright (C) 2021 m.eik michalke, released under the
+  roxyPackage Copyright (C) 2023 m.eik michalke, released under the
   GNU General Public License (GPL) version 3 or (at your option) any later version.
   .
   This software is distributed in the hope that it will be useful, but

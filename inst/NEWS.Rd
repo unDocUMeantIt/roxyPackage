@@ -1,6 +1,46 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
+\section{Changes in roxyPackage version 0.10-1 (2023-03-03)}{
+  \subsection{fixed}{
+    \itemize{
+      \item \code{news2rss()}: adjusted to newer HTML scheme, which now uses
+        <html><body><div> instead of just <html><body> for its content; also a
+        workaround was added for XiMpLe getting confused by an empty \code{"defer"}
+        argument
+      \item \code{debianizeKeyring()}: default package description now uses a proper
+        synopsis
+      \item \code{debianize()}/debianizeKeyring(): description lines are now adjusted to
+        adhere to the 80 character limit
+      \item \code{roxy.html()}: tracked down an issue that prevented the generation of
+        index.html files because \code{XMLNode()} was given a list
+    }
+  }
+  \subsection{added}{
+    \itemize{
+      \item \code{roxy.package()}: new argument \code{"pck.aliases"} to manually define aliases
+        used in the *-package.Rd file, useful if your package has the same name
+        as one of its functions or methods
+      \item \code{roxy.package()}: added usethis block to *-package.Rd file
+      \item \code{roxy.package()}: added generator note to *-package.Rd file, so you know it
+        won't last long if you edited the file manually
+    }
+  }
+  \subsection{changed}{
+    \itemize{
+      \item \code{debianize()}/debianizeKeyring(): lifted Standards-Version to 4.6.1.1,
+        compat level to 10, and changed Priority from \code{"extra"} to \code{"optional"} also
+        for keyring packages
+      \item internally, private function \code{autoLineBreak()} is now a mere wrapper for
+        \code{strwrap()} for simple cases
+      \item package now depends on XiMpLe >=0.11-1, making workarounds for empty XML
+        attributes obsolete
+      \item internally, XML/HTML code is no longer generated using \code{XiMpLe::XMLNode()},
+        but helper functions like \code{a_()} or \code{span_()}, using
+        \code{XiMpLe::gen_tag_functions()}
+    }
+  }
+}
 \section{Changes in roxyPackage version 0.06-5 (2021-05-10)}{
   \subsection{fixed}{
     \itemize{
@@ -8,10 +48,10 @@
         in the format URL
       \item \code{debianizeKeyring()}: no longer use ASCII armored key files but binary only
       \item \code{debianizeKeyring()}: dropped deprecated support for
-        /etc/apt/trusted.gpg.d/, also "apt-key add" is no longer used. keys are just copied to
-        /usr/share/keyrings/ and therefore *must* be pinned explicitly for the reposiory
-        via "[signed-by=/usr/share/keyrings/...]". this is the more secure approach,
-        but wasn't supported before 2017
+        /etc/apt/trusted.gpg.d/, also "apt-key add" is no longer used. keys are
+        just copied to /usr/share/keyrings/ and therefore *must* be pinned
+        explicitly for the reposiory via "[signed-by=/usr/share/keyrings/...]".
+        this is the more secure approach, but wasn't supported before 2017
       \item \code{roxy.package()}: if roxyPackage was in sandbox mode, there were issues
         finding the RSS image
     }
@@ -23,8 +63,9 @@
       \item \code{roxy.package()}: new action \code{"gitCheckout"} to switch to a tagged release
         for binary rebuilds, works well in sandbox mode
       \item \code{roxy.package()}: HTML page for debain package installation now explains
-        how to break the circle and successfully install the keyring package if apt
-        refuses to install it because the keyring package wasn't installed yet
+        how to break the circle and successfully install the keyring package if
+        apt refuses to install it because the keyring package wasn't installed
+        yet
       \item \code{roxy.package()}: HTML page now links to ORCID if a valid ID is provided as
         a person's comment named \code{"ORCID"}; it will ask you to call
         \code{orcid_icon_fetcher()} as well, to fetch the correct icon file
@@ -86,9 +127,9 @@
         \code{"deb.options"}
       \item \code{roxy.description()}: updated internal function responsible for setting up
         the *-package.R file to use more macros (\\packageTitle\{\},
-        \\packageDescription\{\}, \\packageAuthor\{\}, and \\packageMaintainer\{\}); didn't yet get
-        \\packageDESCRIPTION\{\} or \\packageIndices\{\} to generate useful info, so that's
-        still done the old way
+        \\packageDescription\{\}, \\packageAuthor\{\}, and \\packageMaintainer\{\});
+        didn't yet get \\packageDESCRIPTION\{\} or \\packageIndices\{\} to generate
+        useful info, so that's still done the old way
     }
   }
 }
@@ -130,9 +171,9 @@
         to keep supporting R 2.14 and even earlier were removed. no-one should
         use that any longer
       \item the arguments 'html.index' and 'html.title' were moved to 'index' and
-        'title' of a new option list called 'html.options' for more consistency; old
-        code should still work for the time being, but trigger a warning -- please
-        update your scripts!
+        'title' of a new option list called 'html.options' for more consistency;
+        old code should still work for the time being, but trigger a warning --
+        please update your scripts!
       \item cleaned up dependencies, now using mostly imports instead
       \item set debhelper default dependency to >> 9.0.0 (instead of >> 7.0.0)
       \item worked around the news2Rd issue by copying the function to the internal
@@ -144,10 +185,10 @@
         top level directory and link to ../contrib, to work around issues with
         infinite link loops; this does not affect existing repos, only new ones
       \item since Flattr totally changed its API and stuff, the Flattr integration
-        was updated. no more buttons will be generated, instead a meta tag is added
-        to HTML and/or markdown documents. this also means you need to remove the
-        'flattrUser' value from 'readme.options' and add your meta tag ID to the
-        new 'html.options' for this to work correctly
+        was updated. no more buttons will be generated, instead a meta tag is
+        added to HTML and/or markdown documents. this also means you need to
+        remove the 'flattrUser' value from 'readme.options' and add your meta tag
+        ID to the new 'html.options' for this to work correctly
       \item vignette is now in RMarkdown/HTML format; the SWeave/PDF version was
         dropped
     }
@@ -157,12 +198,14 @@
       \item \code{rnw2rmd()}: new function that tries to convert Sweave vignettes into R
         markdown
       \item \code{package_description()}: new function to make it easier to generate proper
-        package description objects (prevent typos, demand mandatory fields, value
-        checks)
+        package description objects (prevent typos, demand mandatory fields,
+        value checks)
       \item \code{debianize()}: explain in the docs that setting a package in
-        \code{"depends.origin.alt"} to NULL will enable you to provide the full R debian package name
+        \code{"depends.origin.alt"} to NULL will enable you to provide the full R debian
+        package name
       \item \code{roxy.html()}: URLs in the form of "(... <...>)" are now automatically
-        turned into <a href> nodes; i hope the parser doesn't introduce new issues
+        turned into <a href> nodes; i hope the parser doesn't introduce new
+        issues
       \item \code{roxy.html()}: fields \code{"Additional_repositories"} and \code{"NeedsCompilation"} are
         now also evaluated
       \item \code{roxy.package()}: vignette generation now takes an existing .install_extras
@@ -170,10 +213,10 @@
       \item \code{roxy.package()}: new action \code{"vignette"} can be used to generate an initial
         vignette stub file
       \item \code{roxy.package()}: new action \code{"buildVignettes"} forces rebuilding all
-        vignettes during the \code{"package"} action, to make sure a proper vignette index is
-        present in the source tarball; this was made configurable via its own action
-        because it is a bit time consuming during builds and usually only
-        neccessary for actual releases
+        vignettes during the \code{"package"} action, to make sure a proper vignette
+        index is present in the source tarball; this was made configurable via
+        its own action because it is a bit time consuming during builds and
+        usually only neccessary for actual releases
     }
   }
 }
@@ -192,9 +235,9 @@
   \subsection{changed}{
     \itemize{
       \item R versions older that 3.0 should no longer be around (it was released
-        four years ago). support for these older versions will be removed in one of
-        the future releases. for now, a warning is shown, announcing that use with
-        R <3.0 is deprecated
+        four years ago). support for these older versions will be removed in one
+        of the future releases. for now, a warning is shown, announcing that use
+        with R <3.0 is deprecated
       \item \code{debianize()}: the R version used for build dependencies in \code{"control"} is
         now taken from DESCRIPTION by default, not the current version
       \item \code{debianize()}: the package description in \code{"control"} is now similar to
@@ -205,8 +248,8 @@
       \item \code{roxy.html()}: HTML page now lists all contributors indicating their roles
         (contributed by robert nuske)
       \item \code{roxy.package()}: checks should be done on built packages, the \code{"check"}
-        action now throws a warning if checks are done on unpackaged sources (which is
-        the case if you omit the \code{"package"} action)
+        action now throws a warning if checks are done on unpackaged sources
+        (which is the case if you omit the \code{"package"} action)
       \item \code{roxy.html()}: we're now also including the comments of person objects
       \item \code{roxy.package()}: the README.md file generated by the \code{"readme"} action now
         flags the installation code as R syntax
@@ -225,10 +268,11 @@
       \item \code{roxy.package()}: the HTML instructions for debian packages now also lists
         the package source files
       \item new EXPERIMENTAL feature: there are cases where \code{roxygenize()} somehow
-        fails but e.g. \code{document()} of the devtools package doesn't. you can now use
-        roxyPackage:::set.roxyEnv(name=\code{"roxyFunction"}, value=devtools::document) to
-        overwrite the function that is being used to roxygenize the docs. use this
-        with caution! it is experimental for a reason!
+        fails but e.g. \code{document()} of the devtools package doesn't. you can now
+        use roxyPackage:::set.roxyEnv(name=\code{"roxyFunction"},
+        value=devtools::document) to overwrite the function that is being used to
+        roxygenize the docs. use this with caution! it is experimental for a
+        reason!
       \item \code{roxy.html()}: HTML page now also lists LinkingTo: and SystemRequirements:
         if present (contributed by robert nuske)
       \item \code{roxy.package()}: source and windows builds now also include an MD5 file
@@ -247,11 +291,11 @@
     \itemize{
       \item added \code{"readme"} action to vignette
       \item changed the docs to suggest to give the most recent R version first in
-        line when building for multiple versions. the debianizing is now also done
-        during the first run
+        line when building for multiple versions. the debianizing is now also
+        done during the first run
       \item internal function \code{GPGsign()} now forces both cert-digest-algo and
-        digest-algo to be set to SHA256; for now, this is hard coded but could be made
-        configurable if requested
+        digest-algo to be set to SHA256; for now, this is hard coded but could be
+        made configurable if requested
       \item reaktanz.de supports HTTPS now, updated references
     }
   }
@@ -262,7 +306,8 @@
       \item HTML page now also lists Imports and BugReports, which can either be a
         URL or mail address (contributed by robert nuske)
       \item if all of 'Date', 'Packaged', and 'Date/Publication' are missing in
-        DESCRIPTION, pck.date will now be used as well (contributed by robert nuske)
+        DESCRIPTION, pck.date will now be used as well (contributed by robert
+        nuske)
       \item support for vignette types other than PDF (contributed by robert nuske)
     }
   }
@@ -271,8 +316,8 @@
   \subsection{fixed}{
     \itemize{
       \item R CMD check should be performed on built packages, not source
-        directories. this is now the case if you run the \code{"check"} action also with \code{"package"}
-        enabled
+        directories. this is now the case if you run the \code{"check"} action also with
+        \code{"package"} enabled
       \item fixed a path issue causing problems to find package sources when in full
         sandboxing mode, most importantly, this affected the internal function
         \code{prep.sndbx.source.dir()}
@@ -318,8 +363,8 @@
   \subsection{fixed}{
     \itemize{
       \item re-activated the unit tests that were shut down with 0.03-11 due to
-        https://github.com/hadley/testthat/issues/86 as there's now a workaround fixing
-        tests/testthat.R
+        https://github.com/hadley/testthat/issues/86 as there's now a workaround
+        fixing tests/testthat.R
       \item removed leftover tests/test_roxyPackage_package.R
       \item updated URL to roxygen2 in docs
       \item fixed title case in title field
@@ -362,23 +407,24 @@
       \item newlines in DESCRIPTION caused \code{debianize()} to misread dependency
         information and quit with an error
       \item roxygen2 can produce too long comment lines in Rd file heads; using
-        \code{"cleanRd"} on this resulted in broken Rd files because the comment char was
-        missing
+        \code{"cleanRd"} on this resulted in broken Rd files because the comment char
+        was missing
     }
   }
   \subsection{changed}{
     \itemize{
       \item removed the options \code{"local.roxy.dir"} and \code{"roxy.unlink.target"} from
-        \code{roxy.package()}, as their counterparts are no longer supported by roxygen2. if
-        you still need those options (working with ancient roxygen2 versions), use
-        \code{"roxygen.dir"} and \code{"unlink.target"} in \code{"..."} instead
+        \code{roxy.package()}, as their counterparts are no longer supported by
+        roxygen2. if you still need those options (working with ancient roxygen2
+        versions), use \code{"roxygen.dir"} and \code{"unlink.target"} in \code{"..."} instead
       \item removed the workaround call to \code{roxygen2:::source_package()} as well, it
         doesn't seem to be necessary any longer
       \item \code{roxy.package()} now uses "--install-tests" as default option for "R CMD
         install"
       \item \code{debianize()} now passes \code{"build.dir"} on to \code{debianizeKeyring()} as a default
       \item \code{debianize()} now uses dch and dpkg-parsechangelog to manage
-        debain/changelog, which is much more robust than the previous construction
+        debain/changelog, which is much more robust than the previous
+        construction
     }
   }
   \subsection{added}{
@@ -394,8 +440,8 @@
     \itemize{
       \item \code{tools::buildVignettes()} doesn't produce PDFs if they are already present;
         remove present PDFs, if the \code{"doc"} action is active. the vignettes
-        creation was reworked to deal with vignettes directories more smoothly, e.g.
-        create inst/doc and copy results and sources there
+        creation was reworked to deal with vignettes directories more smoothly,
+        e.g. create inst/doc and copy results and sources there
       \item \code{debianize()} didn't auto-append default dependencies correctly
       \item docs of \code{debianize()} falsely still said that source packaging wasn't
         implemented
@@ -404,18 +450,19 @@
       \item \code{debianize()} didn't get multiple authors quite all right
       \item the copyright file generated by \code{debianize()} missed out the homepage and
         overwrite rule
-      \item signature changes to \code{roxygenize()} in roxygen2 >= 4.0.0 are now implemented
+      \item signature changes to \code{roxygenize()} in roxygen2 >= 4.0.0 are now
+        implemented
       \item the logic to remove build directories for debian packages could have
-        dangerous consequences if you chose them unwise; now, the directory will only
-        be removed if it was empty before the build process
+        dangerous consequences if you chose them unwise; now, the directory will
+        only be removed if it was empty before the build process
     }
   }
   \subsection{changed}{
     \itemize{
       \item \code{debianize()} gained the new argument \code{"repo.name"}, used for generating a
-        debian package from the OpenPGP key used for secure apt. you should set this
-        to something different from the default if you plan to actually publish
-        the repository -- if you don't, you'll get a warning
+        debian package from the OpenPGP key used for secure apt. you should set
+        this to something different from the default if you plan to actually
+        publish the repository -- if you don't, you'll get a warning
       \item expect gpg2 as the default (earlier versions defaulted to gpg)
       \item moved code for generation of several debian package files into autonomous
         internal functions
@@ -443,15 +490,16 @@
         an existing DESCRIPTION file. working around that by moving the calls to
         a place where the file should be present already
       \item added a workaround for roxygen2 >= 3.0.0, calling
-        \code{roxygen2:::source_package()} to overcome unsolved issues with its S4 implementation
+        \code{roxygen2:::source_package()} to overcome unsolved issues with its S4
+        implementation
     }
   }
   \subsection{changed}{
     \itemize{
       \item managed to remove some of the \code{setwd()} calls, but some don't seem to be
         replaceable as of now. this seems to trigger the problems with the unit
-        tests, so they remain deactivated in tests/ test_roxyPackage_package.R, but
-        have been revived in inst/tests/test,R
+        tests, so they remain deactivated in tests/ test_roxyPackage_package.R,
+        but have been revived in inst/tests/test,R
       \item added a proper GPL notice at the beginning of each R file
       \item replaced all tabs in the source code by two space characters
     }
@@ -468,10 +516,10 @@
         "--no-build-vignettes"
       \item corrected some ::: operators into ::
       \item new action \code{"cleanRd"} checks for lines longer than 90 chars in Rd files
-        and adds automatic line breaks (with a warning). otherwise R CMD check would
-        complain and the package wouldn't be accepted on CRAN. this is actually a
-        workaround for a bug in roxygen2, regarding automatically generated usage
-        sections
+        and adds automatic line breaks (with a warning). otherwise R CMD check
+        would complain and the package wouldn't be accepted on CRAN. this is
+        actually a workaround for a bug in roxygen2, regarding automatically
+        generated usage sections
       \item in the generated DESCRIPTION file, authors and contributors will no
         longer be listed with their e-mail address, just plain names
       \item sandboxing and running the \code{"check"} action now also copies suggested
@@ -482,9 +530,9 @@
     \itemize{
       \item removed the unit tests for this release, because they suddenly stopped
         working with "R CMD check" (while still running fine from an R session).
-        i.e., it's not that the tests themselves fail, but the testthat package stops
-        with yet mysterious errors. i filed a report, hope this can be solved
-        soon: https://github.com/hadley/testthat/issues/86
+        i.e., it's not that the tests themselves fail, but the testthat package
+        stops with yet mysterious errors. i filed a report, hope this can be
+        solved soon: https://github.com/hadley/testthat/issues/86
     }
   }
   \subsection{changed}{
@@ -494,20 +542,21 @@
       \item internal function \code{autoLineBreak()} returns a nameless character vector now
       \item beginning with this version, roxyPackage is no longer hosted on CRAN. its
         policies and checks have become more strict over time, and since the
-        alternative would have been to reduce this package's features to remain in
-        full compliance, i decided to have the package removed instead. the problem
-        is this: the NEWS.Rd related features rely on calls to the internal
-        function \code{tools:::news2Rd()}, as is even recommended in the manual to \code{news()}; CRAN
-        doesn't allow this use of an internal functions, even if it's exactly what
-        the R docs say.
+        alternative would have been to reduce this package's features to remain
+        in full compliance, i decided to have the package removed instead. the
+        problem is this: the NEWS.Rd related features rely on calls to the
+        internal function \code{tools:::news2Rd()}, as is even recommended in the manual
+        to \code{news()}; CRAN doesn't allow this use of an internal functions, even if
+        it's exactly what the R docs say.
     }
   }
   \subsection{added}{
     \itemize{
       \item another EXPERIMENTAL feature: call
-        'roxyPackage:::set.roxyEnv(name=\code{"Rdevel"}, value=TRUE)' and 'roxyPackage:::set.roxyEnv(name=\code{"Rversion"},
-        value=\code{"x.y.z"})' to manually set an arbitrary R version string to be able to build
-        against bleeding edge R-devel installations
+        'roxyPackage:::set.roxyEnv(name=\code{"Rdevel"}, value=TRUE)' and
+        'roxyPackage:::set.roxyEnv(name=\code{"Rversion"}, value=\code{"x.y.z"})' to manually
+        set an arbitrary R version string to be able to build against bleeding
+        edge R-devel installations
       \item new \code{roxy.package()} arguments \code{"Rbuildignore"} and \code{"Rinstignore"} can be used
         to control .Rbuildignore and .Rinstignore files, respectively
     }
@@ -535,18 +584,19 @@
     \itemize{
       \item internal function \code{dateRFC2822()} now always forces LC_TIME into locale \code{"C"}
         temporarily, instead of trying to use "en_GB.UTF-8" (which is not
-        available on all machines). this small function is needed for timestamps in
-        Debian changelogs
+        available on all machines). this small function is needed for timestamps
+        in Debian changelogs
       \item fixed the split-up of debinaizing actions for multiple R installations:
-        the previous implementation accidently dropped package building completely
+        the previous implementation accidently dropped package building
+        completely
     }
   }
   \subsection{added}{
     \itemize{
       \item new function \code{dep4deb()} can recursively download dependencies for a given
         package. this is still in its early stages and probably buggy, and i am
-        also considering placing all Debian related functionality into a package of
-        its own (which would become a dependency of roxyPackage), soon.
+        also considering placing all Debian related functionality into a package
+        of its own (which would become a dependency of roxyPackage), soon.
     }
   }
 }
@@ -574,8 +624,8 @@
         debhelper >= 7.0.0 (instead of >= 4.1.0) if none are given
       \item \code{debianize()} doesn't set the maintainer of upstream as the debian package
         maintainer by default any longer, but generates a maintainer ID from
-        system information and throws a warning. this should encourage everyone to set
-        at least valid maintainer information manually
+        system information and throws a warning. this should encourage everyone
+        to set at least valid maintainer information manually
       \item if multiple R installations are provided, the \code{"deb"} action will be split
         up: debianizing the sources will be done during first run, but package
         building during the last
@@ -586,7 +636,8 @@
   \subsection{fixed}{
     \itemize{
       \item OS X binary packages for R >= 3.0.0 will now be stored in
-        $REPOSITORY/bin/macosx/contrib, and no longer in $REPOSITORY/bin/macosx/leopard/contrib
+        $REPOSITORY/bin/macosx/contrib, and no longer in
+        $REPOSITORY/bin/macosx/leopard/contrib
     }
   }
 }
@@ -594,9 +645,9 @@
   \subsection{added}{
     \itemize{
       \item \code{debianize()} now supports both strict package names according to the
-        Debain R Policy as well as package names with a dot, whichever is expected by
-        your r-cran.mk file. Ignoring the policy is the default, as that is the
-        de-facto standard.
+        Debain R Policy as well as package names with a dot, whichever is
+        expected by your r-cran.mk file. Ignoring the policy is the default, as
+        that is the de-facto standard.
     }
   }
 }
@@ -657,12 +708,13 @@
   \subsection{added}{
     \itemize{
       \item there is now an EXPERIMENTAL option to be able to toy around with
-        roxygen3: call 'roxyPackage:::set.roxyEnv(name=\code{"roxygenVersion"}, value=3)' to
-        enable some hidden features, i.e. use \code{roxygen3::roxygenise()} instead of
-        \code{roxygen2::roxygenize()}. you need to install and load the roxygen3 package first
-        -- temper with this at your own risk. please note: there will probably
-        never be an official roxygen3 package on CRAN, and once its features were
-        merged into roxygen2, this option might be patched out of roxyPackage again.
+        roxygen3: call 'roxyPackage:::set.roxyEnv(name=\code{"roxygenVersion"},
+        value=3)' to enable some hidden features, i.e. use \code{roxygen3::roxygenise()}
+        instead of \code{roxygen2::roxygenize()}. you need to install and load the
+        roxygen3 package first -- temper with this at your own risk. please note:
+        there will probably never be an official roxygen3 package on CRAN, and
+        once its features were merged into roxygen2, this option might be patched
+        out of roxyPackage again.
       \item this is the first version of roxyPackage supposed to be released on CRAN
     }
   }
@@ -699,9 +751,9 @@
     \itemize{
       \item new action \code{"log"} generates an initial ChangeLog, if none is found
       \item introducing new functions \code{initChangeLog()}, \code{readChangeLog()},
-        \code{writeChangeLog()}, as well as the methods \code{getChangeLogEntry()} and \code{updateChangeLog()}.
-        they are probably not bug-free, but should ease the management of proper R
-        ChangeLogs considerably.
+        \code{writeChangeLog()}, as well as the methods \code{getChangeLogEntry()} and
+        \code{updateChangeLog()}. they are probably not bug-free, but should ease the
+        management of proper R ChangeLogs considerably.
     }
   }
   \subsection{changed}{
@@ -733,9 +785,10 @@
         to "inst/doc" for vignette files
       \item added new function \code{archive.packages()} to move old versions of packages to
         an archive directory, or to remove them for good. since this is
-        potentially dangerous and needs some rounds of testing, its \code{"reallyDoIt"}-option
-        needs to be set to TRUE manually, otherwise a dry run is done, i.e., all
-        actions are only printed and not done, so you can check the outcome first.
+        potentially dangerous and needs some rounds of testing, its
+        \code{"reallyDoIt"}-option needs to be set to TRUE manually, otherwise a dry run
+        is done, i.e., all actions are only printed and not done, so you can
+        check the outcome first.
     }
   }
 }
@@ -743,15 +796,15 @@
   \subsection{fixed}{
     \itemize{
       \item using \code{shortPathName()} to fix problems on windows caused by the path
-        normalization introduced with 0.02-17 (thanks to henrik singmann for tracking
-        this one down)
+        normalization introduced with 0.02-17 (thanks to henrik singmann for
+        tracking this one down)
     }
   }
   \subsection{changed}{
     \itemize{
       \item wrote some new internal helper functions, namely \code{createMissingDir()} and
-        \code{removeIfExists()}, and replaced their manual pendants in the \code{roxy.package()}
-        code, which is now easier to read
+        \code{removeIfExists()}, and replaced their manual pendants in the
+        \code{roxy.package()} code, which is now easier to read
     }
   }
 }
@@ -763,8 +816,8 @@
         now done in a more manual manner in roxyPackage
       \item also, on Mac OS X the tar binary is now identified using Sys.which(\code{"tar"})
       \item finally, "--exclude=*~" caused trouble if path names contained a tilde
-        for $HOME, so this was replaced with a more reliable way to exclude backup~
-        files as well
+        for $HOME, so this was replaced with a more reliable way to exclude
+        backup~ files as well
       \item all root paths are now normalized before first use, especially to perform
         tilde expansion, because this lead to errors with \code{tar()}
     }
@@ -850,8 +903,8 @@
         \code{"Date"} field, \code{roxy.package()} considers \code{"Packaged"} and then
         "Date/Publication" as fallback alternatives (and throws a warning)
       \item the actions \code{"deb"}, \code{"roxy"}, \code{"cite"}, \code{"license"}, \code{"doc"}, \code{"cl2news"} and
-        \code{"news2rss"} are now only run once for builds against multiple R installations,
-        because their outcome should be the same anyway
+        \code{"news2rss"} are now only run once for builds against multiple R
+        installations, because their outcome should be the same anyway
     }
   }
   \subsection{fixed}{
@@ -955,26 +1008,26 @@
   \itemize{
     \item using Rd2pdf instead of Rd2dvi for R >= 2.15 now; in 'Rcmd.options',
       Rd2dvi will still be recognized, though
-    \item \code{zip()} should now ignore backup files (ending with a tilde)
+      \code{zip()} should now ignore backup files (ending with a tilde)
   }
 }
 \section{Changes in roxyPackage version 0.02-2 (2012-03-18)}{
   \itemize{
     \item RSS feeds in HTML header now also state the package name (action \code{"html"})
-    \item re-wrote HTML genrating functions, now all is done use XiMpLe methods
+      re-wrote HTML genrating functions, now all is done use XiMpLe methods
   }
 }
 \section{Changes in roxyPackage version 0.02-1 (2012-03-14)}{
   \itemize{
     \item added new function \code{news2rss()} to write RSS feeds (XML) from
       NEWS.Rd/NEWS.html files
-    \item action \code{"html"} now adds the RSS feed for a package to the HTML header and
+      action \code{"html"} now adds the RSS feed for a package to the HTML header and
       news link
-    \item exported a new function, \code{cl2news()}, which now carries out the action by
+      exported a new function, \code{cl2news()}, which now carries out the action by
       the same name, but can also used stand-alone
-    \item added dependency to the XiMpLe package to make the handling of all
+      added dependency to the XiMpLe package to make the handling of all
       HTML/XML stuff easier
-    \item removed \code{"target"} attributes from HTML anchors to comply with XHTML 1.0
+      removed \code{"target"} attributes from HTML anchors to comply with XHTML 1.0
       strict
   }
 }
@@ -988,14 +1041,14 @@
   \itemize{
     \item added option to manually specify options to the internal R CMD calls to
       \code{roxy.package()}
-    \item fixed build for multiple R homes, now using R CMD INSTALL instead of
+      fixed build for multiple R homes, now using R CMD INSTALL instead of
       \code{install.packages()}
-    \item OS is now checked and on Windows \code{shell()} is used instead of \code{system()}
-    \item fixed broken \code{"check"} action on Windows
-    \item added action \code{"cl2news"} to transform ChangeLogs into NEWS.Rd
-    \item action \code{"html"} now transforms inst/NEWS.Rd into NEWS.html and links this
+      OS is now checked and on Windows \code{shell()} is used instead of \code{system()}
+      fixed broken \code{"check"} action on Windows
+      added action \code{"cl2news"} to transform ChangeLogs into NEWS.Rd
+      action \code{"html"} now transforms inst/NEWS.Rd into NEWS.html and links this
       in index.html, if found
-    \item replaced unicode symbols in \code{entities()} with \\uxxxx ASCII escapes
+      replaced unicode symbols in \code{entities()} with \\uxxxx ASCII escapes
   }
 }
 \section{Changes in roxyPackage version 0.01-18 (2012-02-09)}{
@@ -1019,9 +1072,9 @@
 \section{Changes in roxyPackage version 0.01-15 (2011-11-10)}{
   \itemize{
     \item added support for HTML citation info
-    \item added function \code{entities()}, mainly to scramble mail adresses
-    \item html package info now also links to ChangeLog, if found
-    \item fixed typo in html descriptions (some missing colons)
+      added function \code{entities()}, mainly to scramble mail adresses
+      html package info now also links to ChangeLog, if found
+      fixed typo in html descriptions (some missing colons)
   }
 }
 \section{Changes in roxyPackage version 0.01-14 (2011-11-09)}{
@@ -1064,13 +1117,13 @@
 \section{Changes in roxyPackage version 0.01-7 (2011-09-11)}{
   \itemize{
     \item added support for "Authors@R", as needed by R >= 2.14
-    \item added support for different \code{"Type"} values in DESCRIPTION
+      added support for different \code{"Type"} values in DESCRIPTION
   }
 }
 \section{Changes in roxyPackage version 0.01-6 (2011-09-01)}{
   \itemize{
     \item added package check action
-    \item added option to keep/remove vignette PDF in source package
+      added option to keep/remove vignette PDF in source package
   }
 }
 \section{Changes in roxyPackage version 0.01-5 (2011-08-22)}{
@@ -1091,7 +1144,7 @@
 \section{Changes in roxyPackage version 0.01-2 (2011-08-17)}{
   \itemize{
     \item added tools dependency to use \code{write_PACKAGES()}
-    \item added mac OS X support (pure R only)
+      added mac OS X support (pure R only)
   }
 }
 \section{Changes in roxyPackage version 0.01-1 (2011-08-14)}{

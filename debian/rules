@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 # debian/rules file for the Debian/GNU Linux r-other-reaktanz-roxypackage package
-# Copyright 2021 by m.eik michalke <meik.michalke@hhu.de>
+# Copyright 2023 by m.eik michalke <meik.michalke@hhu.de>
 
 debRreposname := other-reaktanz
 

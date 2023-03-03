@@ -211,9 +211,14 @@ setMethod("pasteChangeLog",
     }
     # are there sections?
     if(length(slot(log, "sections")) > 0){
-      this.entry.sections <- paste(sapply(1:length(slot(log, "sections")), function(this.idx){
+      this.entry.sections <- paste(sapply(seq_along(slot(log, "sections")), function(this.idx){
           this.sect <- paste0(item, " ",
-            autoLineBreak(slot(log, "sections")[[this.idx]], lineEnd=lineEnd, breakAt=breakAt, breakBy=breakBy),
+            sapply(
+              seq_along(slot(log, "sections")[[this.idx]]),
+              function(this_item){
+                autoLineBreak(slot(log, "sections")[[this.idx]][[this_item]], lineEnd=lineEnd, breakAt=breakAt, breakBy=breakBy)
+              }
+            ),
             "\n", collapse="")
           this.sect.name <- paste0(names(slot(log, "sections"))[this.idx], ":\n")
           this.sect.full <- paste0(this.sect.name, this.sect, collapse="")
