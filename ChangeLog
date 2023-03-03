@@ -3,13 +3,16 @@ ChangeLog for package roxyPackage
 changes in version 0.10-2 (2023-03-03)
 unreleased:
   - this release is under development
+changed:
+  - ChangeLog: corrected the entry that a workaround for XiMpLe was added
+    to not get confused by an empty "defer" attribute; this was fixed in
+    XiMpLe 0.11-1 and so the workaround had been removed before the final
+    0.10-1 release of roxyPackage
 
 changes in version 0.10-1 (2023-03-03)
 fixed:
   - news2rss(): adjusted to newer HTML scheme, which now uses
-    <html><body><div> instead of just <html><body> for its content; also a
-    workaround was added for XiMpLe getting confused by an empty "defer"
-    argument
+    <html><body><div> instead of just <html><body> for its content
   - debianizeKeyring(): default package description now uses a proper
     synopsis
   - debianize()/debianizeKeyring(): description lines are now adjusted to
