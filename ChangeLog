@@ -1,5 +1,9 @@
 ChangeLog for package roxyPackage
 
+changes in version 0.10-2 (2023-03-03)
+unreleased:
+  - this release is under development
+
 changes in version 0.10-1 (2023-03-03)
 fixed:
   - news2rss(): adjusted to newer HTML scheme, which now uses
