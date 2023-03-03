@@ -68,6 +68,7 @@ gen_tag_functions(
     , "img"
     , "item"
     , "language"
+    , "li"
     , "link"
     , "meta"
     , "p"
@@ -79,6 +80,7 @@ gen_tag_functions(
     , "td"
     , "title"
     , "tr"
+    , "ul"
   ),
   envir=parent.env(.roxyPackage.env),
   func_rename=c(

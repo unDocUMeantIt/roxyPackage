@@ -25,7 +25,7 @@ debianizeKeyring(
   actions = c("bin", "src"),
   overwrite = c("changelog", "control", "copyright", "install", "rules", "compat"),
   bin.opts = "-rfakeroot -b -uc",
-  compat = 9,
+  compat = 10,
   epoch = NULL,
   keyring = NULL,
   gpg.version = 2,

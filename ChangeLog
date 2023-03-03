@@ -20,8 +20,9 @@ added:
   - roxy.package(): added generator note to *-package.Rd file, so you know it
     won't last long if you edited the file manually
 changed:
-  - debianize()/debianizeKeyring(): lifted Standards-Version to 4.6.1.1 and
-    changed Priority from "extra" to "optional" also for keyring packages
+  - debianize()/debianizeKeyring(): lifted Standards-Version to 4.6.1.1, compat
+    level to 10, and changed Priority from "extra" to "optional" also for keyring
+    packages
   - internally, private function autoLineBreak() is now a mere wrapper for
     strwrap() for simple cases
   - package now depends on XiMpLe >=0.11-1, making workarounds for empty

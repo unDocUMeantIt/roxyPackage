@@ -1,4 +1,4 @@
-# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2023 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -210,7 +210,7 @@ debianize <- function(
   overwrite=c("changelog", "control", "copyright", "rules", "compat"),
   bin.opts="-rfakeroot -b -uc",
   arch="all",
-  compat=9,
+  compat=10,
   epoch=NULL,
   gpg.key=NULL,
   keyring=NULL,

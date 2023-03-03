@@ -22,7 +22,7 @@ debianize(
   overwrite = c("changelog", "control", "copyright", "rules", "compat"),
   bin.opts = "-rfakeroot -b -uc",
   arch = "all",
-  compat = 9,
+  compat = 10,
   epoch = NULL,
   gpg.key = NULL,
   keyring = NULL,
