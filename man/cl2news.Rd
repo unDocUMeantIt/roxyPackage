@@ -37,7 +37,7 @@ The ChangeLog related functions and methods of this package,
       e.g. \code{\link[roxyPackage:initChangeLog]{initChangeLog}}, are
 a convenient way to maintain R ChangeLogs in a proper format.
 
-This function is basically a wrapper for the internal function \code{tools::news2Rd}.
+This function is basically a wrapper for the internal function \code{tools:::news2Rd}.
 }
 \examples{
 \dontrun{

@@ -1,4 +1,4 @@
-# Copyright 2011-2022 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2023 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -47,13 +47,19 @@
 #'   channel=channel.info)
 #' }
 
-news2rss <- function(news, rss=NULL, html=NULL, encoding="UTF-8",
+news2rss <- function(
+  news,
+  rss=NULL,
+  html=NULL,
+  encoding="UTF-8",
   channel=c(
     title="",
     link="",
     description="",
     language="",
-    atom="")){
+    atom=""
+  )
+){
 
   # check if all necessary information is present
   for (need.info in c("title", "link", "description")){
@@ -116,13 +122,10 @@ news2rss <- function(news, rss=NULL, html=NULL, encoding="UTF-8",
         html.tags,
         ignore.case=TRUE, perl=TRUE)
     }
-    # in R 4.2 am empty argument "defer" was added to a <script> tag which
-    # confuses XiMpLe
-    html.tags <- gsub(" defer ", " defer=\"defer\" ", html.tags, ignore.case=TRUE)
 
     ## get HTML tree
     # if this works it should be relatively easy to make an RSS XML object from this object
-    html.tree <- XiMpLe::parseXMLTree(html.tags, object=TRUE)
+    html.tree <- parseXMLTree(html.tags, object=TRUE)
 
     # News for Package '*': XiMpLe::node(html.tree, node=list("html","body","div","h2"))
     # Changes in * version *: XiMpLe::node(html.tree, node=list("html","body","div","h3"))
@@ -131,7 +134,7 @@ news2rss <- function(news, rss=NULL, html=NULL, encoding="UTF-8",
 
     # we only need the body child nodes to search for news
     # this node() call returns a named list
-    html.body <- XiMpLe::node(html.tree, node=list("html","body","div"), what="children")
+    html.body <- node(html.tree, node=list("html","body","div"), what="children")
     # now go through the child nodes and return everything from one <h3> to another
     news.start <- which(names(html.body) %in% "h3")
     # how many news nodes are there?
@@ -146,47 +149,49 @@ news2rss <- function(news, rss=NULL, html=NULL, encoding="UTF-8",
         this.news.range <- html.body[(this.news.start+1):this.news.end]
         this.news.title.raw <- slot(slot(html.body[[this.news.start]], "children")[[1]], "value")
         # try to generate a unique, unchanging guid -- we take version string
-        this.news.guid <- XiMpLe::XMLNode("guid",
+        this.news.guid <- guid_(
           gsub("[[:space:]]*", "", gsub(".*Changes in (.*) version (.*)", "\\1\\2", this.news.title.raw, ignore.case=TRUE, perl=TRUE)),
-          attrs=list(isPermaLink="false"))
+          isPermaLink="false"
+        )
         # scan title for release dates
         this.news.hasDate <- grepl(".*(\\()?([[:alnum:]]{4}-[[:alnum:]]{2}-[[:alnum:]]{2})(\\))?.*", this.news.title.raw, perl=TRUE)
           if(isTRUE(this.news.hasDate)){
             this.news.date.raw <- gsub(".*(\\()?([[:alnum:]]{4}-[[:alnum:]]{2}-[[:alnum:]]{2})(\\))?.*", "\\2", this.news.title.raw, perl=TRUE)
-            this.news.date <- XiMpLe::XMLNode("pubDate", dateRFC2822(this.news.date.raw))
+            this.news.date <- pubDate_(dateRFC2822(this.news.date.raw))
             # remove date from the title
             this.news.title.raw <- gsub("[[:space:]]+(\\()?([[:alnum:]]{4}-[[:alnum:]]{2}-[[:alnum:]]{2})(\\))?", "", this.news.title.raw, perl=TRUE)
           } else {
             this.news.date <- NULL
           }
-        this.news.title <- XiMpLe::XMLNode("title", this.news.title.raw)
-        this.news.link <- XiMpLe::XMLNode("link", channel[["link"]])
+        this.news.title <- title_(this.news.title.raw)
+        this.news.link <- link_(channel[["link"]])
         # place description in CDATA to be able to use HTML formatting
-        this.news.range.CDATA <- XiMpLe::XMLNode("![CDATA[", .children=this.news.range)
-        this.news.desc <-  XiMpLe::XMLNode("description", this.news.range.CDATA)
-        this.news.node <- XiMpLe::XMLNode("item", this.news.title, this.news.link, this.news.date, this.news.guid, this.news.desc)
+        this.news.range.CDATA <- CDATA_(.children=this.news.range)
+        this.news.desc <-  description_(this.news.range.CDATA)
+        this.news.node <- item_(this.news.title, this.news.link, this.news.date, this.news.guid, this.news.desc)
       }))
 
-    xml.channel.title <- XiMpLe::XMLNode("title", channel[["title"]])
-    xml.channel.link <- XiMpLe::XMLNode("link", channel[["link"]])
+    xml.channel.title <- title_(channel[["title"]])
+    xml.channel.link <- link_(channel[["link"]])
     roxyPackage.version <- read.dcf(file.path(find.package("roxyPackage"), "DESCRIPTION"), fields="Version")
-    xml.channel.generator <- XiMpLe::XMLNode("generator", paste0("roxyPackage (", roxyPackage.version, ")"))
-    xml.channel.desc <- XiMpLe::XMLNode("description", XiMpLe::XMLNode("![CDATA[", channel[["description"]]))
+    xml.channel.generator <- generator_(paste0("roxyPackage (", roxyPackage.version, ")"))
+    xml.channel.desc <- description_(CDATA_(channel[["description"]]))
     xml.channel.lang <- xml.channel.atom <- NULL
     if("language" %in% names(channel)){
       if(!identical(channel[["language"]], "")){
-        xml.channel.lang <- XiMpLe::XMLNode("language", channel[["language"]])
+        xml.channel.lang <- language_(channel[["language"]])
       } else {}
     } else {}
     rss.node.attrs <- list(version="2.0")
     if("atom" %in% names(channel)){
       if(!identical(channel[["atom"]], "")){
-        xml.channel.atom <- XiMpLe::XMLNode("atom:link", attrs=list(href=channel[["atom"]], rel="self", type="application/rss+xml"))
+        xml.channel.atom <- atomlink_(href=channel[["atom"]], rel="self", type="application/rss+xml")
         rss.node.attrs <- append(rss.node.attrs, list("xmlns:atom"="http://www.w3.org/2005/Atom"))
       } else {}
     } else {}
-    xml.channel <- XiMpLe::XMLNode("rss",
-      XiMpLe::XMLNode("channel",
+    xml.channel <- rss_(
+      channel_(
+        attrs=rss.node.attrs,
         .children=append(
           list(
             xml.channel.title,
@@ -195,9 +200,10 @@ news2rss <- function(news, rss=NULL, html=NULL, encoding="UTF-8",
             xml.channel.desc,
             xml.channel.generator,
             xml.channel.lang),
-          xml.channel.items)),
-      attrs=rss.node.attrs)
-    rss.tree <- XiMpLe::XMLTree(xml.channel, xml=list(version="1.0", encoding=encoding))
+          xml.channel.items)
+        )
+      )
+    rss.tree <- XMLTree(xml.channel, xml=list(version="1.0", encoding=encoding))
 # uncomment for debugging:
 # rss.tree <- xml.channel.items
     if(!is.null(rss)){

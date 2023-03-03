@@ -14,7 +14,7 @@ Description: The intention of this package is to make packaging R code as easy a
 Author: m.eik michalke [aut, cre], Robert Nuske [ctb]
 Maintainer: m.eik michalke <meik.michalke@hhu.de>
 Depends: R (>= 3.0.0)
-Imports: methods,roxygen2,tools,XiMpLe (>= 0.03-20)
+Imports: methods,roxygen2,tools,XiMpLe (>= 0.11-1)
 Suggests: testthat,knitr,rmarkdown
 VignetteBuilder: knitr
 URL: https://reaktanz.de/?c=hacking&s=roxyPackage
@@ -25,8 +25,8 @@ LazyLoad: yes
 Authors@R: c(person(given="m.eik", family="michalke", email="meik.michalke@hhu.de",
           role=c("aut", "cre")), person(given="Robert", family="Nuske", role=c("ctb")))
 Version: 0.10-1
-Date: 2022-07-07
-RoxygenNote: 7.2.0
+Date: 2023-03-03
+RoxygenNote: 7.2.2
 Collate: 
     '00_classes_01_ChangeLog_internal.R'
     '00_classes_02_sandbox_internal.R'

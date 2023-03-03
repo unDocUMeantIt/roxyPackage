@@ -10,8 +10,7 @@ templateFile(
   pck.description = data.frame(Package = "", Author = "", License = "GPL (>= 3)",
     stringsAsFactors = FALSE),
   year = format(Sys.time(), "\%Y"),
-  params = list(obj = "someClass", ... =
-    "\\\\code{\\\\link[somepackage]{somefunction}}"),
+  params = list(obj = "someClass", ... = "\\\\code{\\\\link[somepackage]{somefunction}}"),
   seealso = list(aPackage = "aFunction"),
   return = list(aPackage = "aFunction"),
   type = "function",

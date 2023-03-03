@@ -1,4 +1,4 @@
-# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2023 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -44,6 +44,51 @@ set.roxyEnv(name="sandbox", value=new("roxySandbox", active=FALSE))
 ## work around some limitations regarding private functions
 installMD5sums <- getFromNamespace(".installMD5sums", "tools")
 news2Rd <- getFromNamespace("news2Rd", "tools")
+
+# gegerate some XML functions (requires XiMpLe >= 0.11-1)
+gen_tag_functions(
+  tags=c(
+    "![CDATA["
+    , "a"
+    , "atom:link"
+    , "blockquote"
+    , "body"
+    , "br"
+    , "channel"
+    , "code"
+    , "description"
+    , "generator"
+    , "guid"
+    , "h1"
+    , "h2"
+    , "h3"
+    , "h4"
+    , "head"
+    , "html"
+    , "img"
+    , "item"
+    , "language"
+    , "link"
+    , "meta"
+    , "p"
+    , "pre"
+    , "pubDate"
+    , "rss"
+    , "span"
+    , "table"
+    , "td"
+    , "title"
+    , "tr"
+  ),
+  envir=parent.env(.roxyPackage.env),
+  func_rename=c(
+    "?xml_"="xml_"
+    , "!--_"="comment_"
+    , "![CDATA[_"="CDATA_"
+    , "!DOCTYPE_"="DOCTYPE_"
+    , "atom:link_"="atomlink_"
+  )
+)
 
 
 ## function trim()

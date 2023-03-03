@@ -1,4 +1,4 @@
-# Copyright 2011-2020 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2023 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -19,23 +19,25 @@
 ## function imprint_node()
 imprint_node <- function(imprint=NULL, privacy.policy=NULL){
   if(any(!is.null(imprint), !is.null(privacy.policy))){
-    result <- XMLNode("span",
+    result <- span_(
       if(!is.null(imprint)){
-        XMLNode("a",
-                "Imprint",
-                attrs=list(href=imprint, target="_blank")
+        a_(
+          "Imprint",
+          href=imprint,
+          target="_blank"
         )
       },
-    if(all(!is.null(imprint), !is.null(privacy.policy))){
-      XMLNode("span", "&nbsp;&#183;&nbsp;", attrs=list(class="dot"))
-    },
+      if(all(!is.null(imprint), !is.null(privacy.policy))){
+        span_("&nbsp;&#183;&nbsp;", class="dot")
+      },
       if(!is.null(privacy.policy)){
-        XMLNode("a",
-                "Privacy policy",
-                attrs=list(href=privacy.policy, target="_blank")
+        a_(
+          "Privacy policy",
+          href=privacy.policy,
+          target="_blank"
         )
       },
-      attrs=list(class="imprint")
+      class="imprint"
     )
   } else {
     result <- NULL
@@ -47,13 +49,13 @@ imprint_node <- function(imprint=NULL, privacy.policy=NULL){
 ## function rx.tr()
 # helper function to cretae HTML table rows with two columns
 #' @import XiMpLe
-rx.tr <- function(col1, col2, isList=FALSE){
-  return(XMLNode("tr",
-    XMLNode("td", col1, attrs=list(valign="top")),
-    if(isTRUE(isList)){
-      XMLNode("td", children=col2)
+rx.tr <- function(col1, col2){
+  return(tr_(
+    td_(col1, valign="top"),
+    if(is.list(col2)){
+      td_(.children=col2)
     } else {
-      XMLNode("td", col2)
+      td_(col2)
     }  
   ))
 } ## function rx.tr()
@@ -103,29 +105,37 @@ rx.html.switch <- function(desc, field){
       Additional_repositories=rx.tr("Additional repositories:", 
           if(isTRUE(grepl(",", desc[,"Additional_repositories"]))){
             # more than one extra repo
-            XMLNode("span", .children=lapply(
+            span_(.children=lapply(
                 unlist(strsplit(desc[,"Additional_repositories"], ",")),
                 function(thisURL){
                   URLnoSpace <- gsub("&", "&amp;", gsub("^[[:space:]]*|[[:space:]]*$","",thisURL))
-                  return(XMLNode("a", URLnoSpace, attrs=list(href=URLnoSpace)))
+                  return(a_(URLnoSpace, href=URLnoSpace))
                 }
               )
             )
           } else {
-            XMLNode("a", gsub("&", "&amp;", desc[,"Additional_repositories"]),
-            attrs=list(href=gsub("&", "&amp;", desc[,"Additional_repositories"])))
+            a_(
+              gsub("&", "&amp;", desc[,"Additional_repositories"]),
+              href=gsub("&", "&amp;", desc[,"Additional_repositories"])
+            )
          }
         ),
       BugReports=rx.tr("BugReports:", 
         if(substr(desc[,"BugReports"], 1, 4) != 'http'){
           rx.clean(desc[,"BugReports"], nomail=FALSE, textmail=TRUE)
         } else {
-          XMLNode("a", gsub("&", "&amp;", desc[,"BugReports"]),
-          attrs=list(href=gsub("&", "&amp;", desc[,"BugReports"])))
+          a_(
+            gsub("&", "&amp;", desc[,"BugReports"]),
+            href=gsub("&", "&amp;", desc[,"BugReports"])
+          )
         }),
-      URL=rx.tr("URL:", XMLNode("a",
-        gsub("&", "&amp;", desc[,"URL"]),
-        attrs=list(href=gsub("&", "&amp;", desc[,"URL"])))),
+      URL=rx.tr(
+        "URL:",
+        a_(
+          gsub("&", "&amp;", desc[,"URL"]),
+          href=gsub("&", "&amp;", desc[,"URL"])
+        )
+      ),
       NeedsCompilation=rx.tr("NeedsCompilation:", desc[,"NeedsCompilation"]),
       SystemRequirements=rx.tr("SystemRequirements:", rx.clean(desc[,"SystemRequirements"]))
     )
@@ -173,16 +183,20 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
   # check if URL points to a list of mirrors
   if(!is.null(mirror.list)){
     apt.base.txt <- paste(paste0("[ftp|http]://<mirror>", debian.path), dist, comp, sep=" ")
-    instruction <- XMLNode("p",
+    instruction <- p_(
       "Select a server near you from ",
-      XMLNode("a", "this list of mirrors", attrs=list(href=mirror.list, target="_blank")),
+      a_("this list of mirrors", href=mirror.list, target="_blank"),
       " and add the repository to your configuration (e.g.,",
-      XMLNode("code", paste0("/etc/apt/sources.list.d/", repo, ".list")),
+      code_(paste0("/etc/apt/sources.list.d/", repo, ".list")),
       "):"
     )
   } else {
     apt.base.txt <- paste(paste0(deb.URL, debian.path), dist, comp, sep=" ")
-    instruction <- XMLNode("p", "Add the repository to your configuration (e.g.,", XMLNode("code", paste0("/etc/apt/sources.list.d/", repo, ".list")), "):")
+    instruction <- p_(
+      "Add the repository to your configuration (e.g.,",
+      code_(paste0("/etc/apt/sources.list.d/", repo, ".list")),
+      "):"
+    )
   }
   if(isTRUE(keyInRepo)){
     apt.signed.by <- paste0(" [signed-by=/usr/share/keyrings/", keyname, ".gpg]")
@@ -197,10 +211,13 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
   # XiMpLe currently suffers from a layout glitch: it tries to auto-indent tag content, which doesn't look so great in <pre> tags
   # therefore, all values of <pre> tags start with an empty line to produce nice output in the web browser
   xml.obj.list <- list(
-      XMLNode("h2", "Install R packages from this Debian repository"),
-      XMLNode("h4", "Configure repository"),
+      h2_("Install R packages from this Debian repository"),
+      h4_("Configure repository"),
       instruction,
-      XMLNode("pre", paste0("&nbsp;", paste0("\n", apt.full.txt)), attrs=list(class="repo")) # the "&nbsp;" works around a glitch in XiMpLe
+      pre_(
+        paste0("&nbsp;", paste0("\n", apt.full.txt)), # the "&nbsp;" works around a glitch in XiMpLe
+        class="repo"
+      )
     )
 
   # if we do the update call before installing the OpenPGP package, we don't need to
@@ -220,10 +237,23 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
       stillNeedsUpdate <- ""
       xml.obj.list <- append(xml.obj.list,
         list(
-          XMLNode("p", "You might have to temporarily replace", XMLNode("code", "deb"), "with", XMLNode("code", "deb [trusted=yes]"), "in your", XMLNode("code", paste0(repo, ".list")), "file until after you installed the following keyring package, or apt might refuse to install it because it doesn't know the included OpenPGP key yet. Make sure you remove the", XMLNode("code", "[trusted=yes]"), "after the keyring was successfully installed!"),
-          XMLNode("h4", "Add OpenPGP key"),
-          XMLNode("p", "To be able to make use of secure apt, install the repository's OpenPGP keyring package:"),
-          XMLNode("pre", paste0("&nbsp;\n", gpg.txt), attrs=list(class="repo")) # the "&nbsp;" works around a glitch in XiMpLe
+          p_(
+            "You might have to temporarily replace",
+            code_("deb"),
+            "with",
+            code_("deb [trusted=yes]"),
+            "in your",
+            code_(paste0(repo, ".list")),
+            "file until after you installed the following keyring package, or apt might refuse to install it because it doesn't know the included OpenPGP key yet. Make sure you remove the",
+            code_("[trusted=yes]"),
+            "after the keyring was successfully installed!"
+          ),
+          h4_("Add OpenPGP key"),
+          p_("To be able to make use of secure apt, install the repository's OpenPGP keyring package:"),
+          pre_(
+            paste0("&nbsp;\n", gpg.txt), # the "&nbsp;" works around a glitch in XiMpLe
+            class="repo"
+          )
         ))
     } else {
       message("html: debian keyring package not in repo yet, skipping docs!")
@@ -234,9 +264,12 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
     pkg.txt <- paste0(stillNeedsUpdate, "sudo apt install ", package)
     xml.obj.list <- append(xml.obj.list,
       list(
-        XMLNode("h4", "Install packages"),
-        XMLNode("p", "You can then install the package:"),
-        XMLNode("pre", paste0("&nbsp;\n", pkg.txt), attrs=list(class="repo")) # the "&nbsp;" works around a glitch in XiMpLe
+        h4_("Install packages"),
+        p_("You can then install the package:"),
+        pre_(
+          paste0("&nbsp;\n", pkg.txt), # the "&nbsp;" works around a glitch in XiMpLe
+          class="repo"
+        )
       ))
   } else {}
 
@@ -247,14 +280,14 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
     repo.path.src <- debRepoPath(dist=dist, URL=URL, source=TRUE, deb.dir=deb.dir)
     xml.obj.list <- append(xml.obj.list,
       list(
-        XMLNode("h3", "Manual download"),
-        XMLNode("p", "In case you'd rather like to download the package manually, here it is:"),
-        XMLNode("ul", XMLNode("li", XMLNode("a", package.full, attrs=list(href=paste0(repo.path, "/", package.full))))),
-        XMLNode("p", "Package source code:"),
-        XMLNode("ul",
-          XMLNode("li", XMLNode("a", src.orig, attrs=list(href=paste0(repo.path.src, "/", src.orig)))),
-          XMLNode("li", XMLNode("a", src.debian, attrs=list(href=paste0(repo.path.src, "/", src.debian)))),
-          XMLNode("li", XMLNode("a", src.dsc, attrs=list(href=paste0(repo.path.src, "/", src.dsc))))
+        h3_("Manual download"),
+        p_("In case you'd rather like to download the package manually, here it is:"),
+        ul_(li_(a_(package.full, href=paste0(repo.path, "/", package.full)))),
+        p_("Package source code:"),
+        ul_(
+          li_(a_(src.orig, href=paste0(repo.path.src, "/", src.orig))),
+          li_(a_(src.debian, href=paste0(repo.path.src, "/", src.debian))),
+          li_(a_(src.dsc, href=paste0(repo.path.src, "/", src.dsc)))
         ),
         imprint_node(imprint=imprint, privacy.policy=privacy.policy)
       ))
@@ -264,22 +297,29 @@ debRepoInfo <- function(URL, dist, comp, arch, version, revision, compression, r
   ## make HTML out of these strings
   #############
   html.page <- XMLTree(
-    XMLNode("html",
-      XMLNode("head",
-        XMLNode("title", paste0("Install package ", package, " from Debain repository")),
-        XMLNode("link", attrs=list(
+    html_(
+      head_(
+        title_(paste0("Install package ", package, " from Debain repository")),
+        link_(
           rel="stylesheet",
           type="text/css",
-          href=page.css)),
-        XMLNode("meta", attrs=list(
+          href=page.css
+        ),
+        meta_(
           "http-equiv"="Content-Type",
-          content="text/html; charset=utf-8")),
-        XMLNode("meta", attrs=list(
+          content="text/html; charset=utf-8"
+        ),
+        meta_(
           name="generator",
-          content="roxyPackage"))
+          content="roxyPackage"
+        )
       ),
-      XMLNode("body", attrs=list(lang="en"), .children=xml.obj.list),
-      attrs=list(xmlns="http://www.w3.org/1999/xhtml")),
+      body_(
+        attrs=list(lang="en"),
+        .children=xml.obj.list
+      ),
+      xmlns="http://www.w3.org/1999/xhtml"
+    ),
     dtd=list(
       doctype="html PUBLIC",
       id="-//W3C//DTD XHTML 1.0 Strict//EN",
@@ -315,7 +355,7 @@ URLs_in_DESCRIPTION <- function(desc, result_node="p"){
         } else {
           desc_list[[length(desc_list) + 1]] <- "<"
         }
-        desc_list[[length(desc_list) + 1]] <- XMLNode("a", attrs=list(href=thisString_split[1]), thisString_split[1])
+        desc_list[[length(desc_list) + 1]] <- a_(thisString_split[1], href=thisString_split[1])
         desc_list[[length(desc_list) + 1]] <- ">)"
         if(length(thisString_split) > 1){
           if(isTRUE(grepl("^[[:alnum:]]", thisString_split[2]))){
@@ -356,17 +396,21 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
     html.body.table <- lapply(as.list(pckg), function(this.pckg){
         pckg.name <- this.pckg[,"Package"]
         pckg.title <- this.pckg[,"Title"]
-        table.row <- XMLNode("tr",
-            XMLNode("td", XMLNode("a", pckg.name, attrs=list(href=paste0(redirect, pckg.name, "/index.html")))),
-            XMLNode("td", pckg.title),
+        table.row <- tr_(
+            td_(a_(pckg.name, href=paste0(redirect, pckg.name, "/index.html"))),
+            td_(pckg.title),
             attrs=list(valign="top")
           )
       })
-    html.body <- XMLNode("body",
-      XMLNode("h1", title),
-      XMLNode("table", .children=html.body.table, attrs=list(summary=title)),
+    html.body <- body_(
+      h1_(title),
+      table_(
+        attrs=list(summary=title),
+        .children=html.body.table
+      ),
       imprint_node(imprint=imprint, privacy.policy=privacy.policy),
-      attrs=list(lang="en"))
+      lang="en"
+    )
   } else {
     got.fields <- dimnames(pckg)[[2]]
     pckg.name <- pckg[,"Package"]
@@ -374,18 +418,20 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
 
     # check for RSS
     if(!is.null(rss.file)){
-      rss.header <- XMLNode("link", attrs=list(
+      rss.header <- link_(
         rel="alternate",
         type="application/rss+xml",
         title=paste0("RSS (", title, ")"),  
-        href=rss.file))
+        href=rss.file
+      )
 
-      rss.feed <- XMLNode("a",
-        XMLNode("img", attrs=list(
-            src="../feed-icon-14x14.png",
-            alt=paste0("RSS feed for R package ", pckg.name)
-          )),
-        attrs=list(href=rss.file))
+      rss.feed <- a_(
+        img_(
+          src="../feed-icon-14x14.png",
+          alt=paste0("RSS feed for R package ", pckg.name)
+        ),
+        href=rss.file
+      )
     } else {}
 
     pckg.title <- rx.clean(pckg[,"Title"])
@@ -406,7 +452,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
             pckg.prt.start <- gsub("(.*)(<a href=\\\"https://orcid.*)", "\\1", this_prtc, perl=TRUE)
             pckg.prt.url <- gsub("(.*)(<a href=\\\"https://orcid.*)(.*</a>)(.*)", "\\2\\3", this_prtc, perl=TRUE)
             pckg.prt.end <- gsub("(.*</a>)(.*)", "\\2", this_prtc, perl=TRUE)
-            this_prtc <- XMLNode("span",
+            this_prtc <- span_(
               pckg.prt.start,
               node(parseXMLTree(pckg.prt.url, object=TRUE), node=list("a")),
               pckg.prt.end
@@ -416,27 +462,29 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         return(this_prtc)
       }
     )
+
     pckg.maintainer <- rx.clean(pckg.authors[["cre"]], nomail=FALSE, textmail=TRUE)
+
 
     pckg.materials <- list()
     if(file_test("-f", readme)){
-      pckg.materials <- append(pckg.materials, XMLNode("a", "README", attrs=list(href="README.html", class="urls")))
+      pckg.materials <- append(pckg.materials, a_("README", href="README.html", class="urls"))
     } else {}
     if(file_test("-f", news)){
-      pckg.materials <- append(pckg.materials, XMLNode("a", "NEWS", attrs=list(href=gsub("(.*)(NEWS)(.*)", "\\2\\3", news, perl=TRUE), class="urls")))
+      pckg.materials <- append(pckg.materials, a_("NEWS", href=gsub("(.*)(NEWS)(.*)", "\\2\\3", news, perl=TRUE), class="urls"))
     } else {}
     if(file_test("-f", changelog)){
-      pckg.materials <- append(pckg.materials, XMLNode("a", "ChangeLog", attrs=list(href="ChangeLog", class="urls")))
+      pckg.materials <- append(pckg.materials, a_("ChangeLog", href="ChangeLog", class="urls"))
     } else {}
     if(!is.null(rss.feed)){
       pckg.materials <- append(pckg.materials, rss.feed)
     } else {}
 
     page.css <- paste0("../", css)
-    html.body <- XMLNode("body",
-      XMLNode("h2", paste0(pckg.name, ": ", pckg.title)),
+    html.body <- body_(
+      h2_(paste0(pckg.name, ": ", pckg.title)),
       URLs_in_DESCRIPTION(pckg[,"Description"]),
-      XMLNode("table",
+      table_(
         rx.tr("Version:", pckg[,"Version"]),
         rx.html.switch(desc=pckg, field="Depends"),
         rx.html.switch(desc=pckg, field="Imports"),
@@ -445,7 +493,7 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         rx.html.switch(desc=pckg, field="Enhances"),
         rx.html.switch(desc=pckg, field="Additional_repositories"),
         rx.tr("Published:", as.character(as.Date(getDescField(pckg, field=c("Date","Packaged","Date/Publication"))))),
-        rx.tr("Author:", pckg.participants, isList=TRUE),
+        rx.tr("Author:", pckg.participants),
         rx.tr("Maintainer:", pckg.maintainer),
         rx.html.switch(desc=pckg, field="BugReports"),
         rx.tr("License:", pckg[,"License"]),
@@ -453,34 +501,48 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
         rx.html.switch(desc=pckg, field="NeedsCompilation"),
         rx.html.switch(desc=pckg, field="SystemRequirements"),
         if(file_test("-f", cite)){
-          rx.tr("Citation:", XMLNode("a",
-            paste0(pckg.name, " citation info"),
-            attrs=list(href="citation.html")))
+          rx.tr(
+            "Citation:",
+            a_(
+              paste0(pckg.name, " citation info"),
+              href="citation.html"
+            )
+          )
         },
-        if(length(pckg.materials)){
+        if(length(pckg.materials) > 0){
           rx.tr("Materials:", pckg.materials)
         },
-        attrs=list(summary=paste0("Package ", pckg.name, " summary."))),
-      XMLNode("h4", "Downloads:"),
-      XMLNode("table",
+        summary=paste0("Package ", pckg.name, " summary.")
+      ),
+      h4_("Downloads:"),
+      table_(
         if(!is.null(url.doc)){
-          rx.tr("Reference manual:", XMLNode("a",
-                                             url.doc,
-                                             attrs=list(href=url.doc)))
+          rx.tr(
+            "Reference manual:",
+            a_(
+              url.doc,
+              href=url.doc
+            )
+          )
         },
         if(!is.null(url.vgn)){
           if(is.null(title.vgn)){ title.vgn <- url.vgn }
           rx.tr("Vignettes:", XMLNode("", .children=mapply(function(this.url, this.title){
-            XMLNode("", .children=list(
-              XMLNode("a", this.title, attrs=list(href=this.url)),
-              XMLNode("br")))},
+            XMLNode(
+              "",
+              a_(this.title, href=this.url),
+              br_()
+            )},
             url.vgn, title.vgn, SIMPLIFY=FALSE)
           ))
         },
         if(!is.null(url.src)){
-          rx.tr("Package source:", XMLNode("a",
-            url.src,
-            attrs=list(href=paste0("../../src/contrib/", url.src))))
+          rx.tr(
+            "Package source:",
+            a_(
+              url.src,
+              href=paste0("../../src/contrib/", url.src))
+            )
         },
         if(length(url.win) > 0){
           rx.tr("Windows binaries:",
@@ -488,16 +550,15 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
               length(url.win):1,
               function(this.num){
                 this.R <- names(url.win)[this.num]
-                XMLNode("span",
+                span_(
                   paste0("R ", this.R, ": "),
-                  XMLNode("a",
+                  a_(
                     ifelse(this.num > 1, paste0(url.win[[this.num]], ", "), url.win[[this.num]]),
-                    attrs=list(href=paste0("../../bin/windows/contrib/", this.R, "/", url.win[[this.num]]))
+                    href=paste0("../../bin/windows/contrib/", this.R, "/", url.win[[this.num]])
                   )
                 )
               }
-            ),
-            isList=TRUE
+            )
           )
         },
         if(length(url.mac) > 0){
@@ -506,51 +567,67 @@ roxy.html <- function(pckg, index=FALSE, css="web.css", R.version=NULL,
               length(url.mac):1,
               function(this.num){
                 this.R <- names(url.mac)[this.num]
-                XMLNode("span",
+                span_(
                   paste0("R ", this.R, ": "),
-                  XMLNode("a",
+                  a_(
                     ifelse(this.num > 1, paste0(url.mac[[this.num]], ", "), url.mac[[this.num]]),
-                    attrs=list(href=paste0("../../bin/macosx/", main.path.mac, "/", this.R, "/", url.mac[[this.num]]))
+                    href=paste0("../../bin/macosx/", main.path.mac, "/", this.R, "/", url.mac[[this.num]])
                   )
                 )
               }
-            ),
-            isList=TRUE
+            )
           )
         },
         if(!is.null(url.deb.repo)){
-          rx.tr("Debain binary package:", XMLNode("a", "Learn how to install Debian packages from this repository", attrs=list(href=url.deb.repo)))},
-        attrs=list(summary=paste0("Package ", pckg.name, " downloads."))),
-        imprint_node(imprint=imprint, privacy.policy=privacy.policy),
-      attrs=list(lang="en"))
+          rx.tr(
+            "Debain binary package:",
+            a_(
+              "Learn how to install Debian packages from this repository",
+              href=url.deb.repo
+            )
+          )
+        },
+        summary=paste0("Package ", pckg.name, " downloads.")
+      ),
+      imprint_node(imprint=imprint, privacy.policy=privacy.policy),
+      lang="en"
+    )
   }
 
   html.page <- XMLTree(
-    XMLNode("html",
-      XMLNode("head",
-        XMLNode("title", title),
-        XMLNode("link", attrs=list(
+    html_(
+      head_(
+        title_(title),
+        link_(
           rel="stylesheet",
           type="text/css",
-          href=paste0(redirect, page.css))),
-        XMLNode("meta", attrs=list(
+          href=paste0(redirect, page.css)
+        ),
+        meta_(
           "http-equiv"="Content-Type",
-          content="text/html; charset=utf-8")),
+          content="text/html; charset=utf-8"
+        ),
         if(!is.null(flattr.id)){
-          XMLNode("meta", attrs=list(
+          meta_(
             name="flattr:id",
-            content=flattr.id))
+            content=flattr.id
+          )
         } else {},
-        XMLNode("meta", attrs=list(
+        meta_(
           name="generator",
-          content="roxyPackage")),
-        rss.header),
+          content="roxyPackage"
+        ),
+        rss.header
+      ),
       html.body,
-      attrs=list(xmlns="http://www.w3.org/1999/xhtml")),
+      xmlns="http://www.w3.org/1999/xhtml"
+    ),
     dtd=list(
       doctype="html PUBLIC",
       id="-//W3C//DTD XHTML 1.0 Strict//EN",
-      refer="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"))
+      refer="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+    )
+  )
 
   return(pasteXML(html.page))
 } ## end function roxy.html()
@@ -566,30 +643,36 @@ roxy.html.cite <- function(cite.obj, page.css="web.css", package="", imprint=NUL
   cite.bibtex <- paste(paste0("\t\t\t", gsub("&", "&amp;", gsub("^  ", "\t", toBibtex(cite.obj)))), collapse="\n")
 
   html.page <- XMLTree(
-    XMLNode("html",
-      XMLNode("head",
-        XMLNode("title", paste0(package, " citation info")),
-        XMLNode("link", attrs=list(
+    html_(
+      head_(
+        title_(paste0(package, " citation info")),
+        link_(
           rel="stylesheet",
           type="text/css",
-          href=page.css)),
-        XMLNode("meta", attrs=list(
+          href=page.css
+        ),
+        meta_(
           "http-equiv"="Content-Type",
-          content="text/html; charset=utf-8")),
-        XMLNode("meta", attrs=list(
+          content="text/html; charset=utf-8"
+        ),
+        meta_(
           name="generator",
-          content="roxyPackage"))
+          content="roxyPackage"
+        )
       ),
-      XMLNode("body",
-      if(!is.null(cite.mheader) & !is.null(cite.text)){
-        XMLNode("p", cite.mheader)
-        XMLNode("blockquote", cite.text)},
-      if(!is.null(cite.bibtex)){
-        XMLNode("p", "Corresponding BibTeX entry:")
-        XMLNode("pre", cite.bibtex)},
+      body_(
+        if(!is.null(cite.mheader) & !is.null(cite.text)){
+          p_(cite.mheader)
+          blockquote_(cite.text)},
+        if(!is.null(cite.bibtex)){
+          p_("Corresponding BibTeX entry:")
+          pre_(cite.bibtex)
+        },
         imprint_node(imprint=imprint, privacy.policy=privacy.policy),
-        attrs=list(lang="en")),
-      attrs=list(xmlns="http://www.w3.org/1999/xhtml")),
+        lang="en"
+      ),
+      xmlns="http://www.w3.org/1999/xhtml"
+    ),
     dtd=list(
       doctype="html PUBLIC",
       id="-//W3C//DTD XHTML 1.0 Strict//EN",
