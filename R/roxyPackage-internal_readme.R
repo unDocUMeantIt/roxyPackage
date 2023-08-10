@@ -1,4 +1,4 @@
-# Copyright 2016-2020 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2016-2023 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -72,7 +72,7 @@ readme_text <- function(
           md_h("Installation", level=2),
           md_h("Installation via GitHub", level=3),
           "To install the package directly from GitHub, you can use `install_github()` from the ",
-          md_url("devtools","https://github.com/hadley/devtools"),
+          md_url("devtools","https://github.com/r-lib/devtools"),
           " package:\n\n",
           "```r\n",
           "devtools::install_github(\"", githubUser, "/", githubRepo, "\")\n",
