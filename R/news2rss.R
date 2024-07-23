@@ -1,4 +1,4 @@
-# Copyright 2011-2023 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2024 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -135,6 +135,10 @@ news2rss <- function(
     # we only need the body child nodes to search for news
     # this node() call returns a named list
     html.body <- node(html.tree, node=list("html","body","div"), what="children")
+    # check if entries are inside a <main> tag
+    if(!is.null(XMLScan(html.body, "main"))){
+      html.body <- node(html.body, node=list("main"), what="children")
+    } else {}
     # now go through the child nodes and return everything from one <h3> to another
     news.start <- which(names(html.body) %in% "h3")
     # how many news nodes are there?

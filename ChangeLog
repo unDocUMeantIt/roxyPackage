@@ -3,6 +3,9 @@ ChangeLog for package roxyPackage
 changes in version 0.10-2 (2023-03-03)
 unreleased:
   - this release is under development
+fixed:
+  - news2rss(): adjusted to newer HTML scheme again, which now uses
+    <html><body><div><main> instead of <html><body><div> for its content
 changed:
   - ChangeLog: corrected the entry that a workaround for XiMpLe was added
     to not get confused by an empty "defer" attribute; this was fixed in
