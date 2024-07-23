@@ -18,7 +18,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyLoad: yes
 Authors@R: c(person(given="m.eik", family="michalke", email="meik.michalke@hhu.de", role=c("aut", "cre")), person(given="Robert", family="Nuske", role=c("ctb")))
-Version: 0.10-2
+Version: 0.10-3
 Date: 2024-07-23
 RoxygenNote: 7.3.1
 Collate: 
