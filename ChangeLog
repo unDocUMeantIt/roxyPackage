@@ -1,16 +1,14 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.10-2 (2023-03-03)
-unreleased:
-  - this release is under development
+changes in version 0.10-2 (2024-07-23)
 fixed:
   - news2rss(): adjusted to newer HTML scheme again, which now uses
     <html><body><div><main> instead of <html><body><div> for its content
 changed:
-  - ChangeLog: corrected the entry that a workaround for XiMpLe was added
-    to not get confused by an empty "defer" attribute; this was fixed in
-    XiMpLe 0.11-1 and so the workaround had been removed before the final
-    0.10-1 release of roxyPackage
+  - ChangeLog: corrected the entry that a workaround for XiMpLe was added to
+    not get confused by an empty "defer" attribute; this was fixed in XiMpLe
+    0.11-1 and so the workaround had been removed before the final 0.10-1
+    release of roxyPackage
 
 changes in version 0.10-1 (2023-03-03)
 fixed:
@@ -736,8 +734,8 @@ changed:
 
 changes in version 0.02-3 (2012-04-05)
   - using Rd2pdf instead of Rd2dvi for R >= 2.15 now; in 'Rcmd.options',
-    Rd2dvi will still be recognized, though
-    zip() should now ignore backup files (ending with a tilde)
+    Rd2dvi will still be recognized, though zip() should now ignore backup
+    files (ending with a tilde)
 
 changes in version 0.02-2 (2012-03-18)
   - RSS feeds in HTML header now also state the package name (action "html")
@@ -745,15 +743,12 @@ changes in version 0.02-2 (2012-03-18)
 
 changes in version 0.02-1 (2012-03-14)
   - added new function news2rss() to write RSS feeds (XML) from
-    NEWS.Rd/NEWS.html files
-    action "html" now adds the RSS feed for a package to the HTML header and
-    news link
-    exported a new function, cl2news(), which now carries out the action by
-    the same name, but can also used stand-alone
-    added dependency to the XiMpLe package to make the handling of all
-    HTML/XML stuff easier
-    removed "target" attributes from HTML anchors to comply with XHTML 1.0
-    strict
+    NEWS.Rd/NEWS.html files action "html" now adds the RSS feed for a package
+    to the HTML header and news link exported a new function, cl2news(),
+    which now carries out the action by the same name, but can also used
+    stand-alone added dependency to the XiMpLe package to make the handling
+    of all HTML/XML stuff easier removed "target" attributes from HTML
+    anchors to comply with XHTML 1.0 strict
 
 changes in version 0.01-20 (2012-03-11)
   - action "html" now also writes an index.html file to the repository root
@@ -761,15 +756,12 @@ changes in version 0.01-20 (2012-03-11)
 
 changes in version 0.01-19 (2012-03-10)
   - added option to manually specify options to the internal R CMD calls to
-    roxy.package()
-    fixed build for multiple R homes, now using R CMD INSTALL instead of
-    install.packages()
-    OS is now checked and on Windows shell() is used instead of system()
-    fixed broken "check" action on Windows
-    added action "cl2news" to transform ChangeLogs into NEWS.Rd
-    action "html" now transforms inst/NEWS.Rd into NEWS.html and links this
-    in index.html, if found
-    replaced unicode symbols in entities() with \uxxxx ASCII escapes
+    roxy.package() fixed build for multiple R homes, now using R CMD INSTALL
+    instead of install.packages() OS is now checked and on Windows shell() is
+    used instead of system() fixed broken "check" action on Windows added
+    action "cl2news" to transform ChangeLogs into NEWS.Rd action "html" now
+    transforms inst/NEWS.Rd into NEWS.html and links this in index.html, if
+    found replaced unicode symbols in entities() with \uxxxx ASCII escapes
 
 changes in version 0.01-18 (2012-02-09)
   - removed null function roxygen() from package description files, NULL
@@ -784,10 +776,9 @@ changes in version 0.01-16 (2011-11-21)
     (thanks to natalia belgorodski for reporting the issue)
 
 changes in version 0.01-15 (2011-11-10)
-  - added support for HTML citation info
-    added function entities(), mainly to scramble mail adresses
-    html package info now also links to ChangeLog, if found
-    fixed typo in html descriptions (some missing colons)
+  - added support for HTML citation info added function entities(), mainly to
+    scramble mail adresses html package info now also links to ChangeLog, if
+    found fixed typo in html descriptions (some missing colons)
 
 changes in version 0.01-14 (2011-11-09)
   - roxy.package() now tries to read DESCRIPTION if pck.description=NULL
@@ -813,12 +804,12 @@ changes in version 0.01-8 (2011-09-16)
   - enhanced handling of Authors@R for CITATION files
 
 changes in version 0.01-7 (2011-09-11)
-  - added support for "Authors@R", as needed by R >= 2.14
-    added support for different "Type" values in DESCRIPTION
+  - added support for "Authors@R", as needed by R >= 2.14 added support for
+    different "Type" values in DESCRIPTION
 
 changes in version 0.01-6 (2011-09-01)
-  - added package check action
-    added option to keep/remove vignette PDF in source package
+  - added package check action added option to keep/remove vignette PDF in
+    source package
 
 changes in version 0.01-5 (2011-08-22)
   - updated docs
@@ -830,8 +821,8 @@ changes in version 0.01-3 (2011-08-18)
   - added support for "Author@R" and CITATION files
 
 changes in version 0.01-2 (2011-08-17)
-  - added tools dependency to use write_PACKAGES()
-    added mac OS X support (pure R only)
+  - added tools dependency to use write_PACKAGES() added mac OS X support
+    (pure R only)
 
 changes in version 0.01-1 (2011-08-14)
   - initial release via reaktanz.de

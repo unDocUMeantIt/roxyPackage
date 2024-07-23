@@ -1,13 +1,27 @@
 \name{NEWS}
 \title{News for Package 'roxyPackage'}
 \encoding{UTF-8}
+\section{Changes in roxyPackage version 0.10-2 (2024-07-23)}{
+  \subsection{fixed}{
+    \itemize{
+      \item \code{news2rss()}: adjusted to newer HTML scheme again, which now uses
+        <html><body><div><main> instead of <html><body><div> for its content
+    }
+  }
+  \subsection{changed}{
+    \itemize{
+      \item ChangeLog: corrected the entry that a workaround for XiMpLe was added to
+        not get confused by an empty \code{"defer"} attribute; this was fixed in XiMpLe
+        0.11-1 and so the workaround had been removed before the final 0.10-1
+        release of roxyPackage
+    }
+  }
+}
 \section{Changes in roxyPackage version 0.10-1 (2023-03-03)}{
   \subsection{fixed}{
     \itemize{
       \item \code{news2rss()}: adjusted to newer HTML scheme, which now uses
-        <html><body><div> instead of just <html><body> for its content; also a
-        workaround was added for XiMpLe getting confused by an empty \code{"defer"}
-        argument
+        <html><body><div> instead of just <html><body> for its content
       \item \code{debianizeKeyring()}: default package description now uses a proper
         synopsis
       \item \code{debianize()}/debianizeKeyring(): description lines are now adjusted to
@@ -1007,8 +1021,8 @@
 \section{Changes in roxyPackage version 0.02-3 (2012-04-05)}{
   \itemize{
     \item using Rd2pdf instead of Rd2dvi for R >= 2.15 now; in 'Rcmd.options',
-      Rd2dvi will still be recognized, though
-      \code{zip()} should now ignore backup files (ending with a tilde)
+      Rd2dvi will still be recognized, though \code{zip()} should now ignore backup
+      files (ending with a tilde)
   }
 }
 \section{Changes in roxyPackage version 0.02-2 (2012-03-18)}{
@@ -1020,15 +1034,12 @@
 \section{Changes in roxyPackage version 0.02-1 (2012-03-14)}{
   \itemize{
     \item added new function \code{news2rss()} to write RSS feeds (XML) from
-      NEWS.Rd/NEWS.html files
-      action \code{"html"} now adds the RSS feed for a package to the HTML header and
-      news link
-      exported a new function, \code{cl2news()}, which now carries out the action by
-      the same name, but can also used stand-alone
-      added dependency to the XiMpLe package to make the handling of all
-      HTML/XML stuff easier
-      removed \code{"target"} attributes from HTML anchors to comply with XHTML 1.0
-      strict
+      NEWS.Rd/NEWS.html files action \code{"html"} now adds the RSS feed for a package
+      to the HTML header and news link exported a new function, \code{cl2news()},
+      which now carries out the action by the same name, but can also used
+      stand-alone added dependency to the XiMpLe package to make the handling
+      of all HTML/XML stuff easier removed \code{"target"} attributes from HTML
+      anchors to comply with XHTML 1.0 strict
   }
 }
 \section{Changes in roxyPackage version 0.01-20 (2012-03-11)}{
@@ -1040,15 +1051,12 @@
 \section{Changes in roxyPackage version 0.01-19 (2012-03-10)}{
   \itemize{
     \item added option to manually specify options to the internal R CMD calls to
-      \code{roxy.package()}
-      fixed build for multiple R homes, now using R CMD INSTALL instead of
-      \code{install.packages()}
-      OS is now checked and on Windows \code{shell()} is used instead of \code{system()}
-      fixed broken \code{"check"} action on Windows
-      added action \code{"cl2news"} to transform ChangeLogs into NEWS.Rd
-      action \code{"html"} now transforms inst/NEWS.Rd into NEWS.html and links this
-      in index.html, if found
-      replaced unicode symbols in \code{entities()} with \\uxxxx ASCII escapes
+      \code{roxy.package()} fixed build for multiple R homes, now using R CMD INSTALL
+      instead of \code{install.packages()} OS is now checked and on Windows \code{shell()} is
+      used instead of \code{system()} fixed broken \code{"check"} action on Windows added
+      action \code{"cl2news"} to transform ChangeLogs into NEWS.Rd action \code{"html"} now
+      transforms inst/NEWS.Rd into NEWS.html and links this in index.html, if
+      found replaced unicode symbols in \code{entities()} with \\uxxxx ASCII escapes
   }
 }
 \section{Changes in roxyPackage version 0.01-18 (2012-02-09)}{
@@ -1071,10 +1079,9 @@
 }
 \section{Changes in roxyPackage version 0.01-15 (2011-11-10)}{
   \itemize{
-    \item added support for HTML citation info
-      added function \code{entities()}, mainly to scramble mail adresses
-      html package info now also links to ChangeLog, if found
-      fixed typo in html descriptions (some missing colons)
+    \item added support for HTML citation info added function \code{entities()}, mainly to
+      scramble mail adresses html package info now also links to ChangeLog, if
+      found fixed typo in html descriptions (some missing colons)
   }
 }
 \section{Changes in roxyPackage version 0.01-14 (2011-11-09)}{
@@ -1116,14 +1123,14 @@
 }
 \section{Changes in roxyPackage version 0.01-7 (2011-09-11)}{
   \itemize{
-    \item added support for "Authors@R", as needed by R >= 2.14
-      added support for different \code{"Type"} values in DESCRIPTION
+    \item added support for "Authors@R", as needed by R >= 2.14 added support for
+      different \code{"Type"} values in DESCRIPTION
   }
 }
 \section{Changes in roxyPackage version 0.01-6 (2011-09-01)}{
   \itemize{
-    \item added package check action
-      added option to keep/remove vignette PDF in source package
+    \item added package check action added option to keep/remove vignette PDF in
+      source package
   }
 }
 \section{Changes in roxyPackage version 0.01-5 (2011-08-22)}{
@@ -1143,8 +1150,8 @@
 }
 \section{Changes in roxyPackage version 0.01-2 (2011-08-17)}{
   \itemize{
-    \item added tools dependency to use \code{write_PACKAGES()}
-      added mac OS X support (pure R only)
+    \item added tools dependency to use \code{write_PACKAGES()} added mac OS X support
+      (pure R only)
   }
 }
 \section{Changes in roxyPackage version 0.01-1 (2011-08-14)}{
