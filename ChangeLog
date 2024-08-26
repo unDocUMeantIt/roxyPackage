@@ -1,8 +1,12 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.10-3 (2024-07-23)
+changes in version 0.10-3 (2024-08-26)
 unreleased:
   - this version is under development
+fixed:
+  - unit tests: rewrote roxyPackage:::getRvers() to use Rscript instead of
+    R to determine R version. this should now produce a usable version
+    string also for R develop. also suffixed ".exe" for windows environments
 
 changes in version 0.10-2 (2024-07-23)
 fixed:

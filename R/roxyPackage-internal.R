@@ -136,21 +136,19 @@ checkTools <-function(...){
 getRvers <- function(R.homes=R.home(), win=FALSE){
   if(isTRUE(get.roxyEnv("Rdevel"))){
     # special case: someone's trying R-devel which doesn't have a version number set
-    R.Version.full <- get.roxyEnv("Rversion")
+    R_version_full <- get.roxyEnv("Rversion")
   } else {
-    R.bin <- file.path(R.homes, "bin", "R")
+    Rscript_bin <- file.path(R.homes, "bin", "Rscript")
     if(isUNIX()){
-      R.Version.full <- system(paste0(R.bin, " --version"), intern=TRUE)
+      R_version_full <- system(paste0(Rscript_bin, " -e \"cat(paste0(R.Version()[c('major', 'minor')], collapse='.'))\""), intern=TRUE)
     } else {
-      R.Version.full <- shell(paste0(R.bin, " --version"), translate=TRUE, intern=TRUE)
+      R_version_full <- shell(paste0(Rscript_bin, ".exe -e \"cat(paste0(R.Version()[c('major', 'minor')], collapse='.'))\""), translate=TRUE, intern=TRUE)
     }
-    R.Version.full <- R.Version.full[grep("R version ([[:digit:]]+).([[:digit:]]+)", R.Version.full)]
-    R.Version.full <- gsub("R version ([[:digit:]]+).([[:digit:]]+)([.]?)([[:digit:]]+)(.*)", "\\1.\\2\\3\\4", R.Version.full, perl=TRUE)
   }
   if(isTRUE(win)){
-    R.Version.full <- gsub("([[:digit:]]+).([[:digit:]]+)(.*)", "\\1.\\2", R.Version.full, perl=TRUE)
+    R_version_full <- gsub("([[:digit:]]+).([[:digit:]]+)(.*)", "\\1.\\2", R_version_full, perl=TRUE)
   }
-  return(R.Version.full)
+  return(R_version_full)
 } ## end function getRvers()
 
 
