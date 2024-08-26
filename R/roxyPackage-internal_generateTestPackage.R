@@ -2,42 +2,43 @@
 # can be used to quickly setup a primitive test package and  environment
 # the functions returns a named list of values to be used for testing
 generateTestPackage <- function(
-  rootDir=file.path(tempdir(), "roxyPackageTest"),
-  version="0.01-1",
-  packageDescription=data.frame(
-    Package="examplePackage",
-    Type="Package",
-    Title="An R Example Package",
-    Author="Ernst A. D\u00F6lle [aut, cre, cph], Ludwig D\u00F6lle [trl, ctb] (initial translation to whitespace)",
-    AuthorsR="c(person(given=\"Ernst\", family=\"D\u00F6lle\",
-        email=\"e.a.doelle@example.com\",
-        role=c(\"aut\", \"cre\", \"cph\")),
-      person(given=\"Ludwig\", family=\"D\u00F6lle\",
-        role=c(\"trl\", \"ctb\"),
-        comment=\"initial translation to whitespace\")
-      )",
-    Maintainer="Ernst A. D\u00F6lle <e.a.doelle@example.com>",
-    Depends="R (>= 2.10.0)",
-    Description="Provides a great function to produce NULL results.",
-    License="GPL (>= 3)",
-    Encoding="UTF-8",
-    LazyLoad="yes",
-    URL="http://example.com/doelleInnovations",
-    stringsAsFactors=FALSE
-  ),
-  changeLog=list(
-    added=c("new extra NULL feature", "new oblivion matrix"),
-    fixed=c("finally resolved the reandom results bug")
-  ),
-  deb.options=list(
-    build.dir=rootDir,
-    repo.name="doelle",
-    deb.description=list(
-      Maintainer="Ernst A. D\u00F6lle <e.a.doelle@example.com>"
-    ),
-    keep.build=FALSE
-  ),
-  URL="http://example.com/doelleInnovations/repo"
+    rootDir=file.path(tempdir(), "roxyPackageTest")
+  , version="0.01-1"
+  , packageDescription=data.frame(
+        Package="examplePackage"
+      , Type="Package"
+      , Title="An R Example Package"
+      , Author="Ernst A. D\u00F6lle [aut, cre, cph], Ludwig D\u00F6lle [trl, ctb] (initial translation to whitespace)"
+      , AuthorsR="c(person(given=\"Ernst\", family=\"D\u00F6lle\",
+            email=\"e.a.doelle@example.com\",
+            role=c(\"aut\", \"cre\", \"cph\")),
+          person(given=\"Ludwig\", family=\"D\u00F6lle\",
+            role=c(\"trl\", \"ctb\"),
+            comment=\"initial translation to whitespace\")
+          )"
+      , Maintainer="Ernst A. D\u00F6lle <e.a.doelle@example.com>"
+      , Depends="R (>= 2.10.0)"
+      , Description="Provides a great function to produce NULL results."
+      , License="GPL (>= 3)"
+      , Encoding="UTF-8"
+      , LazyLoad="yes"
+      , URL="http://example.com/doelleInnovations"
+      , stringsAsFactors=FALSE
+    )
+  , changeLog=list(
+        added=c("new extra NULL feature", "new oblivion matrix")
+      , fixed=c("finally resolved the reandom results bug")
+    )
+  , deb.options=list(
+        build.dir=rootDir
+      , repo.name="doelle"
+      , deb.description=list(
+          Maintainer="Ernst A. D\u00F6lle <e.a.doelle@example.com>"
+        )
+      , keep.build=FALSE
+    )
+  , URL="http://example.com/doelleInnovations/repo"
+  , permit_remove=TRUE
 ){
   result <- list()
   # call an internal shortcut to get the R version without patch level
@@ -59,6 +60,7 @@ generateTestPackage <- function(
   result[["changeLog"]] <- changeLog
   result[["deb.options"]] <- deb.options
   result[["URL"]] <- URL
+  result[["permit_remove"]] <- permit_remove
   
   if(!isTRUE(file_test("-d", result[["R"]]))){
     dir.create(result[["R"]], showWarnings=TRUE, recursive=TRUE)
@@ -76,13 +78,10 @@ generateTestPackage <- function(
 
 # quietly clean up the mess
 # takes the list retuend by generateTestPackage() and removes the root directory
-# optionally only if the path starts with the current value of tempdir()
-removeTestPackage <- function(testPackage, onlyIfTempdir=TRUE){
+# only if it was permitted during creation
+removeTestPackage <- function(testPackage){
   stopifnot("rootDir" %in% names(testPackage))
-  if(isTRUE(onlyIfTempdir)){
-    currentTempDir <- tempdir()
-    stopifnot(grepl(paste0("^", tempdir()), testPackage[["rootDir"]]))
-  } else {}
+  stopifnot(isTRUE(testPackage[["permit_remove"]]))
   if(isTRUE(file_test("-d", testPackage[["rootDir"]]))){
     unlink(testPackage[["rootDir"]], recursive=TRUE)
   } else {}
