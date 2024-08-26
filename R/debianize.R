@@ -167,7 +167,7 @@
 #' Eddelbuettel, D. & Bates, D. (2003). \emph{Debian R Policy -- Draft Proposal v 0.1.3}.
 #'   Available from \url{https://lists.debian.org/debian-devel/2003/12/msg02332.html}
 #'
-#' [1] Debian Policy Manual: \url{https://www.debian.org/doc/debian-policy}
+#' [1] Debian Policy Manual: \url{https://www.debian.org/doc/debian-policy/}
 #' @export
 #' @examples
 #' \dontrun{

@@ -7,6 +7,11 @@ fixed:
   - unit tests: rewrote roxyPackage:::getRvers() to use Rscript instead of
     R to determine R version. this should now produce a usable version
     string also for R develop. also suffixed ".exe" for windows environments
+  - unit tests: improved roxyPackage:::generateTestPackage() and
+    roxyPackage:::removeTestPackage() so unlinking also works in
+    windows environments
+  - renamed internal function split.chars() into split_chars() to avoid
+    warnings from CRAN check
 
 changes in version 0.10-2 (2024-07-23)
 fixed:

@@ -1,4 +1,4 @@
-# Copyright 2011-2023 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2024 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -819,10 +819,10 @@ XML.value <- function(tag){
 } ## end function XML.value()
 
 
-## function split.chars()
+## function split_chars()
 # used to split a character string into parts at each occurrence of the start and end of a regex pattern
 # this private function was originally a part of the XiMpLe package and copied here in a simplified version
-split.chars <- function(txt, pattern){
+split_chars <- function(txt, pattern){
   found.pattern <- gregexpr(pattern, text=txt, perl=TRUE)
   found.pattern.start <- found.pattern[[1]]
   found.pattern.end <- found.pattern.start + attr(found.pattern[[1]], "match.length") - 1
@@ -863,7 +863,7 @@ split.chars <- function(txt, pattern){
     ), use.names=FALSE)
     return(result)
   }
-} ## end function split.chars()
+} ## end function split_chars()
 
 
 ## function XML.single.tags()
@@ -893,7 +893,7 @@ XML.single.tags <- function(tree){
   single.tags <- sapply(
     tree,
     function(this.tree){
-      these.tags <- unlist(split.chars(txt=this.tree, "<((?s).*?)>"), use.names=FALSE)
+      these.tags <- unlist(split_chars(txt=this.tree, "<((?s).*?)>"), use.names=FALSE)
       # remove probably troublesome content like newlines
       these.tags[!XML.value(these.tags)] <- gsub("[[:space:]]+", " ", these.tags[!XML.value(these.tags)])
       return(these.tags)
