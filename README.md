@@ -1,6 +1,6 @@
 # roxyPackage
 
-roxyPackage is a collection of tools to automate packaging of [R](https://r-project.org) code.
+roxyPackage is a collection of tools to automate packaging of [R](https://www.r-project.org) code.
 
 The intention of this package is to make packaging R code as easy as possible. 'roxyPackage' uses
 tools from the 'roxygen2' package to generate documentation. It also automatically generates and
@@ -37,7 +37,7 @@ If you're running a Debian based operating system, you might be interested in th
 
 ### Installation via GitHub
 
-To install it directly from GitHub, you can use `install_github()` from the [devtools](https://github.com/hadley/devtools) package:
+To install it directly from GitHub, you can use `install_github()` from the [devtools](https://github.com/r-lib/devtools) package:
 
 ```r
 devtools::install_github("unDocUMeantIt/roxyPackage") # stable release
@@ -63,7 +63,7 @@ branch will be rejected, as it is reserved for the current stable release.
 
 ## Licence
 
-Copyright 2012-2022 Meik Michalke <meik.michalke@hhu.de>
+Copyright 2012-2024 Meik Michalke <meik.michalke@hhu.de>
 
 roxyPackage is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

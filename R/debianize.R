@@ -1,4 +1,4 @@
-# Copyright 2011-2023 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2024 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -67,9 +67,9 @@
 #' in the specified directory (can be the same as used with \code{roxy.package}). You can now access it locally on your machine, or upload the whole thing
 #' to a web server etc. Basically, it should work if you add these lines to your repository configuration:
 #' 
-#' \code{deb http://<URL you uploaded to>/deb <distribution> <component>}
+#' \code{deb https://<URL you uploaded to>/deb <distribution> <component>}
 #'
-#' \code{deb-src http://<URL you uploaded to>/deb <distribution> <component>}
+#' \code{deb-src https://<URL you uploaded to>/deb <distribution> <component>}
 #' 
 #' @section Debianizing arbitrary packages: With a little luck, this function can almot automatically debianize any R package sources. You can even provide
 #' the \code{pck.source.dir} parameter with a URL to package sources (e.g., a source package from CRAN), and \code{debianize} will do its best to end up
@@ -165,9 +165,9 @@
 #' @seealso \code{\link[roxyPackage:sandbox]{sandbox}} to run debianize() in a sandbox.
 #' @references
 #' Eddelbuettel, D. & Bates, D. (2003). \emph{Debian R Policy -- Draft Proposal v 0.1.3}.
-#'   Available from \url{http://lists.debian.org/debian-devel/2003/12/msg02332.html}
+#'   Available from \url{https://lists.debian.org/debian-devel/2003/12/msg02332.html}
 #'
-#' [1] Debian Policy Manual: \url{http://www.debian.org/doc/debian-policy}
+#' [1] Debian Policy Manual: \url{https://www.debian.org/doc/debian-policy}
 #' @export
 #' @examples
 #' \dontrun{
@@ -184,7 +184,7 @@
 #'
 #' # let's try to debianize some R package from CRAN
 #' debianize(
-#'   pck.source.dir="http://cran.r-project.org/src/contrib/roxygen2_4.0.1.tar.gz",
+#'   pck.source.dir="https://cran.r-project.org/src/contrib/roxygen2_4.0.1.tar.gz",
 #'   repo.root=tempdir(),
 #'   deb.description=list(
 #'     Maintainer="A. Sistent <sistent@@eternalwondermaths.example.org>"
