@@ -1,6 +1,6 @@
 ChangeLog for package roxyPackage
 
-changes in version 0.10-3 (2024-08-26)
+changes in version 0.10-3 (2024-08-28)
 unreleased:
   - this version is under development
 fixed:
@@ -12,6 +12,8 @@ fixed:
     windows environments
   - renamed internal function split.chars() into split_chars() to avoid
     warnings from CRAN check
+added:
+  - cl2newsmd(): new function to generate NEWS.md files from ChangeLogs
 
 changes in version 0.10-2 (2024-07-23)
 fixed:
