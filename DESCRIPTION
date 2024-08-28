@@ -29,7 +29,7 @@ Authors@R: c(person(given="m.eik", family="michalke",
         email="meik.michalke@hhu.de", role=c("aut", "cre")),
         person(given="Robert", family="Nuske", role=c("ctb")))
 Version: 0.10-3
-Date: 2024-08-26
+Date: 2024-08-28
 RoxygenNote: 7.3.1
 Collate: 
     '00_classes_01_ChangeLog_internal.R'
@@ -41,6 +41,7 @@ Collate:
     'archive.packages.R'
     'citationText.R'
     'cl2news.R'
+    'cl2newsmd.R'
     'debianize.R'
     'debianizeKeyring.R'
     'dep4deb.R'

@@ -44,6 +44,7 @@ set.roxyEnv(name="sandbox", value=new("roxySandbox", active=FALSE))
 ## work around some limitations regarding private functions
 installMD5sums <- getFromNamespace(".installMD5sums", "tools")
 news2Rd <- getFromNamespace("news2Rd", "tools")
+.news_reader_default <- getFromNamespace(".news_reader_default", "tools")
 
 # gegerate some XML functions (requires XiMpLe >= 0.11-1)
 gen_tag_functions(
@@ -993,3 +994,20 @@ fetch_inst_from_package <- function(dir, pckg="roxyPackage"){
     stop(simpleError(paste0("none of these directories found:\n  ", std_dir, "\n  ", src_dir)))
   }
 } ## end function fetch_inst_from_package()
+
+
+## function codify_md()
+# emulate what codify does in tools:::news2Rd()
+codify_md <- function(
+    text
+  , codify = TRUE
+  , regexp="(\\W|^)(\"[[:alnum:]_.]*\"|[[:alnum:]_.:]+\\(\\))(\\W|$)"
+){
+  text <- gsub("@", "\\\\@", text)
+  text <- gsub("<", "\\\\<", text)
+  if(isTRUE(codify)){
+    return(gsub(regexp, "\\1`\\2`\\3", text))
+  } else {
+    return(text)
+  }
+} ## end function codify_md()

@@ -13,7 +13,7 @@ cl2news(log, news = NULL, codify = TRUE, overwrite = TRUE)
 If \code{NULL}, results are written to \code{stdout()}.}
 
 \item{codify}{Logical,
-      whether to try to detect code snippets like function names and markup them accordingly.}
+      whether to try to detect code snippets like function names and mark them up accordingly.}
 
 \item{overwrite}{Logical, whether to overwrite an existing NEWS.Rd file.}
 }
@@ -21,16 +21,17 @@ If \code{NULL}, results are written to \code{stdout()}.}
 No return value, writes a file.
 }
 \description{
-This function attempts to translate ASCII ChangeLog (or NEWS) files into NEWS.Rd files.
+Attempts to translate ASCII ChangeLog (or NEWS) files into NEWS.Rd files.
 }
 \details{
 This should work for ChangeLog and NEWS files that
 \enumerate{
-  \item have entries named "Changes in version <version number>" (and optionally a YYYY-MM-DD date string afterwards)
+  \item have entries named "Changes in version <version number>" (and optionally a parenthetica YYYY-MM-DD date string afterwards)
   \item have single changes properly itemized, by indentation and then either \code{"o"},
       \code{"-"} or \code{"*"} followed
     by space
-  \item optionally have categories as subsections, like "Fixed" or "Added"
+  \item optionally have categories as subsections, like "Changed", "Fixed", "Added",
+      or "Removed"
 }
 Any text string that isn't indented and doesn't start with "Changes in version" will likely be treated as a subsection.
 The ChangeLog related functions and methods of this package,

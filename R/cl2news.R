@@ -1,4 +1,4 @@
-# Copyright 2011-2022 Meik Michalke <meik.michalke@hhu.de>
+# Copyright 2011-2024 Meik Michalke <meik.michalke@hhu.de>
 #
 # This file is part of the R package roxyPackage.
 #
@@ -18,14 +18,14 @@
 
 #' Convert ChangeLog/NEWS into NEWS.Rd
 #' 
-#' This function attempts to translate ASCII ChangeLog (or NEWS) files into NEWS.Rd files.
+#' Attempts to translate ASCII ChangeLog (or NEWS) files into NEWS.Rd files.
 #' 
 #' This should work for ChangeLog and NEWS files that
 #' \enumerate{
-#'   \item have entries named "Changes in version <version number>" (and optionally a YYYY-MM-DD date string afterwards)
+#'   \item have entries named "Changes in version <version number>" (and optionally a parenthetica YYYY-MM-DD date string afterwards)
 #'   \item have single changes properly itemized, by indentation and then either \code{"o"}, \code{"-"} or \code{"*"} followed
 #'     by space
-#'   \item optionally have categories as subsections, like "Fixed" or "Added"
+#'   \item optionally have categories as subsections, like "Changed", "Fixed", "Added", or "Removed"
 #' }
 #' Any text string that isn't indented and doesn't start with "Changes in version" will likely be treated as a subsection.
 #' The ChangeLog related functions and methods of this package, e.g. \code{\link[roxyPackage:initChangeLog]{initChangeLog}}, are
@@ -36,7 +36,7 @@
 #' @param log Character string, path to the ChangeLog or NEWS file to be converted.
 #' @param news Character string, path to the NEWS.Rd file to be written.
 #'   If \code{NULL}, results are written to \code{stdout()}.
-#' @param codify Logical, whether to try to detect code snippets like function names and markup them accordingly.
+#' @param codify Logical, whether to try to detect code snippets like function names and mark them up accordingly.
 #' @param overwrite Logical, whether to overwrite an existing NEWS.Rd file.
 #' @return No return value, writes a file.
 #' @seealso
@@ -67,6 +67,7 @@ cl2news <- function(log, news=NULL, codify=TRUE, overwrite=TRUE){
       on.exit(unlink(tmp.NEWS.Rd))
     }
     wrote.RD.file <- tryCatch(
+      # news2Rd is fetched from the tools package in roxyPackage-internal.R
       news2Rd(file=log, out=tmp.NEWS.Rd, codify=codify),
         error=function(e){
           warning(paste0("news: could not translate ", log," into NEWS.Rd file!"), call.=FALSE)

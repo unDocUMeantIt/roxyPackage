@@ -2,6 +2,7 @@
 
 export(archive.packages)
 export(cl2news)
+export(cl2newsmd)
 export(debianize)
 export(debianizeKeyring)
 export(dep4deb)
